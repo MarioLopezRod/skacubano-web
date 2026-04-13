@@ -42,7 +42,7 @@ export default function Albums() {
   const [activeAlbum, setActiveAlbum] = useState(null);
 
   return (
-    <section className="min-h-screen w-full bg-[#f3eac0] flex flex-col items-center justify-center overflow-hidden px-4 py-16">
+    <section id="music"className="min-h-screen w-full bg-[#f3eac0] flex flex-col items-center justify-center overflow-hidden px-4 py-16">
       
       <h2 className="text-3xl md:text-6xl font-black text-[#d35400] mb-12 tracking-tighter text-center italic">
         DISCOGRAFÍA

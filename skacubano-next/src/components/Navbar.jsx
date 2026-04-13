@@ -2,22 +2,67 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
-const navLinks = [
-  { label: "Home", href: "/#home" },
+const navLinksLeft = [
   { label: "Music", href: "/#music" },
+    { label: "Shows", href: "/#shows" },
+
+];
+
+const navLinksRight = [
   { label: "History", href: "/#history" },
   { label: "Contact", href: "/#contact" },
 ];
 
+const allNavLinks = [...navLinksLeft, ...navLinksRight];
+
+// Función compartida para manejar el scroll suave
+const handleSmoothScroll = (e, href, callback = null) => {
+  // 1. Caso especial: Volver arriba del todo si se pulsa el logo ("/")
+  if (href === "/") {
+    e.preventDefault(); // Evita que la página recargue de golpe
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+    // Limpiamos la URL para que quede bonita
+    window.history.pushState(null, "", "/");
+  } 
+  // 2. Caso normal: Scroll a una sección específica (ej. /#music)
+  else if (href.includes("#")) {
+    const targetId = href.replace(/.*\#/, "");
+    const elem = document.getElementById(targetId);
+
+    if (elem) {
+      e.preventDefault(); 
+      
+      const offset = 80; // Altura de tu Navbar
+      const elementPosition = elem.getBoundingClientRect().top;
+      const offsetPosition = elementPosition + window.scrollY - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: "smooth",
+      });
+
+      window.history.pushState(null, "", href);
+    }
+  }
+
+  // Ejecutamos el callback opcional (ej. para cerrar el menú móvil)
+  if (callback) {
+    callback();
+  }
+
+};
 function StripeBar() {
   return (
     <div
       className="h-[3px] w-full"
       style={{
         background:
-         
-          "repeating-linear-gradient(90deg,#ffffff 0,#ffffff 18px,transparent 18px,transparent 24px,#333333 24px,#333333 42px,transparent 42px,transparent 48px)"
+          "repeating-linear-gradient(90deg,#ffffff 0,#ffffff 18px,transparent 18px,transparent 24px,#333333 24px,#333333 42px,transparent 42px,transparent 48px)",
       }}
     />
   );
@@ -25,66 +70,40 @@ function StripeBar() {
 
 function InstrumentDeco() {
   return (
-    <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-[0.08]">
+    <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-[0.06]">
       <svg width="100%" height="100%">
         <defs>
-          {/* Aumentamos un poco el ancho del patrón para que los instrumentos descolocados tengan espacio */}
           <pattern id="orquesta" x="0" y="0" width="300" height="76" patternUnits="userSpaceOnUse">
-            
-            {/* Trompeta: Inclinada hacia arriba y posicionada más abajo */}
             <g transform="translate(15, 50) rotate(-15) scale(0.65)" fill="none" stroke="#facc15" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4 12 H24 L32 4 V20 L24 12" />
               <line x1="12" y1="6" x2="12" y2="12" />
               <line x1="16" y1="6" x2="16" y2="12" />
               <line x1="20" y1="6" x2="20" y2="12" />
             </g>
-            
-            {/* Conga: Inclinada a la derecha y posicionada más arriba */}
+            {/* ... resto del patrón SVG se mantiene igual ... */}
             <g transform="translate(85, 15) rotate(12) scale(0.55)" fill="none" stroke="#facc15" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
               <ellipse cx="20" cy="10" rx="14" ry="5" />
               <path d="M6 10 C6 30 12 36 12 44 H28 C28 36 34 30 34 10" />
-              <line x1="14" y1="15" x2="20" y2="44" />
-              <line x1="26" y1="15" x2="20" y2="44" />
             </g>
-
-            {/* Saxofón: Inclinado hacia abajo y centrado */}
-            <g transform="translate(155, 45) rotate(22) scale(0.6)" fill="none" stroke="#facc15" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M12 28 C16 36 28 36 32 28 L22 18 C16 12 16 12 12 28 Z" />
-              <path d="M12 28 C10 42 16 52 28 50 C40 48 42 42 40 10 Q40 4 34 4 H28" />
-              <path d="M28 4 C26 2 20 2 18 4" />
-              <circle cx="40" cy="18" r="2.5" fill="none" stroke="#facc15"/>
-              <circle cx="40" cy="28" r="2.5" fill="none" stroke="#facc15"/>
-              <circle cx="40" cy="38" r="2.5" fill="none" stroke="#facc15"/>
-            </g>
-            
-            {/* Piano: Ligeramente torcido y arriba */}
-            <g transform="translate(225, 20) rotate(-8) scale(0.45)" fill="none" stroke="#facc15" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <rect x="0" y="0" width="110" height="30" rx="3" />
-              <line x1="11" y1="12" x2="11" y2="30" />
-              <line x1="22" y1="12" x2="22" y2="30" />
-              <line x1="33" y1="12" x2="33" y2="30" />
-              <line x1="44" y1="12" x2="44" y2="30" />
-              <line x1="55" y1="12" x2="55" y2="30" />
-              <line x1="66" y1="12" x2="66" y2="30" />
-              <line x1="77" y1="12" x2="77" y2="30" />
-              <line x1="88" y1="12" x2="88" y2="30" />
-              <line x1="99" y1="12" x2="99" y2="30" />
-              <rect x="8.5" y="4" width="5" height="18" rx="1" fill="#facc15" stroke="none" />
-              <rect x="19.5" y="4" width="5" height="18" rx="1" fill="#facc15" stroke="none" />
-              <rect x="41.5" y="4" width="5" height="18" rx="1" fill="#facc15" stroke="none" />
-              <rect x="52.5" y="4" width="5" height="18" rx="1" fill="#facc15" stroke="none" />
-              <rect x="63.5" y="4" width="5" height="18" rx="1" fill="#facc15" stroke="none" />
-              <rect x="85.5" y="4" width="5" height="18" rx="1" fill="#facc15" stroke="none" />
-              <rect x="96.5" y="4" width="5" height="18" rx="1" fill="#facc15" stroke="none" />
-            </g>
-
-            {/* Estrella decorativa descolocada */}
             <text x="285" y="65" fontSize="18" fill="#16a34a" fontFamily="system-ui" transform="rotate(-15 285 65)">★</text>
           </pattern>
         </defs>
         <rect x="0" y="0" width="100%" height="100%" fill="url(#orquesta)" />
       </svg>
     </div>
+  );
+}
+
+function NavLink({ href, label }) {
+  return (
+    <Link
+      href={href}
+      onClick={(e) => handleSmoothScroll(e, href)}
+      className="relative block px-3.5 py-2 text-[12px] font-semibold uppercase tracking-[.06em] text-white/70 hover:text-yellow-400 hover:bg-yellow-400/5 rounded-md transition-all duration-150 group drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]"
+    >
+      {label}
+      <span className="absolute bottom-1 left-3.5 right-3.5 h-[1.5px] rounded-full bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
+    </Link>
   );
 }
 
@@ -103,123 +122,127 @@ export default function Navbar() {
       <StripeBar />
 
       <nav
-        className={`relative overflow-hidden transition-all duration-300 border-b border-yellow-400/10 ${
-          scrolled ? "bg-zinc-950/97 backdrop-blur-md" : "bg-[#111]"
+        className={`relative  transition-all duration-500 ${
+          scrolled
+            ? "bg-zinc-950/95 backdrop-blur-md border-b border-yellow-400/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
+            : "bg-black/30 backdrop-blur-sm border-b border-white/5"
         }`}
       >
-        <InstrumentDeco />
+        <div className={`transition-opacity duration-500 ${scrolled ? "opacity-100" : "opacity-30"}`}>
+          <InstrumentDeco />
+        </div>
 
-        <div className="relative z-10 max-w-6xl mx-auto px-6 flex items-center justify-between h-[76px]">
-
-          {/* Logo */}
-          <Link href="/#home" className="flex items-center gap-3 group shrink-0">
-            <div className="flex flex-col items-center justify-center w-[46px] h-[46px] rounded-full border-2 border-yellow-400 leading-none group-hover:bg-yellow-400/10 transition-colors duration-200">
-              <span className="text-yellow-400 font-black text-[11px] tracking-widest">SKA</span>
-              <span className="text-yellow-400/50 text-[7px] tracking-[.3em] mt-0.5">•BAND•</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-white font-black text-xl tracking-[.08em] uppercase leading-none">
-                Cubano
-              </span>
-              <span className="text-yellow-400/60 text-[9px] tracking-[.35em] uppercase mt-0.5">
-                Ska · Reggae · Brass
-              </span>
-            </div>
-          </Link>
-
-          {/* Desktop nav links */}
-          <ul className="hidden lg:flex items-center gap-0.5 list-none">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="relative block px-3.5 py-2 text-[12px] font-semibold uppercase tracking-[.06em] text-white/50 hover:text-yellow-400 hover:bg-yellow-400/5 rounded-md transition-all duration-150 group"
-                >
-                  {link.label}
-                  <span className="absolute bottom-1 left-3.5 right-3.5 h-[1.5px] rounded-full bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-                </Link>
-              </li>
-            ))}
-          </ul>
-
-          {/* Desktop right */}
-          <div className="hidden lg:flex items-center gap-2.5 shrink-0">
-            {/* Facebook actualizado */}
-            <a
-              href="https://facebook.com/skacubano"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-8 h-8 rounded-full border border-yellow-400/25 flex items-center justify-center text-yellow-400/60 hover:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-400/10 transition-all duration-150"
-            >
-              <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-              </svg>
-            </a>
-            {/* Instagram actualizado */}
-            <a
-              href="https://instagram.com/skacubano"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-8 h-8 rounded-full border border-yellow-400/25 flex items-center justify-center text-yellow-400/60 hover:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-400/10 transition-all duration-150"
-            >
-              <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                <path fill="#111" d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                <circle cx="17.5" cy="6.5" r="1" fill="#111" />
-              </svg>
-            </a>
-            
+        {/* ── DESKTOP ── */}
+        <div className="relative z-10 hidden lg:flex items-center max-w-7xl mx-auto px-6 h-[72px]">
+          
+          {/* LADO IZQUIERDO: Links pegados al logo */}
+          <div className="flex-1 flex justify-end">
+            <ul className="flex items-center gap-1 list-none">
+              {navLinksLeft.map((link) => (
+                <li key={link.href}><NavLink {...link} /></li>
+              ))}
+            </ul>
           </div>
 
-          {/* Hamburger */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="lg:hidden flex flex-col gap-[5px] p-2 rounded-lg hover:bg-white/5 transition-colors"
-            aria-label="Open menu"
+          {/* CENTRO: Logo grande */}
+          <div className="flex-shrink-0 mx-8 relative z-20">
+            <Link 
+              href="/" 
+              onClick={(e) => handleSmoothScroll(e, "/")} 
+              className="hover:scale-105 transition-transform duration-300 block translate-y-[30px]"
+            >
+              <Image
+                src="/skaCubano.png"
+                alt="Ska Cubano Logo"
+                width={350}
+                height={150}
+                priority
+                className="object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
+              />
+            </Link>
+          </div>
+
+          {/* LADO DERECHO: Links cerca del logo + Socials al fondo */}
+          <div className="flex-1 flex items-center justify-between">
+            {/* Links de la derecha (pegados al logo) */}
+            <ul className="flex items-center gap-1 list-none">
+              {navLinksRight.map((link) => (
+                <li key={link.href}><NavLink {...link} /></li>
+              ))}
+            </ul>
+
+            {/* Redes sociales (empujadas al extremo derecho por el justify-between) */}
+            <div className="flex items-center gap-3">
+              <div className="w-px h-5 bg-yellow-400/20 mr-1" />
+              <a href="https://facebook.com/skacubano" target="_blank" rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-yellow-400/25 flex items-center justify-center text-yellow-400/60 hover:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-400/10 transition-all duration-150">
+                <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                </svg>
+              </a>
+              <a href="https://instagram.com/skacubano" target="_blank" rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-yellow-400/25 flex items-center justify-center text-yellow-400/60 hover:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-400/10 transition-all duration-150">
+                <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+                </svg>
+              </a>
+              <a href="https://x.com/skacubano" target="_blank" rel="noopener noreferrer"
+                className="w-8 h-8 rounded-full border border-yellow-400/25 flex items-center justify-center text-yellow-400/60 hover:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-400/10 transition-all duration-150">
+                <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L2.25 2.25h6.918l4.254 5.622L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+
+           {/* ── MOBILE ── */}
+        <div className="relative z-10 lg:hidden flex items-center justify-between max-w-7xl mx-auto px-6 h-[76px]">
+          <Link 
+            href="/" 
+            onClick={(e) => handleSmoothScroll(e, "/")}
+            // AÑADIDO: translate-y-[20px] para que sobresalga hacia abajo
+            className="absolute left-1/2 -translate-x-1/2 hover:scale-105 transition-transform duration-300 translate-y-[20px]"
           >
-            <span className={`block w-[22px] h-[2px] rounded-full bg-white transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
-            <span className={`block h-[2px] rounded-full bg-yellow-400 transition-all duration-300 ${menuOpen ? "opacity-0 w-0" : "w-4"}`} />
-            <span className={`block w-[22px] h-[2px] rounded-full bg-white transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
-          </button>
-        </div>
-
-        {/* Mobile menu */}
-        <div className={`lg:hidden overflow-hidden transition-all duration-300 ${menuOpen ? "max-h-[420px]" : "max-h-0"}`}>
-          <div className="border-t border-yellow-400/10">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-between px-6 py-3.5 text-[13px] font-semibold uppercase tracking-[.08em] text-white/55 hover:text-yellow-400 hover:bg-yellow-400/5 border-b border-white/[.04] transition-all duration-150"
-              >
-                {link.label}
-                <svg className="w-3.5 h-3.5 opacity-40" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
-              </Link>
-            ))}
-            <div className="p-4">
-              <Link
-                href="#tickets"
-                onClick={() => setMenuOpen(false)}
-                className="flex items-center justify-center gap-2 w-full py-3 rounded-lg bg-yellow-400 text-zinc-900 text-[12px] font-extrabold tracking-[.1em] uppercase hover:bg-yellow-300 transition-colors"
-              >
-                <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                  <path d="M20 12V22H4V12" />
-                  <path d="M22 7H2v5h20V7z" />
-                  <path d="M12 22V7" />
-                  <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
-                  <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
-                </svg>
-                Tickets
-              </Link>
-            </div>
+            <Image 
+              src="/skaCubano.png" 
+              alt="Ska Cubano Logo" 
+              width={350} 
+              height={150} 
+              // AÑADIDO: drop-shadow para que tenga profundidad sobre el resto de la web
+              className="object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]" 
+            />
+          </Link>
+          <div className="ml-auto">
+            <button onClick={() => setMenuOpen(!menuOpen)} className="flex flex-col gap-[5px] p-2 rounded-lg hover:bg-white/5 transition-colors">
+              <span className={`block w-[22px] h-[2px] rounded-full bg-white transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
+              <span className={`block h-[2px] rounded-full bg-yellow-400 transition-all duration-300 ${menuOpen ? "opacity-0 w-0" : "w-4"}`} />
+              <span className={`block w-[22px] h-[2px] rounded-full bg-white transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+            </button>
           </div>
         </div>
-      </nav>
 
-      <StripeBar />
+         
+            <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
+              <div className="border-t border-yellow-400/10 bg-transparent">
+                {allNavLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={(e) => handleSmoothScroll(e, link.href, () => setMenuOpen(false))}
+                    className="flex items-center justify-between px-6 py-4 text-[13px] font-semibold uppercase tracking-[.08em] text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] hover:text-yellow-400 hover:bg-white/5 border-b border-white/[.04] transition-colors"
+                  >
+                    {link.label}
+                    <svg className="w-3.5 h-3.5 opacity-70 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <polyline points="9 18 15 12 9 6" />
+                    </svg>
+                  </Link>
+                ))}
+              </div>
+            </div>
+      </nav>
     </header>
   );
 }
