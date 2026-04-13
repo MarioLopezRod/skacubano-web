@@ -56,17 +56,6 @@ const handleSmoothScroll = (e, href, callback = null) => {
   }
 
 };
-function StripeBar() {
-  return (
-    <div
-      className="h-[3px] w-full"
-      style={{
-        background:
-          "repeating-linear-gradient(90deg,#ffffff 0,#ffffff 18px,transparent 18px,transparent 24px,#333333 24px,#333333 42px,transparent 42px,transparent 48px)",
-      }}
-    />
-  );
-}
 
 function InstrumentDeco() {
   return (
@@ -119,7 +108,7 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      <StripeBar />
+     
 
       <nav
         className={`relative  transition-all duration-500 ${
@@ -188,7 +177,7 @@ export default function Navbar() {
                   <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
                 </svg>
               </a>
-              <a href="https://x.com/skacubano" target="_blank" rel="noopener noreferrer"
+              <a href="https://x.com/skcubano" target="_blank" rel="noopener noreferrer"
                 className="w-8 h-8 rounded-full border border-yellow-400/25 flex items-center justify-center text-yellow-400/60 hover:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-400/10 transition-all duration-150">
                 <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L2.25 2.25h6.918l4.254 5.622L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
