@@ -117,8 +117,43 @@ function NoteForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("sending");
-    await new Promise((r) => setTimeout(r, 1500));
-    setStatus("sent");
+
+    try {
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify({
+          // Aquí está tu clave real funcionando
+          access_key: "3bf0aa46-0b5e-40e2-b66f-1467c34753ee", 
+          name: form.name,
+          email: form.email,
+          message: form.message,
+          // Un asunto predeterminado para que sepas de dónde viene el correo
+          subject: "New message from the Ska Cubano website", 
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setStatus("sent"); // Muestra el mensaje de éxito
+        setForm({ name: "", email: "", message: "" }); // Limpia el formulario
+        
+        // Vuelve al estado inicial después de 5 segundos
+        setTimeout(() => setStatus("idle"), 5000);
+      } else {
+        console.error("Error Web3Forms:", result);
+        setStatus("idle");
+        alert("Hubo un problema al enviar el mensaje. Inténtalo de nuevo.");
+      }
+    } catch (error) {
+      console.error("Error de red:", error);
+      setStatus("idle");
+      alert("Error de conexión. Revisa tu internet.");
+    }
   };
 
   return (
@@ -218,7 +253,7 @@ function NoteForm() {
                 value={form.message}
                 onChange={handleChange}
                 required
-                rows={4}
+                rows={2}
                 placeholder="Leave us a message. Thank you for your interest in our music and history!"
                 className="w-full bg-transparent border-b-2 border-[#b09070] text-[#2a1a0a] text-base py-1.5 placeholder:text-[#a08060] focus:outline-none focus:border-[#d35400] transition-colors resize-none leading-8"
                 style={{ fontFamily: "Georgia, serif" }}
