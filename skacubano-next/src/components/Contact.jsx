@@ -394,7 +394,7 @@ export default function Contact() {
           >
             — Ska Cubano —
           </p>
-          <h2 className="text-4xl md:text-6xl font-black text-white tracking-tighter italic leading-none">
+          <h2 className="font-alfa text-3xl md:text-5xl text-white tracking-tight leading-none">
             GET IN TOUCH
           </h2>
           <p

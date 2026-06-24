@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion"; // 1. Importamos las herramientas de animación
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"; // Importamos las herramientas de animación y scroll
 
 const albums = [
   { 
@@ -40,11 +40,97 @@ const albums = [
 
 export default function Albums() {
   const [activeAlbum, setActiveAlbum] = useState(null);
+  const containerRef = useRef(null);
+
+  // Rastreo de la posición de scroll sobre el contenedor de discografía
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start end", "end start"]
+  });
+
+  // Transformaciones de movimiento y rotación sutiles al scrollear (Parallax)
+  const trumpetY = useTransform(scrollYProgress, [0, 1], [-60, 100]);
+  const trumpetRot = useTransform(scrollYProgress, [0, 1], [-20, 5]);
+
+  const guitarY = useTransform(scrollYProgress, [0, 1], [60, -100]);
+  const guitarRot = useTransform(scrollYProgress, [0, 1], [15, -5]);
+
+  const drumsY = useTransform(scrollYProgress, [0, 1], [-40, 80]);
+  const drumsRot = useTransform(scrollYProgress, [0, 1], [-10, 15]);
+
+  const saxY = useTransform(scrollYProgress, [0, 1], [80, -60]);
+  const saxRot = useTransform(scrollYProgress, [0, 1], [-15, 10]);
 
   return (
-    <section id="music"className="min-h-screen w-full bg-[#f3eac0] flex flex-col items-center justify-center overflow-hidden px-4 py-16">
+    <section 
+      id="music"
+      ref={containerRef}
+      className="min-h-screen w-full bg-[#f3eac0] flex flex-col items-center justify-center overflow-hidden px-4 py-16 relative"
+    >
       
-      <h2 className="text-3xl md:text-6xl font-black text-[#d35400] mb-12 tracking-tighter text-center italic">
+      {/* INSTRUMENTOS FLOTANTES CON PARALLAX (Ocultos en móvil para no tapar los discos) */}
+      
+      {/* Trompeta - Arriba a la Izquierda */}
+      <motion.div
+        style={{ y: trumpetY, rotate: trumpetRot }}
+        className="hidden lg:block absolute left-[9%] xl:left-[12%] top-[12%] w-56 z-0 pointer-events-none select-none opacity-20"
+      >
+        <motion.img
+          src="/images/instruments/Trompeta.png"
+          alt="Trompeta"
+          className="w-full h-auto"
+          style={{ filter: "drop-shadow(0 15px 30px rgba(0,0,0,0.15))" }}
+          animate={{ y: [0, -12, 0], rotate: [0, 2, -2, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+      </motion.div>
+
+      {/* Guitarra - Arriba a la Derecha */}
+      <motion.div
+        style={{ y: guitarY, rotate: guitarRot }}
+        className="hidden lg:block absolute right-[9%] xl:right-[12%] top-[18%] w-60 z-0 pointer-events-none select-none opacity-20"
+      >
+        <motion.img
+          src="/images/instruments/Guitarra.png"
+          alt="Guitarra"
+          className="w-full h-auto"
+          style={{ filter: "drop-shadow(0 15px 30px rgba(0,0,0,0.15))" }}
+          animate={{ y: [0, -15, 0], rotate: [0, -3, 3, 0] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+        />
+      </motion.div>
+
+      {/* Bombos/Percusión - Abajo a la Izquierda */}
+      <motion.div
+        style={{ y: drumsY, rotate: drumsRot }}
+        className="hidden lg:block absolute left-[7%] xl:left-[10%] bottom-[12%] w-64 z-0 pointer-events-none select-none opacity-20"
+      >
+        <motion.img
+          src="/images/instruments/Bombos.png"
+          alt="Bombos y percusión"
+          className="w-full h-auto"
+          style={{ filter: "drop-shadow(0 15px 30px rgba(0,0,0,0.15))" }}
+          animate={{ y: [0, -10, 0], rotate: [0, -2, 2, 0] }}
+          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+      </motion.div>
+
+      {/* Saxofón - Abajo a la Derecha */}
+      <motion.div
+        style={{ y: saxY, rotate: saxRot }}
+        className="hidden lg:block absolute right-[7%] xl:right-[10%] bottom-[15%] w-56 z-0 pointer-events-none select-none opacity-20"
+      >
+        <motion.img
+          src="/images/instruments/Saxofon.png"
+          alt="Saxofón"
+          className="w-full h-auto"
+          style={{ filter: "drop-shadow(0 15px 30px rgba(0,0,0,0.15))" }}
+          animate={{ y: [0, -14, 0], rotate: [0, 3, -3, 0] }}
+          transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
+        />
+      </motion.div>
+      
+      <h2 className="font-alfa text-3xl md:text-5xl text-[#d35400] mb-12 tracking-tight text-center">
         DISCOGRAFÍA
       </h2>
 

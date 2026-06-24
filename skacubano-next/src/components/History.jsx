@@ -1,8 +1,6 @@
 "use client";
-
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-
 const milestones = [
   {
     year: "2001",
@@ -89,10 +87,8 @@ const milestones = [
     )
   }
 ];
-
 export default function History() {
   const [activeIndex, setActiveIndex] = useState(0);
-
   return (
     <section
       id="history"
@@ -106,7 +102,6 @@ export default function History() {
             "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E\")",
         }}
       />
-
       {/* Decorative compass lines in background */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] flex items-center justify-center z-0">
         <svg width="600" height="600" viewBox="0 0 200 200" fill="none" stroke="#f3eac0" strokeWidth="0.5">
@@ -118,7 +113,6 @@ export default function History() {
           <line x1="29.29" y1="170.71" x2="170.71" y2="29.29" />
         </svg>
       </div>
-
       <div className="relative z-20 max-w-6xl mx-auto flex flex-col items-center">
 
         {/* Section Heading */}
@@ -133,7 +127,6 @@ export default function History() {
             — La Utopía del Ritmo —
           </p>
         </div>
-
         {/* Outer Box with two columns */}
         <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
 
@@ -141,7 +134,6 @@ export default function History() {
           <div className="lg:col-span-4 flex flex-row lg:flex-col justify-between lg:justify-center items-center lg:items-end gap-3 lg:gap-6 pb-6 lg:pb-0 border-b lg:border-b-0 lg:border-r border-[#8c6239]/20 pr-0 lg:pr-8 overflow-x-auto lg:overflow-x-visible scrollbar-none">
             {milestones.map((milestone, idx) => {
               const isActive = activeIndex === idx;
-
               return (
                 <button
                   key={milestone.year}
@@ -157,14 +149,13 @@ export default function History() {
                       {milestone.title}
                     </h3>
                   </div>
-
                   {/* Year Bubble Badge */}
                   <motion.div
                     whileHover={{ scale: 1.08 }}
                     whileTap={{ scale: 0.95 }}
                     className={`relative w-14 h-14 md:w-16 md:h-16 rounded-full flex flex-col items-center justify-center font-black transition-all duration-300 border-2 ${isActive
-                        ? "bg-[#d35400] border-yellow-400 text-[#f3eac0] shadow-[0_0_20px_rgba(211,84,0,0.5)]"
-                        : "bg-[#2a1a0a]/70 border-[#8c6239]/30 text-[#f3eac0]/70 group-hover:border-yellow-400/50 group-hover:text-yellow-400"
+                      ? "bg-[#d35400] border-yellow-400 text-[#f3eac0] shadow-[0_0_20px_rgba(211,84,0,0.5)]"
+                      : "bg-[#2a1a0a]/70 border-[#8c6239]/30 text-[#f3eac0]/70 group-hover:border-yellow-400/50 group-hover:text-yellow-400"
                       }`}
                   >
                     <span className="text-[10px] md:text-[11px] font-black uppercase tracking-tight leading-none">
@@ -175,7 +166,6 @@ export default function History() {
                         - {milestone.year.split("-")[1].trim()}
                       </span>
                     )}
-
                     {/* Timeline line connector - Desktop only */}
                     {idx < milestones.length - 1 && (
                       <div className="hidden lg:block absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-6 bg-[#8c6239]/30 pointer-events-none mt-2" />
@@ -185,7 +175,6 @@ export default function History() {
               );
             })}
           </div>
-
           {/* RIGHT COLUMN: The Scrapbook Content Display */}
           <div className="lg:col-span-8 relative flex items-center">
             <div className="w-full min-h-[420px] md:min-h-[380px] flex">
@@ -200,7 +189,6 @@ export default function History() {
                 >
                   {/* Decorative Vintage Stamp */}
                   {milestones[activeIndex].badge}
-
                   {/* Top Header details inside Card */}
                   <div>
                     <div className="flex items-center gap-3 mb-4 text-[#8c6239]">
@@ -216,7 +204,6 @@ export default function History() {
                         </h3>
                       </div>
                     </div>
-
                     {/* Handwritten Style Quote */}
                     <p
                       className="text-base md:text-lg text-[#b85b24] italic mb-6 leading-relaxed border-l-4 border-[#b85b24]/30 pl-4 py-1"
@@ -224,7 +211,6 @@ export default function History() {
                     >
                       “{milestones[activeIndex].quote}”
                     </p>
-
                     {/* Description Paragraph */}
                     <p
                       className="text-slate-800 text-sm md:text-[15px] leading-relaxed tracking-wide"
@@ -233,7 +219,6 @@ export default function History() {
                       {milestones[activeIndex].text}
                     </p>
                   </div>
-
                   {/* Card bottom details */}
                   <div className="mt-8 pt-4 border-t border-[#8c6239]/10 flex items-center justify-between">
                     <span className="text-[10px] font-mono uppercase tracking-widest text-[#8c6239]/60">
@@ -247,9 +232,7 @@ export default function History() {
               </AnimatePresence>
             </div>
           </div>
-
         </div>
-
       </div>
     </section>
   );
