@@ -1,5 +1,6 @@
 import Hero from '../components/Hero';
 import Albums from '../components/Albums';
+import History from '../components/History';
 import Contact from '../components/Contact';
 
 
@@ -8,6 +9,7 @@ export default function Home() {
     <main>
       <Hero />
       <Albums />
+      <History />
       <Contact />
     </main>
   );

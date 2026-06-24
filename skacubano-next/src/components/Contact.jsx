@@ -108,7 +108,10 @@ function NoteForm() {
   const [currentDate, setCurrentDate] = useState("");
 
   useEffect(() => {
-    setCurrentDate(new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }));
+    const timer = setTimeout(() => {
+      setCurrentDate(new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }));
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleChange = (e) =>
