@@ -43,18 +43,18 @@ export default function Footer() {
             Music
           </a>
           <a 
-            href="#shows" 
-            onClick={(e) => handleSmoothScroll(e, "#shows")} 
-            className="hover:text-yellow-400 transition-colors"
-          >
-            Shows
-          </a>
-          <a 
             href="#history" 
             onClick={(e) => handleSmoothScroll(e, "#history")} 
             className="hover:text-yellow-400 transition-colors"
           >
             History
+          </a>
+          <a 
+            href="#shows" 
+            onClick={(e) => handleSmoothScroll(e, "#shows")} 
+            className="hover:text-yellow-400 transition-colors"
+          >
+            Shows
           </a>
           <a 
             href="#contact" 

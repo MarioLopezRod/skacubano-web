@@ -6,12 +6,11 @@ import Image from "next/image";
 
 const navLinksLeft = [
   { label: "Music", href: "/#music" },
-    { label: "Shows", href: "/#shows" },
-
+  { label: "History", href: "/#history" },
 ];
 
 const navLinksRight = [
-  { label: "History", href: "/#history" },
+  { label: "Shows", href: "/#shows" },
   { label: "Contact", href: "/#contact" },
 ];
 
@@ -28,15 +27,15 @@ const handleSmoothScroll = (e, href, callback = null) => {
     });
     // Limpiamos la URL para que quede bonita
     window.history.pushState(null, "", "/");
-  } 
+  }
   // 2. Caso normal: Scroll a una sección específica (ej. /#music)
   else if (href.includes("#")) {
     const targetId = href.replace(/.*\#/, "");
     const elem = document.getElementById(targetId);
 
     if (elem) {
-      e.preventDefault(); 
-      
+      e.preventDefault();
+
       const offset = 80; // Altura de tu Navbar
       const elementPosition = elem.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - offset;
@@ -108,14 +107,13 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-     
+
 
       <nav
-        className={`relative  transition-all duration-500 ${
-          scrolled
+        className={`relative  transition-all duration-500 ${scrolled
             ? "bg-zinc-950/95 backdrop-blur-md border-b border-yellow-400/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
             : "bg-black/30 backdrop-blur-sm border-b border-white/5"
-        }`}
+          }`}
       >
         <div className={`transition-opacity duration-500 ${scrolled ? "opacity-100" : "opacity-30"}`}>
           <InstrumentDeco />
@@ -123,7 +121,7 @@ export default function Navbar() {
 
         {/* ── DESKTOP ── */}
         <div className="relative z-10 hidden lg:flex items-center max-w-7xl mx-auto px-6 h-[72px]">
-          
+
           {/* LADO IZQUIERDO: Links pegados al logo */}
           <div className="flex-1 flex justify-end">
             <ul className="flex items-center gap-1 list-none">
@@ -135,9 +133,9 @@ export default function Navbar() {
 
           {/* CENTRO: Logo grande */}
           <div className="flex-shrink-0 mx-8 relative z-20">
-            <Link 
-              href="/" 
-              onClick={(e) => handleSmoothScroll(e, "/")} 
+            <Link
+              href="/"
+              onClick={(e) => handleSmoothScroll(e, "/")}
               className="hover:scale-105 transition-transform duration-300 block translate-y-[30px]"
             >
               <Image
@@ -187,21 +185,21 @@ export default function Navbar() {
           </div>
         </div>
 
-           {/* ── MOBILE ── */}
+        {/* ── MOBILE ── */}
         <div className="relative z-10 lg:hidden flex items-center justify-between max-w-7xl mx-auto px-6 h-[76px]">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             onClick={(e) => handleSmoothScroll(e, "/")}
             // AÑADIDO: translate-y-[20px] para que sobresalga hacia abajo
             className="absolute left-1/2 -translate-x-1/2 hover:scale-105 transition-transform duration-300 translate-y-[20px]"
           >
-            <Image 
-              src="/skaCubano.png" 
-              alt="Ska Cubano Logo" 
-              width={350} 
-              height={150} 
+            <Image
+              src="/skaCubano.png"
+              alt="Ska Cubano Logo"
+              width={350}
+              height={150}
               // AÑADIDO: drop-shadow para que tenga profundidad sobre el resto de la web
-              className="object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]" 
+              className="object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
             />
           </Link>
           <div className="ml-auto">
@@ -213,24 +211,24 @@ export default function Navbar() {
           </div>
         </div>
 
-         
-            <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
-              <div className="border-t border-yellow-400/10 bg-transparent">
-                {allNavLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    onClick={(e) => handleSmoothScroll(e, link.href, () => setMenuOpen(false))}
-                    className="flex items-center justify-between px-6 py-4 text-[13px] font-semibold uppercase tracking-[.08em] text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] hover:text-yellow-400 hover:bg-white/5 border-b border-white/[.04] transition-colors"
-                  >
-                    {link.label}
-                    <svg className="w-3.5 h-3.5 opacity-70 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                      <polyline points="9 18 15 12 9 6" />
-                    </svg>
-                  </Link>
-                ))}
-              </div>
-            </div>
+
+        <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
+          <div className="border-t border-yellow-400/10 bg-transparent">
+            {allNavLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={(e) => handleSmoothScroll(e, link.href, () => setMenuOpen(false))}
+                className="flex items-center justify-between px-6 py-4 text-[13px] font-semibold uppercase tracking-[.08em] text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] hover:text-yellow-400 hover:bg-white/5 border-b border-white/[.04] transition-colors"
+              >
+                {link.label}
+                <svg className="w-3.5 h-3.5 opacity-70 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                  <polyline points="9 18 15 12 9 6" />
+                </svg>
+              </Link>
+            ))}
+          </div>
+        </div>
       </nav>
     </header>
   );

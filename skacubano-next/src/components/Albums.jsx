@@ -4,37 +4,37 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"; // Importamos las herramientas de animación y scroll
 
 const albums = [
-  { 
+  {
     id: 1, title: "Ska Cubano", cover: "/images/albums/skacubano.jpg", year: "2004",
-    links: { 
+    links: {
       sp: "https://open.spotify.com/intl-es/album/3N58JMWyiCXtS0uJB5Kvxt?si=jB9p9RSnTsGstRTSSgQAbw",
       yt: "https://www.youtube.com/watch?v=wnMAwJ4KaPM&list=OLAK5uy_ll4KrcoDJi0_RU3fwPh0zAePNQo33j5KQ",
-      ap: "https://music.apple.com/es/album/ska-cubano/949685364" 
-    } 
+      ap: "https://music.apple.com/es/album/ska-cubano/949685364"
+    }
   },
-  { 
+  {
     id: 2, title: "Ajiaco!", cover: "/images/albums/ajiaco.jpg", year: "2007",
-    links: { 
+    links: {
       sp: "https://open.spotify.com/intl-es/album/4l0RKxCjk4xB9a4lsQ6SXK?si=cFJxv-07QR-5Hrrx_oADYQ",
       yt: "https://www.youtube.com/watch?v=40_2h7Vkpo8&list=OLAK5uy_kOaE4-Bqj6IwANG6RfDGqqQmewJ1T7I8g",
-      ap: "https://music.apple.com/es/album/ajiaco-the-remix-album/705272102" 
-    } 
+      ap: "https://music.apple.com/es/album/ajiaco-the-remix-album/705272102"
+    }
   },
-  { 
+  {
     id: 3, title: "¡Ay Caramba!", cover: "/images/albums/caramba.jpg", year: "2005",
-    links: { 
+    links: {
       sp: "https://open.spotify.com/intl-es/album/6dGWSlqez8ptLOJBCt1ymW?si=afdcvAJvT2OK5qXWkgrZXA",
       yt: "https://www.youtube.com/watch?v=nwLyUCy7O7A&list=OLAK5uy_k0ldgoIleSHm7Ljh7-cr_NnXXH-dyWLVY",
-      ap: "https://music.apple.com/es/album/ay-caramba/902312351" 
-    } 
+      ap: "https://music.apple.com/es/album/ay-caramba/902312351"
+    }
   },
-  { 
+  {
     id: 4, title: "Mambo Ska", cover: "/images/albums/mamboska.jpg", year: "2010",
-    links: { 
+    links: {
       sp: "https://open.spotify.com/intl-es/album/7qfCYynbJSqc6OzpLQwRy6?si=x5ulwQg5TsuDsn1MhpTHvg",
       yt: "https://www.youtube.com/watch?v=Es62wlmIlyE&list=OLAK5uy_m0kRcur0qgsmu9v5gZDePEDx4pXJiCFGg",
-      ap: "https://music.apple.com/es/album/mambo-ska/1617405456" 
-    } 
+      ap: "https://music.apple.com/es/album/mambo-ska/1617405456"
+    }
   },
 ];
 
@@ -62,14 +62,14 @@ export default function Albums() {
   const saxRot = useTransform(scrollYProgress, [0, 1], [-15, 10]);
 
   return (
-    <section 
+    <section
       id="music"
       ref={containerRef}
       className="min-h-screen w-full bg-[#f3eac0] flex flex-col items-center justify-center overflow-hidden px-4 py-16 relative"
     >
-      
+
       {/* INSTRUMENTOS FLOTANTES CON PARALLAX (Ocultos en móvil para no tapar los discos) */}
-      
+
       {/* Trompeta - Arriba a la Izquierda */}
       <motion.div
         style={{ y: trumpetY, rotate: trumpetRot }}
@@ -129,24 +129,24 @@ export default function Albums() {
           transition={{ duration: 6.5, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
         />
       </motion.div>
-      
+
       <h2 className="font-alfa text-3xl md:text-5xl text-[#d35400] mb-12 tracking-tight text-center">
-        DISCOGRAFÍA
+        DISCOGRAPHY
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 md:gap-x-40 max-w-5xl mx-auto">
-        
+
         {albums.map((album, index) => {
           const isLeftColumn = index % 2 === 0;
 
           return (
             <div key={album.id} className="flex flex-col items-center relative">
-              
-              <div 
+
+              <div
                 className="group relative w-44 h-44 md:w-56 md:h-56 cursor-pointer"
                 onClick={() => setActiveAlbum(activeAlbum === album.id ? null : album.id)}
               >
-                
+
                 {/* VINILO */}
                 <div className="absolute inset-0 bg-[#1a1a1a] rounded-full shadow-xl transition-transform duration-700 group-hover:translate-x-10 md:group-hover:translate-x-20 flex items-center justify-center z-10">
                   <div className="w-14 h-14 md:w-20 md:h-20 rounded-full border-[6px] md:border-[8px] border-[#222] flex items-center justify-center">
@@ -171,7 +171,7 @@ export default function Albums() {
                       exit={{ opacity: 0, scale: 0.5, y: 20 }}
                       // Tipo de movimiento (un "pop" elástico)
                       transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                      
+
                       className={`
                         absolute z-50 bg-white p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem]
                         shadow-[0_20px_50px_rgba(0,0,0,0.3)]
@@ -185,8 +185,8 @@ export default function Albums() {
                         ${isLeftColumn ? "md:right-full md:mr-16" : "md:left-full md:ml-16"}
                       `}
                     >
-                     {/* FLECHA (FIX RESPONSIVE TOTAL) */}
-                    <div className={`
+                      {/* FLECHA (FIX RESPONSIVE TOTAL) */}
+                      <div className={`
                     absolute w-6 h-6 bg-white rotate-45 border-[#d35400]/10 z-0
                     
                     /* 1. MÓVIL (Por defecto) */
@@ -196,10 +196,10 @@ export default function Albums() {
                     /* El md:inset-auto es vital: borra el 'top' y el 'left' del móvil */
                     md:inset-auto md:top-1/2 md:-translate-y-1/2 md:translate-x-0
                     
-                    ${isLeftColumn 
-                        ? "md:-right-3 md:border-t-4 md:border-r-4 md:border-b-0 md:border-l-0" 
-                        : "md:-left-3 md:border-b-4 md:border-l-4 md:border-t-0 md:border-r-0"
-                    }
+                    ${isLeftColumn
+                          ? "md:-right-3 md:border-t-4 md:border-r-4 md:border-b-0 md:border-l-0"
+                          : "md:-left-3 md:border-b-4 md:border-l-4 md:border-t-0 md:border-r-0"
+                        }
                     `} />
 
                       <div className="relative z-10 flex gap-6 md:gap-8">

@@ -6,14 +6,14 @@ import Image from "next/image";
 
 /* ── Photo data ─────────────────────────────────────────────────────── */
 const PHOTOS = [
-  { src: "/images/hero/SkaImagen2.jpg",  rotate: -4,  top: "2%",    left: "0%",   z: 1, w: 320, label: "On stage" },
-  { src: "/images/hero/SkaImagen5.jpg",  rotate:  3,  top: "0%",    left: "22%",  z: 2, w: 280, label: "The band" },
-  { src: "/images/hero/SkaImagen8.jpg",  rotate: -2,  top: "5%",    right: "19%", z: 1, w: 260, label: "Africa festival" },
-  { src: "/images/hero/SkaImagen1.jpg",  rotate:  5,  top: "1%",    right: "0%",  z: 2, w: 300, label: "AY CARAMBA!" },
-  { src: "/images/hero/SkaImagen9.jpg",  rotate: -3,  bottom: "2%", left: "1%",   z: 2, w: 290, label: "Tour " },
-  { src: "/images/hero/SkaImagen11.jpg", rotate:  4,  bottom: "0%", left: "20%",  z: 1, w: 270, label: "Backstage" },
-  { src: "/images/hero/SkaImagen14.jpg", rotate: -5,  bottom: "3%", right: "18%", z: 2, w: 285, label: "Mambo Ska Tour" },
-  { src: "/images/hero/SkaImagen16.jpg", rotate:  2,  bottom: "1%", right: "0%",  z: 1, w: 305, label: "Festival" },
+  { src: "/images/hero/SkaImagen2.jpg", rotate: -4, top: "2%", left: "0%", z: 1, w: 320, label: "On stage" },
+  { src: "/images/hero/SkaImagen5.jpg", rotate: 3, top: "0%", left: "22%", z: 2, w: 280, label: "The band" },
+  { src: "/images/hero/SkaImagen8.jpg", rotate: -2, top: "5%", right: "19%", z: 1, w: 260, label: "Africa festival" },
+  { src: "/images/hero/SkaImagen1.jpg", rotate: 5, top: "1%", right: "0%", z: 2, w: 300, label: "AY CARAMBA!" },
+  { src: "/images/hero/SkaImagen9.jpg", rotate: -3, bottom: "2%", left: "1%", z: 2, w: 290, label: "Tour " },
+  { src: "/images/hero/SkaImagen11.jpg", rotate: 4, bottom: "0%", left: "20%", z: 1, w: 270, label: "Backstage" },
+  { src: "/images/hero/SkaImagen14.jpg", rotate: -5, bottom: "3%", right: "18%", z: 2, w: 285, label: "Mambo Ska Tour" },
+  { src: "/images/hero/SkaImagen16.jpg", rotate: 2, bottom: "1%", right: "0%", z: 1, w: 305, label: "Festival" },
 ];
 
 /* ── Social links with SVG icons ────────────────────────────────────── */
@@ -129,33 +129,33 @@ function NoteForm() {
           Accept: "application/json",
         },
         body: JSON.stringify({
-          // Aquí está tu clave real funcionando
-          access_key: "3bf0aa46-0b5e-40e2-b66f-1467c34753ee", 
+          // Here is your active access key
+          access_key: "3bf0aa46-0b5e-40e2-b66f-1467c34753ee",
           name: form.name,
           email: form.email,
           message: form.message,
-          // Un asunto predeterminado para que sepas de dónde viene el correo
-          subject: "New message from the Ska Cubano website", 
+          // Default subject so you know where the email comes from
+          subject: "New message from the Ska Cubano website",
         }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        setStatus("sent"); // Muestra el mensaje de éxito
-        setForm({ name: "", email: "", message: "" }); // Limpia el formulario
-        
-        // Vuelve al estado inicial después de 5 segundos
+        setStatus("sent"); // Show success message
+        setForm({ name: "", email: "", message: "" }); // Clear the form
+
+        // Return to idle state after 5 seconds
         setTimeout(() => setStatus("idle"), 5000);
       } else {
         console.error("Error Web3Forms:", result);
         setStatus("idle");
-        alert("Hubo un problema al enviar el mensaje. Inténtalo de nuevo.");
+        alert("There was a problem sending the message. Please try again.");
       }
     } catch (error) {
-      console.error("Error de red:", error);
+      console.error("Network error:", error);
       setStatus("idle");
-      alert("Error de conexión. Revisa tu internet.");
+      alert("Connection error. Please check your internet connection.");
     }
   };
 

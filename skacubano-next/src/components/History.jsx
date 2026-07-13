@@ -4,10 +4,10 @@ import { motion, AnimatePresence } from "framer-motion";
 const milestones = [
   {
     year: "2001",
-    title: "La Utopía de Dos Islas",
-    subtitle: "El Sueño Caribeño",
-    quote: "¿Y si las fronteras políticas nunca hubieran silenciado la síncopa?",
-    text: "Todo comenzó en el corazón de Londres, donde el visionario productor y melómano Peter A. Scott concibió un audaz ejercicio de 'historia alternativa'. Se preguntó qué habría ocurrido si Cuba y Jamaica, dos gigantes musicales separados por escasos kilómetros de mar Caribe, hubieran entrelazado sus ritmos libremente antes de la Revolución de 1959. Para dar vida a este puente imaginario, Scott buscó a Natty Bo (Nathan Lerner), el carismático líder de la banda de ska londinense Top Cats. Juntos, decidieron reescribir la historia a través del baile.",
+    title: "The Two-Island Utopia",
+    subtitle: "The Caribbean Dream",
+    quote: "What if political borders had never silenced the syncopation?",
+    text: "It all began in the heart of London, where visionary producer and music lover Peter A. Scott conceived a bold exercise in 'alternate history'. He wondered what would have happened if Cuba and Jamaica, two musical giants separated by just a few miles of the Caribbean Sea, had freely intertwined their rhythms before the 1959 Revolution. To bring this imaginary bridge to life, Scott sought out Natty Bo (Nathan Lerner), the charismatic leader of London ska band Top Cats. Together, they decided to rewrite history through dance.",
     badge: (
       <svg viewBox="0 0 100 100" className="w-20 h-20 text-[#8c6239]/25 absolute top-4 right-4 -rotate-12 pointer-events-none fill-none stroke-current" strokeWidth="2">
         <rect x="10" y="10" width="80" height="80" rx="8" />
@@ -25,10 +25,10 @@ const milestones = [
   },
   {
     year: "2002",
-    title: "El Sonido en las Calles",
-    subtitle: "La Raíz en Santiago de Cuba",
-    quote: "Encontramos la voz de Santiago en un rincón cubierto de humo, guitarras y ron.",
-    text: "Decididos a buscar la raíz de su idea, Scott y Natty Bo viajaron a Santiago de Cuba, la cuna del son tradicional. Allí, entre callejones coloniales y cantos trasnochados, se toparon en un bar con Juan Manuel Villy Carbonell, conocido artísticamente como 'Beny Billy'. Su voz vibrante y desgarradora parecía invocar al mismísimo Beny Moré, el 'Bárbaro del Ritmo'. Junto a él y una constelación de instrumentistas locales santiagueros, grabaron las primeras maquetas de lo que sería una revolución sonora transatlántica.",
+    title: "The Sound on the Streets",
+    subtitle: "The Roots in Santiago de Cuba",
+    quote: "We found the voice of Santiago in a corner filled with smoke, guitars, and rum.",
+    text: "Determined to find the roots of their idea, Scott and Natty Bo traveled to Santiago de Cuba, the cradle of traditional son. There, among colonial alleyways and late-night songs, they came across Juan Manuel Villy Carbonell, known artistically as 'Beny Billy', in a bar. His vibrant, soulful voice seemed to summon Beny Moré himself, the 'Barbarón del Ritmo'. Along with him and a constellation of local musicians from Santiago, they recorded the first demos of what would become a transatlantic sound revolution.",
     badge: (
       <svg viewBox="0 0 100 100" className="w-20 h-20 text-[#8c6239]/25 absolute top-4 right-4 rotate-12 pointer-events-none fill-none stroke-current" strokeWidth="2">
         <circle cx="50" cy="50" r="45" strokeDasharray="4,4" />
@@ -46,15 +46,15 @@ const milestones = [
   },
   {
     year: "2004",
-    title: "La Conexión de Londres",
-    subtitle: "Nace la Superbanda",
-    quote: "Una orquesta sin fronteras: de Jamaica y Cuba al río Támesis.",
-    text: "El experimento de estudio creció rápidamente hasta convertirse en un monstruo de los escenarios. De regreso a Londres, Scott y Natty Bo reunieron a una alineación estelar única: el legendario trompetista jamaiquino Eddie 'Tan Tan' Thornton (quien grabó con The Beatles, Jimi Hendrix y Boney M), la virtuosa saxofonista japonesa Megumi Mesaku ('Miss Megoo'), y prodigios del contrabajo y el tres cubano como Rey Crespo y Jesús Cutiño. Su álbum debut homónimo desató una fiebre colectiva e inauguró un nuevo género en el mundo entero.",
+    title: "The London Connection",
+    subtitle: "The Superband is Born",
+    quote: "An orchestra without borders: from Jamaica and Cuba to the River Thames.",
+    text: "The studio experiment quickly grew into a live-performance powerhouse. Returning to London, Scott and Natty Bo assembled a stellar, unique lineup: legendary Jamaican trumpeter Eddie 'Tan Tan' Thornton (who recorded with The Beatles, Jimi Hendrix, and Boney M), virtuous Japanese saxophonist Megumi Mesaku ('Miss Megoo'), and double bass and Cuban tres prodigies like Rey Crespo and Jesús Cutiño. Their self-titled debut album unleashed a collective fever and inaugurated a new genre worldwide.",
     badge: (
       <svg viewBox="0 0 100 100" className="w-20 h-20 text-[#8c6239]/25 absolute top-4 right-4 rotate-6 pointer-events-none fill-none stroke-current" strokeWidth="2">
         <polygon points="50,5 95,25 95,75 50,95 5,75 5,25" />
         <polygon points="50,12 87,28 87,72 50,88 13,72 13,28" strokeDasharray="2,2" />
-        <text x="50" y="42" textAnchor="middle" fontSize="6" fontWeight="bold" fill="currentColor" stroke="none">SUPERBANDA</text>
+        <text x="50" y="42" textAnchor="middle" fontSize="6" fontWeight="bold" fill="currentColor" stroke="none">SUPERBAND</text>
         <text x="50" y="58" textAnchor="middle" fontSize="11" fontWeight="black" fill="currentColor" stroke="none">2004</text>
         <text x="50" y="71" textAnchor="middle" fontSize="6" fontWeight="bold" fill="currentColor" stroke="none">LONDON</text>
       </svg>
@@ -67,10 +67,10 @@ const milestones = [
   },
   {
     year: "2005 - 2010",
-    title: "Mambo Ska Global",
-    subtitle: "La Fiesta Sin Límites",
-    quote: "El mambo-ska no se explica en los libros, se baila bajo el sol o bajo la lluvia.",
-    text: "Con la incorporación del vocalista venezolano Carlos Pena en 2006, la banda consolidó su arrollador directo. Álbumes memorables como '¡Ay Caramba!' (nominado a los prestigiosos premios BBC World Music Awards) y 'Mambo Ska' (2010) definieron un sonido libre y frenético. Recorrieron más de 30 países y fueron cabezas de cartel en los festivales más importantes de la música global, desde Glastonbury hasta el WOMAD. Ska Cubano demostró que el ska y el mambo nacieron para ser hermanos de sangre.",
+    title: "Global Mambo Ska",
+    subtitle: "The Party Without Borders",
+    quote: "Mambo-ska isn't explained in books; it is danced under the sun or under the rain.",
+    text: "With the addition of Venezuelan vocalist Carlos Pena in 2006, the band consolidated its devastating live show. Memorable albums like '¡Ay Caramba!' (nominated for the prestigious BBC World Music Awards) and 'Mambo Ska' (2010) defined a free, frenetic sound. They toured more than 30 countries and headlined the most important global music festivals, from Glastonbury to WOMAD. Ska Cubano proved that ska and mambo were born to be blood brothers.",
     badge: (
       <svg viewBox="0 0 100 100" className="w-20 h-20 text-[#8c6239]/25 absolute top-4 right-4 -rotate-6 pointer-events-none fill-none stroke-current" strokeWidth="2">
         <ellipse cx="50" cy="50" rx="48" ry="32" />
@@ -118,13 +118,13 @@ export default function History() {
         {/* Section Heading */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-6xl font-black text-[#d35400] tracking-tighter italic leading-none drop-shadow-[0_2px_10px_rgba(243,234,192,0.15)]">
-            NUESTRA HISTORIA
+            OUR STORY
           </h2>
           <p
             className="mt-3 text-[#2a1a0a] text-xs md:text-sm font-bold uppercase tracking-[.35em]"
             style={{ fontFamily: "Courier New, monospace" }}
           >
-            — La Utopía del Ritmo —
+            — The Rhythm Utopia —
           </p>
         </div>
         {/* Outer Box with two columns */}
@@ -222,10 +222,10 @@ export default function History() {
                   {/* Card bottom details */}
                   <div className="mt-8 pt-4 border-t border-[#8c6239]/10 flex items-center justify-between">
                     <span className="text-[10px] font-mono uppercase tracking-widest text-[#8c6239]/60">
-                      Ska Cubano • La Utopía del Ritmo
+                      Ska Cubano • The Rhythm Utopia
                     </span>
                     <span className="text-[10px] font-mono text-[#8c6239]/60">
-                      Pág. {activeIndex + 1} de {milestones.length}
+                      Page {activeIndex + 1} of {milestones.length}
                     </span>
                   </div>
                 </motion.div>
