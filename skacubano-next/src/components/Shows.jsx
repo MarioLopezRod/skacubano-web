@@ -16,10 +16,10 @@ const showVideos = [
     description: "Experience the band's raw, infectious energy and brass-heavy mambo-ska backbeat driving festival crowds wild.",
   },
   {
-    id: "7o9Ogonuwo",
-    title: "Camden Town Live Jam",
-    location: "London, UK Gig",
-    description: "Bridging Kingston, Havana, and London's multicultural heart with a joyous and syncopated live party vibe.",
+    id: "CmoXFLzOiFc",
+    title: "Freedom Sounds 2019 Live",
+    location: "Cologne, Germany (2019)",
+    description: "Ska Cubano performs Cleopatra at Freedom Sounds festival in Cologne, Germany in 2019.",
   },
 ];
 
