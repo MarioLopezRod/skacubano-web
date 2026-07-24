@@ -14,13 +14,13 @@ const handleSmoothScroll = (e, href, callback = null) => {
       behavior: "smooth",
     });
     window.history.pushState(null, "", "/");
-  } 
+  }
   else if (href.includes("#")) {
     const targetId = href.replace(/.*\#/, "");
     const elem = document.getElementById(targetId);
 
     if (elem) {
-      e.preventDefault(); 
+      e.preventDefault();
       const offset = 80;
       const elementPosition = elem.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - offset;
@@ -91,6 +91,7 @@ export default function Navbar() {
   const navLinksLeft = [
     { label: t.nav.music, href: "/#music" },
     { label: t.nav.shows, href: "/#shows" },
+    { label: t.nav.gallery, href: "/galeria" },
   ];
 
   const navLinksRight = [
@@ -103,21 +104,20 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <nav
-        className={`relative transition-all duration-500 ${
-          scrolled
+        className={`relative transition-all duration-500 ${scrolled
             ? "bg-zinc-950/95 backdrop-blur-md border-b border-yellow-400/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
             : "bg-black/40 backdrop-blur-sm border-b border-white/5"
-        }`}
+          }`}
       >
         <div className={`transition-opacity duration-500 ${scrolled ? "opacity-100" : "opacity-30"}`}>
           <InstrumentDeco />
         </div>
 
         {/* ── DESKTOP ── */}
-        <div className="relative z-10 hidden lg:flex items-center max-w-7xl mx-auto px-6 h-[72px]">
-          
-          {/* LADO IZQUIERDO: Links pegados al logo */}
-          <div className="flex-1 flex justify-end">
+        <div className="relative z-10 hidden lg:flex items-center justify-between max-w-7xl mx-auto px-6 h-[72px]">
+
+          {/* LADO IZQUIERDO: Links del lado izquierdo del logo (MUSIC | SHOWS | GALLERY) */}
+          <div className="flex-1 flex justify-end items-center pr-16 xl:pr-20 relative z-30">
             <ul className="flex items-center gap-1 list-none">
               {navLinksLeft.map((link) => (
                 <li key={link.href}><NavLink {...link} /></li>
@@ -125,12 +125,12 @@ export default function Navbar() {
             </ul>
           </div>
 
-          {/* CENTRO: Logo grande */}
-          <div className="flex-shrink-0 mx-8 relative z-20">
-            <Link 
-              href="/" 
-              onClick={(e) => handleSmoothScroll(e, "/")} 
-              className="hover:scale-105 transition-transform duration-300 block translate-y-[28px]"
+          {/* CENTRO: Logo grande en el centro absoluto */}
+          <div className="absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none flex justify-center">
+            <Link
+              href="/"
+              onClick={(e) => handleSmoothScroll(e, "/")}
+              className="hover:scale-105 transition-transform duration-300 block translate-y-[28px] pointer-events-auto w-[200px] xl:w-[240px]"
             >
               <Image
                 src="/skaCubano.png"
@@ -138,13 +138,13 @@ export default function Navbar() {
                 width={350}
                 height={150}
                 priority
-                className="object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
+                className="w-full h-auto object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
               />
             </Link>
           </div>
 
-          {/* LADO DERECHO: Links cerca del logo + Socials + Language Toggle */}
-          <div className="flex-1 flex items-center justify-between">
+          {/* LADO DERECHO: Links de la derecha (HISTORY | CONTACT) + Socials + Language Toggle */}
+          <div className="flex-1 flex items-center justify-between pl-16 xl:pl-20 relative z-30">
             {/* Links de la derecha */}
             <ul className="flex items-center gap-1 list-none">
               {navLinksRight.map((link) => (
@@ -192,21 +192,21 @@ export default function Navbar() {
 
         {/* ── MOBILE ── */}
         <div className="relative z-10 lg:hidden flex items-center justify-between max-w-7xl mx-auto px-6 h-[76px]">
-          <Link 
-            href="/" 
+          <Link
+            href="/"
             onClick={(e) => handleSmoothScroll(e, "/")}
-            className="absolute left-1/2 -translate-x-1/2 hover:scale-105 transition-transform duration-300 translate-y-[20px]"
+            className="absolute left-1/2 -translate-x-1/2 hover:scale-105 transition-transform duration-300 translate-y-[20px] w-[180px] pointer-events-auto z-20"
           >
-            <Image 
-              src="/skaCubano.png" 
-              alt="Ska Cubano Logo" 
-              width={350} 
-              height={150} 
-              className="object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]" 
+            <Image
+              src="/skaCubano.png"
+              alt="Ska Cubano Logo"
+              width={350}
+              height={150}
+              className="w-full h-auto object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
             />
           </Link>
 
-          <div className="flex items-center gap-3 ml-auto">
+          <div className="flex items-center gap-3 ml-auto relative z-30">
             {/* Mobile Language Switcher */}
             <button
               onClick={toggleLanguage}
@@ -244,4 +244,4 @@ export default function Navbar() {
       </nav>
     </header>
   );
-}
+}

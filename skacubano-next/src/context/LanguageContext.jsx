@@ -10,8 +10,23 @@ export const translations = {
     nav: {
       music: "Music",
       shows: "Shows",
+      gallery: "Gallery",
       history: "History",
       contact: "Contact",
+    },
+    gallery: {
+      badge: "★ Archive & Memories ★",
+      title: "PHOTO GALLERY",
+      subtitle: "Relive the legendary concerts, backstage memories, and individual profiles of the Ska Cubano Big Band.",
+      tabBand: "Band Gallery",
+      tabMembers: "Band Members",
+      allPhotos: "All Photos",
+      memberProfile: "Member Profile",
+      mainPhoto: "Main Photo",
+      additionalPhotos: "Additional Photos",
+      noPhotos: "No photos available in this category.",
+      backToTop: "Back to Top",
+      adminBtn: "Admin Panel"
     },
     // Hero
     hero: {
@@ -161,8 +176,23 @@ export const translations = {
     nav: {
       music: "Música",
       shows: "Shows",
+      gallery: "Galería",
       history: "Historia",
       contact: "Contacto",
+    },
+    gallery: {
+      badge: "★ Archivo y Recuerdos ★",
+      title: "GALERIA DE FOTOS",
+      subtitle: "Revive los conciertos legendarios, momentos de camerino y perfiles individuales de la orquesta Ska Cubano.",
+      tabBand: "Galería General",
+      tabMembers: "Integrantes",
+      allPhotos: "Todas las fotos",
+      memberProfile: "Perfil del Integrante",
+      mainPhoto: "Foto Principal",
+      additionalPhotos: "Fotos Adicionales",
+      noPhotos: "No hay fotos disponibles en esta categoría.",
+      backToTop: "Volver Arriba",
+      adminBtn: "Panel Admin"
     },
     // Hero
     hero: {
@@ -221,7 +251,7 @@ export const translations = {
     // Albums
     albums: {
       badge: "— Selección Musical —",
-      title: "DISCOGRAFÍA",
+      title: "DISCOGRAFIA",
     },
     // Shows
     shows: {

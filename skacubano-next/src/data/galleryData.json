@@ -1,0 +1,446 @@
+{
+  "integrantes": [
+    {
+      "id": "beny-villy",
+      "nombre": "Beny Villy",
+      "slug": "beny-villy",
+      "rol": "Voz Principal",
+      "bio": "Juan Manuel Villy Carbonell, cantante originario de Santiago de Cuba con un carisma inolvidable y voz inconfundible de son cubano tradicional.",
+      "fotoPrincipalUrl": "/images/photos/galery/BenyVilly/fruitguitar.jpg"
+    },
+    {
+      "id": "carlos-pena",
+      "nombre": "Carlos Peña",
+      "slug": "carlos-pena",
+      "rol": "Voz / Co-Líder Vocal",
+      "bio": "Vocalista venezolano que se unió a Ska Cubano en 2006, aportando dinamismo, sabor y energía arrolladora al escenario.",
+      "fotoPrincipalUrl": "/images/photos/galery/CarlosPeña/IMG_4575Watermark.jpg"
+    },
+    {
+      "id": "ernesto",
+      "nombre": "Ernesto",
+      "slug": "ernesto",
+      "rol": "Piano & Teclados",
+      "bio": "Ernesto Estruch, virtuoso pianista habanero que combina tumbaos cubanos tradicionales con la rítmica síncopa del ska jamaicano.",
+      "fotoPrincipalUrl": "/images/photos/galery/Ernesto/DSC_2005.JPG"
+    },
+    {
+      "id": "jesus",
+      "nombre": "Jesus",
+      "slug": "jesus",
+      "rol": "Tres & Guitarra",
+      "bio": "Jesús Cutiño, maestro de las cuerdas cubanas cuyo toque en el tres eléctrico define el característico choque de géneros de la banda.",
+      "fotoPrincipalUrl": "/images/photos/galery/Jesus/IMG_4508Watermark.jpg"
+    },
+    {
+      "id": "megumi",
+      "nombre": "Megumi",
+      "slug": "megumi",
+      "rol": "Saxofón Alto & Barítono",
+      "bio": "Megumi Mesaku (Miss Megoo), virtuosa del saxofón de Japón con un potente estilo skatalita y presencia deslumbrante en vivo.",
+      "fotoPrincipalUrl": "/images/photos/galery/Megumi/live in Rabat.jpg"
+    },
+    {
+      "id": "natty-bo",
+      "nombre": "Natty Bo",
+      "slug": "natty-bo",
+      "rol": "Voz Principal & Co-fundador",
+      "bio": "Nathan Lerner (Natty Bo), cantante y DJ londinense, cofundador de Ska Cubano e ideólogo de la fusión del ska retro con el mambo.",
+      "fotoPrincipalUrl": "/images/photos/galery/NattyBo/afcbe4dce0dacf04d566d1d888d44821.jpeg"
+    },
+    {
+      "id": "noda",
+      "nombre": "Noda",
+      "slug": "noda",
+      "rol": "Trombón",
+      "bio": "Kousuke Noda, trombonista versátil con potentes solos que impulsan la vibrante sección de vientos de la orquesta.",
+      "fotoPrincipalUrl": "/images/photos/galery/Noda/DSC_1970.JPG"
+    },
+    {
+      "id": "rey-crespo",
+      "nombre": "Rey Crespo",
+      "slug": "rey-crespo",
+      "rol": "Contrabajo & Dirección Musical",
+      "bio": "Rey Crespo, bajista habanero y director musical clave en la orquestación y arreglos explosivos del grupo.",
+      "fotoPrincipalUrl": "/images/photos/galery/ReyCrespo/IMG_4479Watermark.jpg"
+    },
+    {
+      "id": "sleepy",
+      "nombre": "Sleepy",
+      "slug": "sleepy",
+      "rol": "Batería & Percusión",
+      "bio": "Granville Sloane-Seale (Dr. Sleepy), baterista de Montserrat que sostiene la potente locomotora rítmica de Ska Cubano.",
+      "fotoPrincipalUrl": "/images/photos/galery/Sleepy/IMG_4486Watermark.jpg"
+    },
+    {
+      "id": "tan-tan",
+      "nombre": "Tan Tan",
+      "slug": "tan-tan",
+      "rol": "Trompeta",
+      "bio": "Eddie 'Tan Tan' Thornton, legendario trompetista jamaicano que ha tocado con los mayores iconos del ska, reggae y afrobeat.",
+      "fotoPrincipalUrl": "/images/photos/galery/TanTan/IMG_4498Watermark.jpg"
+    }
+  ],
+  "fotos": [
+    {
+      "id": "banda-1",
+      "url": "/images/photos/galery/banda/IMG_4407-Final.jpg",
+      "descripcion": "Ska Cubano Big Band en concierto estelar",
+      "fecha": "2010",
+      "integranteId": null,
+      "orden": 1,
+      "esPrincipal": false
+    },
+    {
+      "id": "banda-2",
+      "url": "/images/photos/galery/banda/IMG_4547Watermark.jpg",
+      "descripcion": "Actuación en vivo en festival internacional",
+      "fecha": "2008",
+      "integranteId": null,
+      "orden": 2,
+      "esPrincipal": false
+    },
+    {
+      "id": "banda-3",
+      "url": "/images/photos/galery/banda/IMG_4551Watermark.jpg",
+      "descripcion": "Sección de vientos en plena descarga cubana",
+      "fecha": "2008",
+      "integranteId": null,
+      "orden": 3,
+      "esPrincipal": false
+    },
+    {
+      "id": "banda-4",
+      "url": "/images/photos/galery/banda/IMG_4552Watermark.jpg",
+      "descripcion": "Explosión de energía ante miles de espectadores",
+      "fecha": "2009",
+      "integranteId": null,
+      "orden": 4,
+      "esPrincipal": false
+    },
+    {
+      "id": "banda-5",
+      "url": "/images/photos/galery/banda/IMG_4554Watermark.jpg",
+      "descripcion": "Momento festivo de la banda en el escenario",
+      "fecha": "2009",
+      "integranteId": null,
+      "orden": 5,
+      "esPrincipal": false
+    },
+    {
+      "id": "banda-6",
+      "url": "/images/photos/galery/banda/IMG_4631Watermark.jpg",
+      "descripcion": "Show inolvidable en gira europea",
+      "fecha": "2011",
+      "integranteId": null,
+      "orden": 6,
+      "esPrincipal": false
+    },
+    {
+      "id": "banda-7",
+      "url": "/images/photos/galery/banda/IMG_0916.JPG",
+      "descripcion": "Foto promocional clásica de la orquesta",
+      "fecha": "2005",
+      "integranteId": null,
+      "orden": 7,
+      "esPrincipal": false
+    },
+    {
+      "id": "banda-8",
+      "url": "/images/photos/galery/banda/advert ska cubano copy.JPG",
+      "descripcion": "Cartel y anuncio histórico de Ska Cubano",
+      "fecha": "2004",
+      "integranteId": null,
+      "orden": 8,
+      "esPrincipal": false
+    },
+    {
+      "id": "beny-1",
+      "url": "/images/photos/galery/BenyVilly/fruitguitar.jpg",
+      "descripcion": "Beny Villy con su vestuario característico de frutas y guitarra",
+      "fecha": "2005",
+      "integranteId": "beny-villy",
+      "orden": 1,
+      "esPrincipal": true
+    },
+    {
+      "id": "beny-2",
+      "url": "/images/photos/galery/BenyVilly/006_04.JPG",
+      "descripcion": "Beny Villy en Santiago de Cuba",
+      "fecha": "2001",
+      "integranteId": "beny-villy",
+      "orden": 2,
+      "esPrincipal": false
+    },
+    {
+      "id": "beny-3",
+      "url": "/images/photos/galery/BenyVilly/18.jpg",
+      "descripcion": "Beny sonriendo en el estudio de ensayo",
+      "fecha": "2004",
+      "integranteId": "beny-villy",
+      "orden": 3,
+      "esPrincipal": false
+    },
+    {
+      "id": "beny-4",
+      "url": "/images/photos/galery/BenyVilly/24.jpg",
+      "descripcion": "Beny Villy durante la grabación del álbum debut",
+      "fecha": "2003",
+      "integranteId": "beny-villy",
+      "orden": 4,
+      "esPrincipal": false
+    },
+    {
+      "id": "beny-5",
+      "url": "/images/photos/galery/BenyVilly/3.jpg",
+      "descripcion": "Retrato cálido de Beny Villy",
+      "fecha": "2005",
+      "integranteId": "beny-villy",
+      "orden": 5,
+      "esPrincipal": false
+    },
+    {
+      "id": "beny-6",
+      "url": "/images/photos/galery/BenyVilly/4.jpg",
+      "descripcion": "Beny cantando en vivo",
+      "fecha": "2006",
+      "integranteId": "beny-villy",
+      "orden": 6,
+      "esPrincipal": false
+    },
+    {
+      "id": "carlos-1",
+      "url": "/images/photos/galery/CarlosPeña/IMG_4575Watermark.jpg",
+      "descripcion": "Carlos Peña interpretando un potente mambo ska",
+      "fecha": "2008",
+      "integranteId": "carlos-pena",
+      "orden": 1,
+      "esPrincipal": true
+    },
+    {
+      "id": "carlos-2",
+      "url": "/images/photos/galery/CarlosPeña/DSC_1978.JPG",
+      "descripcion": "Carlos Peña en camerinos antes del concierto",
+      "fecha": "2007",
+      "integranteId": "carlos-pena",
+      "orden": 2,
+      "esPrincipal": false
+    },
+    {
+      "id": "carlos-3",
+      "url": "/images/photos/galery/CarlosPeña/IMG_4713Watermark.jpg",
+      "descripcion": "Carlos Peña bailando en el escenario",
+      "fecha": "2010",
+      "integranteId": "carlos-pena",
+      "orden": 3,
+      "esPrincipal": false
+    },
+    {
+      "id": "ernesto-1",
+      "url": "/images/photos/galery/Ernesto/DSC_2005.JPG",
+      "descripcion": "Ernesto Estruch al piano de cola",
+      "fecha": "2007",
+      "integranteId": "ernesto",
+      "orden": 1,
+      "esPrincipal": true
+    },
+    {
+      "id": "ernesto-2",
+      "url": "/images/photos/galery/Ernesto/IMG_4639Watermark.jpg",
+      "descripcion": "Ernesto ejecutando un tumbao cubano en vivo",
+      "fecha": "2009",
+      "integranteId": "ernesto",
+      "orden": 2,
+      "esPrincipal": false
+    },
+    {
+      "id": "jesus-1",
+      "url": "/images/photos/galery/Jesus/IMG_4508Watermark.jpg",
+      "descripcion": "Jesús Cutiño con el tres cubano",
+      "fecha": "2008",
+      "integranteId": "jesus",
+      "orden": 1,
+      "esPrincipal": true
+    },
+    {
+      "id": "jesus-2",
+      "url": "/images/photos/galery/Jesus/DSC_1962.JPG",
+      "descripcion": "Jesús ensayando un solo de guitarra",
+      "fecha": "2006",
+      "integranteId": "jesus",
+      "orden": 2,
+      "esPrincipal": false
+    },
+    {
+      "id": "jesus-3",
+      "url": "/images/photos/galery/Jesus/DSC_2039.JPG",
+      "descripcion": "Jesús sonriendo en backstage",
+      "fecha": "2007",
+      "integranteId": "jesus",
+      "orden": 3,
+      "esPrincipal": false
+    },
+    {
+      "id": "jesus-4",
+      "url": "/images/photos/galery/Jesus/DSC_2099.JPG",
+      "descripcion": "Jesús Cutiño cantando coros",
+      "fecha": "2007",
+      "integranteId": "jesus",
+      "orden": 4,
+      "esPrincipal": false
+    },
+    {
+      "id": "jesus-5",
+      "url": "/images/photos/galery/Jesus/IMG_4511Watermark.jpg",
+      "descripcion": "Jesús en medio de la descarga musical",
+      "fecha": "2009",
+      "integranteId": "jesus",
+      "orden": 5,
+      "esPrincipal": false
+    },
+    {
+      "id": "megumi-1",
+      "url": "/images/photos/galery/Megumi/live in Rabat.jpg",
+      "descripcion": "Miss Megoo (Megumi) en vivo en el festival de Rabat",
+      "fecha": "2008",
+      "integranteId": "megumi",
+      "orden": 1,
+      "esPrincipal": true
+    },
+    {
+      "id": "megumi-2",
+      "url": "/images/photos/galery/Megumi/DSC_2018.JPG",
+      "descripcion": "Megumi afinando su saxofón alto",
+      "fecha": "2007",
+      "integranteId": "megumi",
+      "orden": 2,
+      "esPrincipal": false
+    },
+    {
+      "id": "megumi-3",
+      "url": "/images/photos/galery/Megumi/IMG_4450Watermark.jpg",
+      "descripcion": "Megumi tocando saxofón barítono con la sección de vientos",
+      "fecha": "2009",
+      "integranteId": "megumi",
+      "orden": 3,
+      "esPrincipal": false
+    },
+    {
+      "id": "megumi-4",
+      "url": "/images/photos/galery/Megumi/IMG_4494Watermark.jpg",
+      "descripcion": "Solo deslumbrante de Miss Megoo",
+      "fecha": "2010",
+      "integranteId": "megumi",
+      "orden": 4,
+      "esPrincipal": false
+    },
+    {
+      "id": "natty-1",
+      "url": "/images/photos/galery/NattyBo/bio_portrait_natty.jpg",
+      "descripcion": "Natty Bo retrato con sombrero clásico",
+      "fecha": "2005",
+      "integranteId": "natty-bo",
+      "orden": 1,
+      "esPrincipal": false
+    },
+    {
+      "id": "natty-2",
+      "url": "/images/photos/galery/NattyBo/Beny&Natty, Santiago de Cuba 2.jpg",
+      "descripcion": "Natty Bo y Beny Villy en Santiago de Cuba",
+      "fecha": "2001",
+      "integranteId": "natty-bo",
+      "orden": 2,
+      "esPrincipal": false
+    },
+    {
+      "id": "natty-3",
+      "url": "/images/photos/galery/NattyBo/IMG_2593.JPG",
+      "descripcion": "Natty Bo cantando en vivo en Londres",
+      "fecha": "2006",
+      "integranteId": "natty-bo",
+      "orden": 3,
+      "esPrincipal": false
+    },
+    {
+      "id": "natty-4",
+      "url": "/images/photos/galery/NattyBo/afcbe4dce0dacf04d566d1d888d44821.jpeg",
+      "descripcion": "Natty Bo stylish vintage portrait",
+      "fecha": "2004",
+      "integranteId": "natty-bo",
+      "orden": 4,
+      "esPrincipal": true
+    },
+    {
+      "id": "noda-1",
+      "url": "/images/photos/galery/Noda/DSC_1970.JPG",
+      "descripcion": "Noda con el trombón de varas",
+      "fecha": "2007",
+      "integranteId": "noda",
+      "orden": 1,
+      "esPrincipal": true
+    },
+    {
+      "id": "noda-2",
+      "url": "/images/photos/galery/Noda/DSC_1976.JPG",
+      "descripcion": "Noda sonriendo en soundcheck",
+      "fecha": "2007",
+      "integranteId": "noda",
+      "orden": 2,
+      "esPrincipal": false
+    },
+    {
+      "id": "noda-3",
+      "url": "/images/photos/galery/Noda/IMG_4542Watermark.jpg",
+      "descripcion": "Noda en plena descarga de trombón",
+      "fecha": "2009",
+      "integranteId": "noda",
+      "orden": 3,
+      "esPrincipal": false
+    },
+    {
+      "id": "rey-1",
+      "url": "/images/photos/galery/ReyCrespo/IMG_4479Watermark.jpg",
+      "descripcion": "Rey Crespo marcando el tumbao en el contrabajo",
+      "fecha": "2008",
+      "integranteId": "rey-crespo",
+      "orden": 1,
+      "esPrincipal": true
+    },
+    {
+      "id": "rey-3",
+      "url": "/images/photos/galery/ReyCrespo/IMG_4675Watermark.jpg",
+      "descripcion": "Rey Crespo en plena improvisación",
+      "fecha": "2010",
+      "integranteId": "rey-crespo",
+      "orden": 3,
+      "esPrincipal": false
+    },
+    {
+      "id": "sleepy-1",
+      "url": "/images/photos/galery/Sleepy/IMG_4486Watermark.jpg",
+      "descripcion": "Dr. Sleepy al mando de la batería y percusión",
+      "fecha": "2008",
+      "integranteId": "sleepy",
+      "orden": 1,
+      "esPrincipal": true
+    },
+    {
+      "id": "tantan-1",
+      "url": "/images/photos/galery/TanTan/IMG_4498Watermark.jpg",
+      "descripcion": "Eddie 'Tan Tan' Thornton con la trompeta dorada",
+      "fecha": "2008",
+      "integranteId": "tan-tan",
+      "orden": 1,
+      "esPrincipal": true
+    },
+    {
+      "id": "tantan-2",
+      "url": "/images/photos/galery/TanTan/DSC_1998.JPG",
+      "descripcion": "Tan Tan sonriendo antes de salir a escena",
+      "fecha": "2007",
+      "integranteId": "tan-tan",
+      "orden": 2,
+      "esPrincipal": false
+    }
+  ]
+}

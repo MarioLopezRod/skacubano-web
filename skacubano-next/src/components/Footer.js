@@ -54,6 +54,13 @@ export default function Footer() {
             {t.nav.shows}
           </a>
           <a 
+            href="#gallery" 
+            onClick={(e) => handleSmoothScroll(e, "#gallery")} 
+            className="hover:text-yellow-400 transition-colors"
+          >
+            {t.nav.gallery}
+          </a>
+          <a 
             href="#history" 
             onClick={(e) => handleSmoothScroll(e, "#history")} 
             className="hover:text-yellow-400 transition-colors"
