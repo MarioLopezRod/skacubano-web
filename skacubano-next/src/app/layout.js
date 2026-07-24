@@ -1,8 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-
-import Navbar from "../components/Navbar"; 
+import { Providers } from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Ska Cubano",
-  description: "Ska Cubano official page",
+  description: "Ska Cubano official website",
   icons: {
     icon: "/logoSKA.ico", 
   }
@@ -28,16 +26,11 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
-        
-        
-        <Navbar />
-
-        <main className="flex-1">
+      <body className="min-h-full flex flex-col bg-[#0d0a07] text-[#faf6ee]">
+        <Providers>
           {children}
-        </main>
-
+        </Providers>
       </body>
     </html>
   );
-}
+}

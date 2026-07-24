@@ -1,12 +1,14 @@
 "use client";
 
+import { useLanguage } from "../context/LanguageContext";
+
 const handleSmoothScroll = (e, href) => {
   if (href.startsWith("#")) {
     e.preventDefault();
     const targetId = href.substring(1);
     const elem = document.getElementById(targetId);
     if (elem) {
-      const offset = 80; // Altura del Navbar
+      const offset = 80;
       const elementPosition = elem.getBoundingClientRect().top;
       const offsetPosition = elementPosition + window.scrollY - offset;
       window.scrollTo({
@@ -19,17 +21,19 @@ const handleSmoothScroll = (e, href) => {
 };
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="w-full bg-[#080605] py-12 px-6 border-t border-yellow-900/10 text-amber-50/40 relative z-20">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         
         {/* Lado izquierdo: Sello y logo */}
         <div className="flex flex-col items-center md:items-start text-center md:text-left">
-          <span className="font-alfa text-xl text-white tracking-wide uppercase select-none">
-            SKA <span className="text-[#d35400] font-alfa">CUBANO</span>
+          <span className="font-bowlorama text-xl text-white tracking-wide uppercase select-none">
+            SKA <span className="text-[#d35400] font-bowlorama">CUBANO</span>
           </span>
-          <p className="mt-2 text-xs font-serif italic text-amber-50/30 max-w-xs leading-relaxed">
-            The explosive clash of classic Jamaican ska and the traditional rhythms of Cuba, son, mambo and cumbia.
+          <p className="mt-2 text-xs font-serif italic text-amber-50/40 max-w-xs leading-relaxed">
+            {t.footer.description}
           </p>
         </div>
 
@@ -40,28 +44,28 @@ export default function Footer() {
             onClick={(e) => handleSmoothScroll(e, "#music")} 
             className="hover:text-yellow-400 transition-colors"
           >
-            Music
+            {t.nav.music}
           </a>
           <a 
             href="#shows" 
             onClick={(e) => handleSmoothScroll(e, "#shows")} 
             className="hover:text-yellow-400 transition-colors"
           >
-            Shows
+            {t.nav.shows}
           </a>
           <a 
             href="#history" 
             onClick={(e) => handleSmoothScroll(e, "#history")} 
             className="hover:text-yellow-400 transition-colors"
           >
-            History
+            {t.nav.history}
           </a>
           <a 
             href="#contact" 
             onClick={(e) => handleSmoothScroll(e, "#contact")} 
             className="hover:text-yellow-400 transition-colors"
           >
-            Contact
+            {t.nav.contact}
           </a>
         </div>
 
@@ -107,11 +111,12 @@ export default function Footer() {
               </svg>
             </a>
           </div>
-          <span className="text-[10px] font-mono tracking-wider text-amber-50/20">
-            © 2026 SKA CUBANO. ALL RIGHTS RESERVED.
+          <span className="text-[10px] font-mono tracking-wider text-amber-50/30">
+            © 2026 {t.footer.rights}
           </span>
         </div>
       </div>
     </footer>
   );
 }
+

@@ -1,57 +1,22 @@
 "use client";
 
 import { motion } from "framer-motion";
-
-const TIMELINE_EVENTS = [
-  {
-    year: "2001",
-    title: "SANTIAGO DE CUBA",
-    subtitle: "La idea de una historia alternativa",
-    text: "El gestor de inversiones Peter A. Scott decide recrear una 'historia alternativa en la que el ska cubano hubiera surgido de forma natural'. Viaja a Santiago de Cuba con el carismático cantante y DJ Natty Bo (Nathan Lerner) para ensayar y grabar su álbum debut con talentos locales como el cantante Beny Billy (Juan Manuel Villy Carbonell).",
-    align: "left"
-  },
-  {
-    year: "2004",
-    title: "LA BIG BAND",
-    subtitle: "Conexión Londres - Caribe",
-    text: "A finales de 2004, la banda se consolida en Londres con músicos caribeños e internacionales de primer nivel, incluyendo a Rey Crespo y Ernesto Estruch (La Habana), Dr. Sleepy (Montserrat), Eddie 'Tan Tan' Thornton (Jamaica), Miss Megoo (Japón) y Trevor Edwards (Londres), con Beny Billy viajando constantemente desde Cuba para giras y grabaciones.",
-    align: "right"
-  },
-  {
-    year: "2005",
-    title: "¡AY CARAMBA!",
-    subtitle: "Nominación a los Premios BBC",
-    text: "Lanzan su aclamado segundo álbum, '¡Ay Caramba!', que es nominado a los prestigiosos premios BBC World Music Award en la categoría 'Crossover'. La prensa musical lo describe como 'imaginativo, lleno de melodía, ingenio y una fusión alegre de ritmos irresistibles'. En 2006, el cantante venezolano Carlos Peña se une como co-líder vocal.",
-    align: "left"
-  },
-  {
-    year: "2010",
-    title: "MAMBO SKA",
-    subtitle: "Sonido de alto octanaje",
-    text: "Se publica 'Mambo Ska', calificado por la prestigiosa revista All About Jazz como 'una explosión ruidosa, desordenada e irresistible de música de alto octanaje'. Su popular tema 'Soy Campesino' se convierte en un fenómeno publicitario navideño en el Reino Unido para la cadena Comet.",
-    align: "right"
-  },
-  {
-    year: "LEGADO",
-    title: "GIRAS GLOBALES",
-    subtitle: "Más de 30 países conquistados",
-    text: "Con uno de los directos más enérgicos y fiesteros del mundo, Ska Cubano se presenta en los principales escenarios y festivales internacionales de prestigio como Glastonbury, WOMAD y Big Day Out, llevando su fusión contagiosa a rincones de todo el planeta.",
-    align: "left"
-  }
-];
+import { useLanguage } from "../context/LanguageContext";
 
 export default function History() {
+  const { t } = useLanguage();
+
   return (
     <section 
       id="history" 
-      className="relative w-full bg-[#fcfbf7] px-4 py-20 md:py-32 overflow-hidden border-t border-yellow-800/10"
+      className="relative w-full bg-cuban-blue px-4 py-20 md:py-32 overflow-hidden border-t border-yellow-800/20"
     >
-      {/* Elemento decorativo de fondo: Papel pautado o manchado */}
+      {/* Superposición sutil para riqueza visual */}
       <div 
-        className="absolute inset-0 pointer-events-none opacity-40 z-0"
+        className="absolute inset-0 pointer-events-none opacity-20 z-0"
         style={{
-          backgroundImage: "radial-gradient(#d4c4a8 1px, transparent 1px)",
-          backgroundSize: "24px 24px"
+          backgroundImage: "radial-gradient(#d35400 1px, transparent 1px)",
+          backgroundSize: "32px 32px"
         }}
       />
 
@@ -59,27 +24,27 @@ export default function History() {
         {/* Cabecera de la sección */}
         <div className="text-center mb-16 md:mb-24">
           <span 
-            className="text-[#d35400] text-xs font-mono tracking-[0.4em] uppercase block mb-3"
+            className="text-yellow-400 text-xs font-mono tracking-[0.4em] uppercase block mb-3 drop-shadow"
           >
-            — Nuestra Trayectoria —
+            {t.history.badge}
           </span>
           <h2 
-            className="font-alfa text-4xl md:text-6xl text-zinc-900 tracking-tight leading-none uppercase"
+            className="font-bowlorama text-4xl md:text-7xl text-[#faf6ee] tracking-wide leading-none uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
           >
-            HISTORIA
+            {t.history.title}
           </h2>
-          <div className="w-16 h-1 bg-[#d35400] mx-auto mt-6" />
+          <div className="w-20 h-1 bg-[#d35400] mx-auto mt-6 shadow-md" />
         </div>
 
         {/* Línea de Tiempo */}
         <div className="relative w-full">
           {/* Línea vertical central */}
-          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[2px] bg-[#d35400]/25 -translate-x-[1px] md:-translate-x-1/2 z-0" />
+          <div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-[3px] bg-yellow-500/40 -translate-x-[1px] md:-translate-x-1/2 z-0" />
 
           {/* Bloques de la línea de tiempo */}
           <div className="space-y-12 md:space-y-20 relative z-10">
-            {TIMELINE_EVENTS.map((event, index) => {
-              const isLeft = event.align === "left";
+            {t.history.events.map((event, index) => {
+              const isLeft = index % 2 === 0;
 
               return (
                 <div 
@@ -90,7 +55,7 @@ export default function History() {
                 >
                   {/* Punto indicador sobre la línea de tiempo */}
                   <div 
-                    className="absolute left-4 md:left-1/2 w-4 h-4 rounded-full bg-[#d35400] border-4 border-[#fcfbf7] -translate-x-1/2 top-2 z-20 shadow-md"
+                    className="absolute left-4 md:left-1/2 w-5 h-5 rounded-full bg-[#d35400] border-4 border-yellow-400 -translate-x-1/2 top-3 z-20 shadow-lg"
                   />
 
                   {/* Lado Vacío (espacio en escritorio) */}
@@ -103,35 +68,51 @@ export default function History() {
                       whileInView={{ opacity: 1, y: 0, scale: 1 }}
                       viewport={{ once: true, margin: "-100px" }}
                       transition={{ duration: 0.6, ease: "easeOut" }}
-                      className="bg-[#faf6ee] p-6 md:p-8 rounded-sm shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-[#d4c4a8]/30 relative hover:shadow-[0_12px_40px_rgba(211,84,0,0.08)] transition-all duration-300 group"
+                      className="bg-[#faf6ee] p-6 md:p-8 rounded-sm shadow-[0_12px_36px_rgba(0,0,0,0.4)] border-2 border-amber-950/20 relative hover:shadow-[0_16px_45px_rgba(0,0,0,0.5)] transition-all duration-300 group overflow-hidden"
                     >
-                      {/* Chincheta o detalle decorativo superior retro */}
-                      <div className="absolute -top-1.5 left-6 w-3 h-3 bg-zinc-700 rounded-full border border-white shadow-sm opacity-60 group-hover:bg-[#d35400] transition-colors duration-300" />
+                      {/* Sello postal retro */}
+                      <div className="absolute top-4 right-4 text-[10px] font-mono font-bold tracking-widest text-[#d35400] uppercase border border-[#d35400]/40 px-2.5 py-1 rounded-sm bg-amber-100/60 rotate-2 shadow-sm">
+                        {event.stamp}
+                      </div>
+
+                      {/* Chincheta decorativa */}
+                      <div className="absolute -top-2 left-6 w-3.5 h-3.5 bg-amber-800 rounded-full border-2 border-white shadow-md group-hover:bg-[#d35400] transition-colors duration-300" />
+
+                      {/* Foto Histórica Archivo */}
+                      {event.photo && (
+                        <div className="mb-4 rounded-sm overflow-hidden border border-amber-900/20 shadow-sm max-h-48">
+                          <img 
+                            src={event.photo} 
+                            alt={event.title} 
+                            className="w-full h-44 object-cover group-hover:scale-105 transition-transform duration-500" 
+                          />
+                        </div>
+                      )}
                       
-                      {/* Año destacado */}
+                      {/* Año destacado (Uso de font-alfa para perfecta alineación de números) */}
                       <span 
-                        className="font-alfa text-3xl md:text-5xl text-[#d35400]/80 tracking-tighter block mb-2"
+                        className="font-alfa text-3xl md:text-5xl text-[#d35400] tracking-tight block mb-2 leading-none"
                       >
                         {event.year}
                       </span>
 
                       {/* Título */}
                       <h3 
-                        className="font-alfa text-lg md:text-xl text-zinc-900 uppercase tracking-tight mb-1"
+                        className="font-bowlorama text-xl md:text-2xl text-zinc-900 uppercase tracking-wide mb-1"
                       >
                         {event.title}
                       </h3>
 
                       {/* Subtítulo */}
                       <span 
-                        className="text-xs uppercase font-mono tracking-wider text-zinc-500 block mb-4"
+                        className="text-xs uppercase font-mono tracking-wider text-amber-900/80 block mb-3 font-semibold"
                       >
                         {event.subtitle}
                       </span>
 
                       {/* Texto */}
                       <p 
-                        className="text-zinc-700 font-serif text-sm md:text-base leading-relaxed"
+                        className="text-zinc-800 font-serif text-sm md:text-base leading-relaxed"
                       >
                         {event.text}
                       </p>
@@ -149,13 +130,13 @@ export default function History() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 1, delay: 0.2 }}
-          className="text-center mt-20 md:mt-32 max-w-xl mx-auto"
+          className="text-center mt-20 md:mt-32 max-w-xl mx-auto p-6 rounded-lg bg-black/40 backdrop-blur-md border border-yellow-500/20 shadow-xl"
         >
-          <p className="text-zinc-400 font-serif italic text-lg leading-relaxed">
-            "Aunque la banda hoy no está en activo, la fusión mágica del Ska jamaicano y el Son cubano sigue resonando en sus grabaciones y en la memoria de miles de fans en todo el mundo."
+          <p className="text-yellow-100/90 font-serif italic text-lg leading-relaxed">
+            {t.history.quote}
           </p>
-          <span className="text-[#d35400] font-mono text-xs uppercase tracking-[0.2em] mt-3 block">
-            ★ original ska & son ★
+          <span className="text-yellow-400 font-mono text-xs uppercase tracking-[0.25em] mt-4 block font-bold">
+            {t.history.tag}
           </span>
         </motion.div>
       </div>

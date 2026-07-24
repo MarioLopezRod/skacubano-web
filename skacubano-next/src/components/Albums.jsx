@@ -38,9 +38,12 @@ const albums = [
   },
 ];
 
+import { useLanguage } from "../context/LanguageContext";
+
 export default function Albums() {
   const [activeAlbum, setActiveAlbum] = useState(null);
   const containerRef = useRef(null);
+  const { t } = useLanguage();
 
   // Rastreo de la posición de scroll sobre el contenedor de discografía
   const { scrollYProgress } = useScroll({
@@ -65,7 +68,7 @@ export default function Albums() {
     <section 
       id="music"
       ref={containerRef}
-      className="min-h-screen w-full bg-[#f3eac0] flex flex-col items-center justify-center overflow-hidden px-4 py-16 relative"
+      className="min-h-screen w-full bg-cuban-yellow flex flex-col items-center justify-center overflow-hidden px-4 py-20 relative border-t border-amber-900/20"
     >
       
       {/* INSTRUMENTOS FLOTANTES CON PARALLAX (Ocultos en móvil para no tapar los discos) */}
@@ -130,9 +133,15 @@ export default function Albums() {
         />
       </motion.div>
       
-      <h2 className="font-alfa text-3xl md:text-5xl text-[#d35400] mb-12 tracking-tight text-center">
-        DISCOGRAFÍA
-      </h2>
+      <div className="text-center mb-16 relative z-10">
+        <span className="text-[#d35400] text-xs font-mono tracking-[0.4em] uppercase block mb-3 font-bold drop-shadow">
+          {t.albums.badge}
+        </span>
+        <h2 className="font-bowlorama text-4xl md:text-7xl text-[#2a1a0a] tracking-wide text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.15)] pb-4">
+          {t.albums.title}
+        </h2>
+        <div className="w-24 h-1.5 bg-[#d35400] mx-auto mt-6 rounded-full shadow-md" />
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 md:gap-x-40 max-w-5xl mx-auto">
         
