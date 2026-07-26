@@ -25,7 +25,14 @@ export default function Footer() {
           >
             Mario López
           </a>
-          {" "}& Alejandro Pozuelo
+          {" "}& <a
+            href="https://www.linkedin.com/in/alejandro-pozuelo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-amber-200/90 hover:text-yellow-400 underline decoration-yellow-500/40 underline-offset-4 transition-colors font-medium"
+          >
+            Alejandro Pozuelo
+          </a>
         </p>
 
       </div>
