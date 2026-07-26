@@ -13,7 +13,7 @@ export async function PUT(request, { params }) {
 
     const { id } = await params;
     const body = await request.json();
-    const { descripcion, fecha, integranteId, esPrincipal } = body;
+    const { descripcion, descripcionEn, fecha, integranteId, esPrincipal } = body;
 
     const data = getGalleryData();
     const photoIndex = data.fotos.findIndex((f) => f.id === id);
@@ -37,6 +37,7 @@ export async function PUT(request, { params }) {
     data.fotos[photoIndex] = {
       ...data.fotos[photoIndex],
       descripcion: descripcion !== undefined ? descripcion : currentPhoto.descripcion,
+      descripcionEn: descripcionEn !== undefined ? descripcionEn : (currentPhoto.descripcionEn || ''),
       fecha: fecha !== undefined ? fecha : currentPhoto.fecha,
       integranteId: targetMemberId,
       esPrincipal: esPrincipal !== undefined ? esPrincipal : currentPhoto.esPrincipal

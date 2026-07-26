@@ -1,0 +1,37 @@
+{
+  "links": [
+    {
+      "id": "link-1785064232149",
+      "titulo": "Rider Técnico y Escenario – Festival Summer Beats 2026",
+      "slug": "rider-tecnico-y-escenario-festival-summer-beats-2026",
+      "clave": "summer2026stage",
+      "notasTecnicas": "• Escenario de 12 x 10 metros.\r\n• Alimentación eléctrica trifásica 63A disponible en ambos laterales.\r\n• Batería centrada sobre tarima de 2 x 2 m.\r\n• Bajo por DI + amplificador.\r\n• Guitarras con dos líneas independientes.\r\n• 6 monitores de suelo y 2 sidefills.\r\n• Sistema de in-ear para voz principal.\r\n• Mesa FOH digital compatible con Dante.\r\n• Prueba de sonido prevista de 16:30 a 17:30.\r\n• Mantener acceso libre al backstage durante el montaje.",
+      "fotos": [
+        {
+          "id": "img-1785064232146-0",
+          "url": "/uploads/privado/stage_1785064232145_0.png",
+          "nombre": "STAGEPLAN & MONITOR MIX & CHANEL LIST-1.png"
+        },
+        {
+          "id": "img-1785064232147-1",
+          "url": "/uploads/privado/stage_1785064232146_1.jpg",
+          "nombre": "back of jewel case.jpg"
+        },
+        {
+          "id": "img-1785064232149-2",
+          "url": "/uploads/privado/stage_1785064232148_2.jpg",
+          "nombre": "pages 7 & 8 copy.jpg"
+        },
+        {
+          "id": "file-1785064414316-0",
+          "url": "/uploads/privado/doc_1785064414315_0.pdf",
+          "nombre": "certificado_calculadora-570-991SPCW.pdf",
+          "esPdf": true,
+          "tipo": "pdf"
+        }
+      ],
+      "creadoEn": "2026-07-26T11:10:32.149Z",
+      "activo": true
+    }
+  ]
+}

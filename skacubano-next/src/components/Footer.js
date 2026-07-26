@@ -1,129 +1,34 @@
 "use client";
 
-import { useLanguage } from "../context/LanguageContext";
-
-const handleSmoothScroll = (e, href) => {
-  if (href.startsWith("#")) {
-    e.preventDefault();
-    const targetId = href.substring(1);
-    const elem = document.getElementById(targetId);
-    if (elem) {
-      const offset = 80;
-      const elementPosition = elem.getBoundingClientRect().top;
-      const offsetPosition = elementPosition + window.scrollY - offset;
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: "smooth",
-      });
-      window.history.pushState(null, "", href);
-    }
-  }
-};
-
 export default function Footer() {
-  const { t } = useLanguage();
-
   return (
-    <footer className="w-full bg-[#080605] py-12 px-6 border-t border-yellow-900/10 text-amber-50/40 relative z-20">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+    <footer className="w-full bg-[#080605] py-4 px-6 border-t border-amber-900/20 text-amber-50/50 relative z-20">
+      <div className="max-w-4xl mx-auto flex flex-col items-center justify-center gap-2 text-center">
         
-        {/* Lado izquierdo: Sello y logo */}
-        <div className="flex flex-col items-center md:items-start text-center md:text-left">
-          <span className="font-bowlorama text-xl text-white tracking-wide uppercase select-none">
-            SKA <span className="text-[#d35400] font-bowlorama">CUBANO</span>
-          </span>
-          <p className="mt-2 text-xs font-serif italic text-amber-50/40 max-w-xs leading-relaxed">
-            {t.footer.description}
-          </p>
+        {/* Logo compacto centrado */}
+        <div className="flex items-center justify-center">
+          <img 
+            src="/images/logos/logoSkaCubano.png" 
+            alt="Ska Cubano" 
+            className="h-8 md:h-10 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] transition-transform duration-300 hover:scale-105"
+          />
         </div>
 
-        {/* Lado central: Enlaces rápidos */}
-        <div className="flex flex-wrap justify-center gap-6 font-mono text-xs uppercase tracking-widest">
-          <a 
-            href="#music" 
-            onClick={(e) => handleSmoothScroll(e, "#music")} 
-            className="hover:text-yellow-400 transition-colors"
+        {/* Copyright y Créditos totalmente centrados */}
+        <p className="text-[11px] sm:text-xs font-mono tracking-wider text-amber-50/50 leading-tight text-center">
+          © 2026 Skacubano · Designed & Developed by{" "}
+          <a
+            href="https://www.linkedin.com/in/mario-l%C3%B3pez-rodr%C3%ADguez-863349306/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-amber-200/90 hover:text-yellow-400 underline decoration-yellow-500/40 underline-offset-4 transition-colors font-medium"
           >
-            {t.nav.music}
+            Mario López
           </a>
-          <a 
-            href="#shows" 
-            onClick={(e) => handleSmoothScroll(e, "#shows")} 
-            className="hover:text-yellow-400 transition-colors"
-          >
-            {t.nav.shows}
-          </a>
-          <a 
-            href="#gallery" 
-            onClick={(e) => handleSmoothScroll(e, "#gallery")} 
-            className="hover:text-yellow-400 transition-colors"
-          >
-            {t.nav.gallery}
-          </a>
-          <a 
-            href="#history" 
-            onClick={(e) => handleSmoothScroll(e, "#history")} 
-            className="hover:text-yellow-400 transition-colors"
-          >
-            {t.nav.history}
-          </a>
-          <a 
-            href="#contact" 
-            onClick={(e) => handleSmoothScroll(e, "#contact")} 
-            className="hover:text-yellow-400 transition-colors"
-          >
-            {t.nav.contact}
-          </a>
-        </div>
+          {" "}& Alejandro Pozuelo
+        </p>
 
-        {/* Lado derecho: Redes e información */}
-        <div className="flex flex-col items-center md:items-end gap-3">
-          <div className="flex gap-4 text-amber-50/50">
-            {/* Facebook */}
-            <a 
-              href="https://facebook.com/skacubano" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-yellow-400 hover:scale-110 transition-all"
-              aria-label="Facebook"
-            >
-              <svg className="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-              </svg>
-            </a>
-            {/* Instagram */}
-            <a 
-              href="https://instagram.com/skacubano" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-yellow-400 hover:scale-110 transition-all"
-              aria-label="Instagram"
-            >
-              <svg className="w-[18px] h-[18px]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                <circle cx="12" cy="12" r="4" />
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-              </svg>
-            </a>
-            {/* X / Twitter */}
-            <a 
-              href="https://x.com/skcubano" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="hover:text-yellow-400 hover:scale-110 transition-all"
-              aria-label="X (Twitter)"
-            >
-              <svg className="w-[16px] h-[16px]" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L2.25 2.25h6.918l4.254 5.622L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-              </svg>
-            </a>
-          </div>
-          <span className="text-[10px] font-mono tracking-wider text-amber-50/30">
-            © 2026 {t.footer.rights}
-          </span>
-        </div>
       </div>
     </footer>
   );
 }
-

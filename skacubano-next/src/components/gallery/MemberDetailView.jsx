@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import BowloramaText from "../BowloramaText";
 
 export default function MemberDetailView({ member, photos = [], onBack, onSelectPhoto }) {
   if (!member) return null;
@@ -28,10 +29,6 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
         >
           <span>← Volver a Integrantes</span>
         </button>
-
-        <span className="text-xs font-mono text-amber-200/80 uppercase tracking-widest bg-black/60 px-3 py-1 rounded-full border border-yellow-400/20">
-          ★ {memberPhotos.length} {memberPhotos.length === 1 ? "Fotografia" : "Fotografias"}
-        </span>
       </div>
 
       {/* Member Hero Banner with Cuban Vintage Paper Texture */}
@@ -58,7 +55,7 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
               ★ {member.rol} ★
             </div>
             
-            <h2 className="font-bowlorama text-4xl sm:text-6xl text-[#0d0a07] uppercase tracking-wide drop-shadow">
+            <h2 className="font-bebas text-5xl sm:text-7xl text-[#0d0a07] uppercase tracking-wider drop-shadow leading-none mb-1">
               {member.nombre}
             </h2>
 

@@ -17,8 +17,8 @@ export async function POST(request) {
     }
 
     const formData = await request.formData();
-    const file = formData.get('file');
     const descripcion = formData.get('descripcion') || '';
+    const descripcionEn = formData.get('descripcionEn') || '';
     const fecha = formData.get('fecha') || new Date().getFullYear().toString();
     const integranteId = formData.get('integranteId') === 'banda' ? null : formData.get('integranteId');
     const esPrincipal = formData.get('esPrincipal') === 'true';
@@ -52,6 +52,7 @@ export async function POST(request) {
       id: `photo_${timestamp}`,
       url: filePublicUrl,
       descripcion,
+      descripcionEn,
       fecha,
       integranteId,
       orden: maxOrder + 1,

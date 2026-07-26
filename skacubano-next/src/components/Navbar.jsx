@@ -2,10 +2,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { useLanguage } from "../context/LanguageContext";
 
-// Shared smooth scroll function
 const handleSmoothScroll = (e, href, callback = null) => {
   if (href === "/") {
     e.preventDefault();
@@ -14,8 +12,7 @@ const handleSmoothScroll = (e, href, callback = null) => {
       behavior: "smooth",
     });
     window.history.pushState(null, "", "/");
-  }
-  else if (href.includes("#")) {
+  } else if (href.includes("#")) {
     const targetId = href.replace(/.*\#/, "");
     const elem = document.getElementById(targetId);
 
@@ -39,209 +36,186 @@ const handleSmoothScroll = (e, href, callback = null) => {
   }
 };
 
-function InstrumentDeco() {
-  return (
-    <div className="absolute inset-0 pointer-events-none select-none overflow-hidden opacity-[0.06]">
-      <svg width="100%" height="100%">
-        <defs>
-          <pattern id="orquesta" x="0" y="0" width="300" height="76" patternUnits="userSpaceOnUse">
-            <g transform="translate(15, 50) rotate(-15) scale(0.65)" fill="none" stroke="#facc15" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M4 12 H24 L32 4 V20 L24 12" />
-              <line x1="12" y1="6" x2="12" y2="12" />
-              <line x1="16" y1="6" x2="16" y2="12" />
-              <line x1="20" y1="6" x2="20" y2="12" />
-            </g>
-            <g transform="translate(85, 15) rotate(12) scale(0.55)" fill="none" stroke="#facc15" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-              <ellipse cx="20" cy="10" rx="14" ry="5" />
-              <path d="M6 10 C6 30 12 36 12 44 H28 C28 36 34 30 34 10" />
-            </g>
-            <text x="285" y="65" fontSize="18" fill="#16a34a" fontFamily="system-ui" transform="rotate(-15 285 65)">★</text>
-          </pattern>
-        </defs>
-        <rect x="0" y="0" width="100%" height="100%" fill="url(#orquesta)" />
-      </svg>
-    </div>
-  );
-}
-
-function NavLink({ href, label }) {
-  return (
-    <Link
-      href={href}
-      onClick={(e) => handleSmoothScroll(e, href)}
-      className="relative block px-3.5 py-2 text-[12px] font-semibold uppercase tracking-[.06em] text-white/80 hover:text-yellow-400 hover:bg-yellow-400/10 rounded-md transition-all duration-150 group drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]"
-    >
-      {label}
-      <span className="absolute bottom-1 left-3.5 right-3.5 h-[1.5px] rounded-full bg-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-200" />
-    </Link>
-  );
-}
-
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { lang, toggleLanguage, t } = useLanguage();
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => {
+      // Reveal header logo once scrolled past the main Hero section
+      setScrolled(window.scrollY > 220);
+    };
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const navLinksLeft = [
-    { label: t.nav.music, href: "/#music" },
-    { label: t.nav.shows, href: "/#shows" },
-    { label: t.nav.gallery, href: "/galeria" },
+  const navLinks = [
+    { label: t.nav.music, href: "#music" },
+    { label: t.nav.shows, href: "#shows" },
+    { label: t.nav.gallery, href: "#gallery" },
+    { label: t.nav.history, href: "#history" },
+    { label: t.nav.contact, href: "#contact" },
   ];
-
-  const navLinksRight = [
-    { label: t.nav.history, href: "/#history" },
-    { label: t.nav.contact, href: "/#contact" },
-  ];
-
-  const allNavLinks = [...navLinksLeft, ...navLinksRight];
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
-      <nav
-        className={`relative transition-all duration-500 ${scrolled
-            ? "bg-zinc-950/95 backdrop-blur-md border-b border-yellow-400/10 shadow-[0_4px_30px_rgba(0,0,0,0.5)]"
-            : "bg-black/40 backdrop-blur-sm border-b border-white/5"
-          }`}
-      >
-        <div className={`transition-opacity duration-500 ${scrolled ? "opacity-100" : "opacity-30"}`}>
-          <InstrumentDeco />
-        </div>
-
-        {/* ── DESKTOP ── */}
-        <div className="relative z-10 hidden lg:flex items-center justify-between max-w-7xl mx-auto px-6 h-[72px]">
-
-          {/* LADO IZQUIERDO: Links del lado izquierdo del logo (MUSIC | SHOWS | GALLERY) */}
-          <div className="flex-1 flex justify-end items-center pr-16 xl:pr-20 relative z-30">
-            <ul className="flex items-center gap-1 list-none">
-              {navLinksLeft.map((link) => (
-                <li key={link.href}><NavLink {...link} /></li>
-              ))}
-            </ul>
-          </div>
-
-          {/* CENTRO: Logo grande en el centro absoluto */}
-          <div className="absolute left-1/2 -translate-x-1/2 z-20 pointer-events-none flex justify-center">
-            <Link
-              href="/"
-              onClick={(e) => handleSmoothScroll(e, "/")}
-              className="hover:scale-105 transition-transform duration-300 block translate-y-[28px] pointer-events-auto w-[200px] xl:w-[240px]"
-            >
-              <Image
-                src="/skaCubano.png"
-                alt="Ska Cubano Logo"
-                width={350}
-                height={150}
-                priority
-                className="w-full h-auto object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
-              />
-            </Link>
-          </div>
-
-          {/* LADO DERECHO: Links de la derecha (HISTORY | CONTACT) + Socials + Language Toggle */}
-          <div className="flex-1 flex items-center justify-between pl-16 xl:pl-20 relative z-30">
-            {/* Links de la derecha */}
-            <ul className="flex items-center gap-1 list-none">
-              {navLinksRight.map((link) => (
-                <li key={link.href}><NavLink {...link} /></li>
-              ))}
-            </ul>
-
-            {/* Redes sociales + Botón de Idioma */}
-            <div className="flex items-center gap-3">
-              {/* Language Switcher Flag Button */}
-              <button
-                onClick={toggleLanguage}
-                title={lang === "en" ? "Cambiar a Español" : "Switch to English"}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-yellow-400/40 bg-black/40 hover:bg-yellow-400/20 transition-all duration-200 text-xs font-mono font-bold text-yellow-400 shadow-md cursor-pointer hover:scale-105"
-              >
-                <span className="text-base">{lang === "en" ? "🇬🇧" : "🇪🇸"}</span>
-                <span className="uppercase">{lang === "en" ? "EN" : "ES"}</span>
-              </button>
-
-              <div className="w-px h-5 bg-yellow-400/20 mr-1" />
-
-              <a href="https://facebook.com/skacubano" target="_blank" rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full border border-yellow-400/25 flex items-center justify-center text-yellow-400/70 hover:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-400/10 transition-all duration-150">
-                <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
-                </svg>
-              </a>
-              <a href="https://instagram.com/skacubano" target="_blank" rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full border border-yellow-400/25 flex items-center justify-center text-yellow-400/70 hover:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-400/10 transition-all duration-150">
-                <svg className="w-[14px] h-[14px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                </svg>
-              </a>
-              <a href="https://x.com/skcubano" target="_blank" rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full border border-yellow-400/25 flex items-center justify-center text-yellow-400/70 hover:text-yellow-400 hover:border-yellow-400/60 hover:bg-yellow-400/10 transition-all duration-150">
-                <svg className="w-[13px] h-[13px]" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L2.25 2.25h6.918l4.254 5.622L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* ── MOBILE ── */}
-        <div className="relative z-10 lg:hidden flex items-center justify-between max-w-7xl mx-auto px-6 h-[76px]">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 border-b border-yellow-500/15 bg-[#0d0906]/92 backdrop-blur-md px-4 sm:px-8 py-2.5 shadow-[0_4px_25px_rgba(0,0,0,0.85)]">
+      <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
+        
+        {/* LADO IZQUIERDO: Logo dentro de un círculo retro elegante que destaca sobre el fondo */}
+        <div className="flex items-center min-w-[120px] sm:min-w-[160px]">
           <Link
             href="/"
             onClick={(e) => handleSmoothScroll(e, "/")}
-            className="absolute left-1/2 -translate-x-1/2 hover:scale-105 transition-transform duration-300 translate-y-[20px] w-[180px] pointer-events-auto z-20"
+            title="Volver al Inicio"
+            aria-label="Volver al Inicio"
+            className={`w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#18110b] border-2 border-yellow-500/40 hover:border-yellow-400 hover:bg-[#d35400] transition-all duration-300 flex items-center justify-center p-1.5 shadow-[0_4px_15px_rgba(0,0,0,0.8)] group cursor-pointer ${
+              scrolled
+                ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
+                : "opacity-0 -translate-x-4 scale-90 pointer-events-none"
+            }`}
           >
-            <Image
-              src="/skaCubano.png"
+            <img
+              src="/images/logos/logoSkaCubano.png"
               alt="Ska Cubano Logo"
-              width={350}
-              height={150}
-              className="w-full h-auto object-contain drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
+              className="w-full h-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] group-hover:scale-110 transition-transform duration-300"
+            />
+          </Link>
+        </div>
+
+        {/* CENTRO: Menú de navegación tradicional centrado */}
+        <nav className="hidden md:flex items-center justify-center gap-6 lg:gap-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={(e) => handleSmoothScroll(e, link.href)}
+              className="relative py-1 text-xs sm:text-sm font-mono font-bold uppercase tracking-[0.2em] text-amber-100/90 hover:text-yellow-400 transition-colors duration-200 group"
+            >
+              {link.label}
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#d35400] scale-x-0 group-hover:scale-x-100 transition-transform duration-200 rounded-full" />
+            </Link>
+          ))}
+        </nav>
+
+        {/* LADO DERECHO: Selector de Idioma & Redes Sociales */}
+        <div className="hidden md:flex items-center gap-4 min-w-[120px] sm:min-w-[160px] justify-end">
+          {/* Botón de Idioma */}
+          <button
+            onClick={toggleLanguage}
+            title={lang === "en" ? "Cambiar a Español" : "Switch to English"}
+            className="flex items-center gap-2 px-3 py-1 rounded-sm border border-yellow-500/40 bg-[#1a120b] hover:bg-[#d35400] hover:text-black text-amber-200 transition-all duration-200 text-xs font-mono font-bold uppercase tracking-wider shadow-md cursor-pointer hover:scale-105"
+          >
+            <span className={`fi ${lang === "en" ? "fi-gb" : "fi-es"} rounded-xs shadow-sm`}></span>
+            <span>{lang === "en" ? "EN" : "ES"}</span>
+          </button>
+
+          <div className="w-px h-4 bg-yellow-500/20" />
+
+          {/* Redes Sociales */}
+          <div className="flex items-center gap-2">
+            <a
+              href="https://facebook.com/skacubano"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-7 h-7 rounded-full border border-yellow-500/30 flex items-center justify-center text-amber-200/80 hover:text-yellow-400 hover:border-yellow-400 hover:bg-[#d35400]/20 transition-all duration-200 shadow-sm"
+              aria-label="Facebook"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+              </svg>
+            </a>
+            <a
+              href="https://instagram.com/skacubano"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-7 h-7 rounded-full border border-yellow-500/30 flex items-center justify-center text-amber-200/80 hover:text-yellow-400 hover:border-yellow-400 hover:bg-[#d35400]/20 transition-all duration-200 shadow-sm"
+              aria-label="Instagram"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
+              </svg>
+            </a>
+            <a
+              href="https://x.com/skcubano"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-7 h-7 rounded-full border border-yellow-500/30 flex items-center justify-center text-amber-200/80 hover:text-yellow-400 hover:border-yellow-400 hover:bg-[#d35400]/20 transition-all duration-200 shadow-sm"
+              aria-label="X (Twitter)"
+            >
+              <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L2.25 2.25h6.918l4.254 5.622L18.244 2.25Zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        {/* CONTROLES MOBILE */}
+        <div className="flex md:hidden items-center justify-between w-full">
+          {/* Logo mobile circular animado */}
+          <Link
+            href="/"
+            onClick={(e) => handleSmoothScroll(e, "/")}
+            title="Volver al Inicio"
+            className={`w-10 h-10 rounded-full bg-[#18110b] border-2 border-yellow-500/40 p-1 flex items-center justify-center transition-all duration-500 ease-out transform ${
+              scrolled
+                ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
+                : "opacity-0 -translate-x-4 scale-90 pointer-events-none"
+            }`}
+          >
+            <img
+              src="/images/logos/logoSkaCubano.png"
+              alt="Ska Cubano Logo"
+              className="w-full h-full object-contain"
             />
           </Link>
 
-          <div className="flex items-center gap-3 ml-auto relative z-30">
-            {/* Mobile Language Switcher */}
+          <div className="flex items-center gap-3 ml-auto">
             <button
               onClick={toggleLanguage}
-              className="flex items-center gap-1 px-2 py-1 rounded-full border border-yellow-400/40 bg-black/60 text-xs font-mono font-bold text-yellow-400"
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-sm border border-yellow-500/40 bg-[#1a120b] text-xs font-mono font-bold text-yellow-400"
             >
-              <span>{lang === "en" ? "🇬🇧" : "🇪🇸"}</span>
+              <span className={`fi ${lang === "en" ? "fi-gb" : "fi-es"} rounded-xs shadow-sm`}></span>
               <span>{lang === "en" ? "EN" : "ES"}</span>
             </button>
 
-            <button onClick={() => setMenuOpen(!menuOpen)} className="flex flex-col gap-[5px] p-2 rounded-lg hover:bg-white/5 transition-colors">
-              <span className={`block w-[22px] h-[2px] rounded-full bg-white transition-all duration-300 ${menuOpen ? "rotate-45 translate-y-[7px]" : ""}`} />
-              <span className={`block h-[2px] rounded-full bg-yellow-400 transition-all duration-300 ${menuOpen ? "opacity-0 w-0" : "w-4"}`} />
-              <span className={`block w-[22px] h-[2px] rounded-full bg-white transition-all duration-300 ${menuOpen ? "-rotate-45 -translate-y-[7px]" : ""}`} />
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-1.5 text-yellow-400 hover:bg-yellow-500/10 rounded-sm focus:outline-none"
+              aria-label="Toggle Menu"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                {menuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
             </button>
           </div>
         </div>
 
-        <div className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${menuOpen ? "max-h-[600px] opacity-100" : "max-h-0 opacity-0"}`}>
-          <div className="border-t border-yellow-400/10 bg-black/90 backdrop-blur-md">
-            {allNavLinks.map((link) => (
+      </div>
+
+      {/* Menú desplegable mobile */}
+      {menuOpen && (
+        <div className="md:hidden border-t border-yellow-900/30 bg-[#0d0906]/98 backdrop-blur-md px-6 py-6 shadow-2xl mt-3">
+          <div className="flex flex-col gap-3">
+            {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={(e) => handleSmoothScroll(e, link.href, () => setMenuOpen(false))}
-                className="flex items-center justify-between px-6 py-4 text-[13px] font-semibold uppercase tracking-[.08em] text-white/90 drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] hover:text-yellow-400 hover:bg-white/5 border-b border-white/[.04] transition-colors"
+                className="px-4 py-2.5 text-sm font-mono font-bold uppercase tracking-wider text-amber-100 hover:text-yellow-400 hover:bg-[#d35400]/20 rounded-sm transition-all"
               >
                 {link.label}
-                <svg className="w-3.5 h-3.5 opacity-70 drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                  <polyline points="9 18 15 12 9 6" />
-                </svg>
               </Link>
             ))}
           </div>
         </div>
-      </nav>
+      )}
     </header>
   );
 }

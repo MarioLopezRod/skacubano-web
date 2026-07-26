@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"; // Importamos las herramientas de animación y scroll
 
 const albums = [
@@ -39,11 +39,35 @@ const albums = [
 ];
 
 import { useLanguage } from "../context/LanguageContext";
+import BowloramaText from "./BowloramaText";
 
 export default function Albums() {
   const [activeAlbum, setActiveAlbum] = useState(null);
   const containerRef = useRef(null);
   const { t } = useLanguage();
+
+  // Auto-cerrar el menú desplegable del álbum al hacer scroll o al hacer clic fuera
+  useEffect(() => {
+    if (!activeAlbum) return;
+
+    const handleScroll = () => {
+      setActiveAlbum(null);
+    };
+
+    const handleClickOutside = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setActiveAlbum(null);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    document.addEventListener("pointerdown", handleClickOutside);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("pointerdown", handleClickOutside);
+    };
+  }, [activeAlbum]);
 
   // Rastreo de la posición de scroll sobre el contenedor de discografía
   const { scrollYProgress } = useScroll({
@@ -137,8 +161,8 @@ export default function Albums() {
         <span className="text-[#d35400] text-xs font-mono tracking-[0.4em] uppercase block mb-3 font-bold drop-shadow">
           {t.albums.badge}
         </span>
-        <h2 className="font-bowlorama text-4xl md:text-7xl text-[#2a1a0a] tracking-wide text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.15)] pb-4">
-          {t.albums.title}
+        <h2 className="text-4xl md:text-7xl text-[#2a1a0a] tracking-wide text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.15)] pb-4">
+          <BowloramaText text={t.albums.title} />
         </h2>
         <div className="w-24 h-1.5 bg-[#d35400] mx-auto mt-6 rounded-full shadow-md" />
       </div>

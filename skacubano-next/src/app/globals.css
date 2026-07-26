@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alfa+Slab+One&family=Bebas+Neue&family=Lilita+One&display=swap');
+@import "flag-icons/css/flag-icons.min.css";
 @import "tailwindcss";
 
 @font-face {
@@ -12,6 +13,17 @@
 :root {
   --background: #fdf8eb;
   --foreground: #171717;
+}
+
+/* Complete Scrollbar Hide Utility for horizontal tab bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+.no-scrollbar {
+  -ms-overflow-style: none !important;  /* IE and Edge */
+  scrollbar-width: none !important;  /* Firefox */
 }
 
 @theme inline {

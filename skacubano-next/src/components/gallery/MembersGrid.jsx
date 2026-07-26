@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import BowloramaText from "../BowloramaText";
 
 export default function MembersGrid({ integrantes = [], fotos = [], onSelectMember }) {
   return (
@@ -20,7 +21,7 @@ export default function MembersGrid({ integrantes = [], fotos = [], onSelectMemb
             onClick={() => onSelectMember(member.id)}
             className="group relative cursor-pointer flex flex-col justify-between rounded-2xl bg-[#14100c] border-2 border-yellow-500/30 shadow-[0_10px_25px_rgba(0,0,0,0.8)] overflow-hidden hover:border-yellow-400 transition-all duration-300 hover:-translate-y-2 hover:shadow-[0_15px_35px_rgba(250,204,21,0.25)]"
           >
-            {/* Header Badge & Image */}
+            {/* Header Image Frame */}
             <div className="relative aspect-[4/5] w-full overflow-hidden bg-black p-2">
               <div className="relative w-full h-full overflow-hidden rounded-lg border border-yellow-400/20">
                 <Image
@@ -31,22 +32,13 @@ export default function MembersGrid({ integrantes = [], fotos = [], onSelectMemb
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#14100c] via-black/30 to-transparent" />
-
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between">
-                  <span className="px-2.5 py-1 rounded bg-black/85 border border-yellow-400/50 text-[10px] font-mono font-bold text-yellow-300 backdrop-blur-md shadow-md uppercase tracking-wider">
-                    ★ {memberPhotos.length} {memberPhotos.length === 1 ? "foto" : "fotos"}
-                  </span>
-                  <span className="w-7 h-7 rounded-full bg-yellow-400 text-black flex items-center justify-center text-xs font-bold group-hover:scale-110 transition-transform shadow-md">
-                    ➔
-                  </span>
-                </div>
               </div>
             </div>
 
             {/* Member Info */}
             <div className="p-4 flex-1 flex flex-col justify-between">
               <div>
-                <h3 className="font-bowlorama text-2xl text-yellow-400 tracking-wide uppercase drop-shadow group-hover:text-yellow-300 transition-colors">
+                <h3 className="font-bebas text-3xl text-yellow-400 tracking-wider uppercase drop-shadow group-hover:text-yellow-300 transition-colors leading-none mb-1">
                   {member.nombre}
                 </h3>
                 <p className="text-xs font-mono font-bold text-amber-200/80 tracking-wider uppercase mb-2">
@@ -55,11 +47,6 @@ export default function MembersGrid({ integrantes = [], fotos = [], onSelectMemb
                 <p className="text-xs font-sans text-amber-100/75 line-clamp-3 leading-relaxed">
                   {member.bio || "Integrante fundamental de Ska Cubano."}
                 </p>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-yellow-400/10 flex items-center justify-between text-[11px] font-mono text-yellow-400 font-bold group-hover:text-yellow-300 uppercase tracking-wider">
-                <span>Ver Galeria</span>
-                <span>★</span>
               </div>
             </div>
           </motion.div>

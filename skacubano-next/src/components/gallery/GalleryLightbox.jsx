@@ -1,10 +1,10 @@
-"use client";
-
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function GalleryLightbox({ photo, photos = [], onClose, onSelectPhoto }) {
+  const { lang } = useLanguage();
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!photo) return;
@@ -113,7 +113,7 @@ export default function GalleryLightbox({ photo, photos = [], onClose, onSelectP
           {/* Bottom Caption Bar */}
           <div className="w-full px-6 py-4 bg-[#14100c] border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <p className="text-sm font-sans text-amber-100/90 leading-relaxed max-w-3xl">
-              {photo.descripcion || "Fotografía oficial de la orquesta Ska Cubano."}
+              {(lang === "en" && photo.descripcionEn) ? photo.descripcionEn : (photo.descripcion || "Fotografía oficial de la orquesta Ska Cubano.")}
             </p>
             {photo.esPrincipal && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400/20 border border-yellow-400/50 text-yellow-300 text-xs font-mono font-semibold shrink-0 uppercase">

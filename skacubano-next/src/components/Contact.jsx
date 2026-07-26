@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { useLanguage } from "../context/LanguageContext";
+import BowloramaText from "./BowloramaText";
 
 /* ── Photo data ─────────────────────────────────────────────────────── */
 const PHOTOS = [
@@ -376,8 +377,8 @@ export default function Contact() {
           >
             {t.contact.badge}
           </p>
-          <h2 className="font-bowlorama text-4xl md:text-6xl text-white tracking-wide leading-none pb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
-            {t.contact.title}
+          <h2 className="text-4xl md:text-6xl text-white tracking-wide leading-none pb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+            <BowloramaText text={t.contact.title} />
           </h2>
           <p
             className="mt-4 text-[#c8a87a]/90 text-sm md:text-base max-w-md mx-auto leading-relaxed whitespace-pre-line font-serif italic"

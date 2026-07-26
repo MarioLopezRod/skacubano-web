@@ -1,17 +1,14 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
 import BowloramaText from "@/components/BowloramaText";
 import BandGalleryGrid from "@/components/gallery/BandGalleryGrid";
 import MembersGrid from "@/components/gallery/MembersGrid";
 import MemberDetailView from "@/components/gallery/MemberDetailView";
 import GalleryLightbox from "@/components/gallery/GalleryLightbox";
 import { useLanguage } from "@/context/LanguageContext";
-import Link from "next/link";
 
-export default function GaleriaPage() {
+export default function GallerySection() {
   const { t } = useLanguage();
   const tabsRef = useRef(null);
 
@@ -33,7 +30,6 @@ export default function GaleriaPage() {
     subtitle: "Revive los conciertos legendarios, momentos de camerino y perfiles individuales de la orquesta Ska Cubano.",
     tabBand: "Galería General",
     tabMembers: "Integrantes",
-    adminBtn: "Panel Admin"
   };
 
   useEffect(() => {
@@ -65,8 +61,11 @@ export default function GaleriaPage() {
     : data.fotos.filter((f) => f.integranteId === activeTab);
 
   return (
-    <main className="min-h-screen bg-cuban-gallery-blue text-[#faf6ee] flex flex-col justify-between relative overflow-hidden">
-      {/* Background Decorative Pattern & Light Ray overlay */}
+    <section 
+      id="gallery" 
+      className="relative w-full bg-cuban-gallery-blue text-[#faf6ee] py-20 md:py-28 px-4 sm:px-6 lg:px-8 border-t border-yellow-800/30 overflow-hidden"
+    >
+      {/* Pattern overlay */}
       <div 
         className="absolute inset-0 pointer-events-none opacity-15 z-0"
         style={{
@@ -74,11 +73,8 @@ export default function GaleriaPage() {
           backgroundSize: "36px 36px"
         }}
       />
-      <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-black/80 to-transparent pointer-events-none z-0" />
 
-      <Navbar />
-
-      <div className="relative z-10 pt-28 pb-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full flex-1">
+      <div className="relative z-10 max-w-7xl mx-auto w-full">
         {/* Cuban Vintage Header Title Section */}
         <div className="text-center space-y-4 mb-12 relative">
           <div className="inline-flex items-center gap-2 px-5 py-1.5 rounded-full border border-yellow-400/50 bg-black/75 text-xs font-mono font-bold tracking-[0.25em] text-yellow-400 uppercase shadow-[0_4px_15px_rgba(0,0,0,0.8)]">
@@ -87,13 +83,13 @@ export default function GaleriaPage() {
             <span>★</span>
           </div>
 
-          <h1 className="text-5xl sm:text-7xl text-yellow-400 tracking-wide uppercase drop-shadow-[0_6px_16px_rgba(0,0,0,0.95)]">
+          <h2 className="text-4xl md:text-7xl text-yellow-400 tracking-wide uppercase drop-shadow-[0_6px_16px_rgba(0,0,0,0.95)]">
             <BowloramaText text={g.title} />
-          </h1>
+          </h2>
 
           <div className="flex items-center justify-center gap-4 max-w-md mx-auto py-1">
             <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-amber-500 to-yellow-400" />
-            <span className="text-yellow-400 text-sm font-bold">★ SANTIAGO DE CUBA • LONDON ★</span>
+            <span className="text-yellow-400 text-xs sm:text-sm font-bold tracking-wider">★ SANTIAGO DE CUBA • LONDON ★</span>
             <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent via-amber-500 to-yellow-400" />
           </div>
 
@@ -213,8 +209,6 @@ export default function GaleriaPage() {
         onClose={() => setSelectedPhoto(null)}
         onSelectPhoto={(photo) => setSelectedPhoto(photo)}
       />
-
-      <Footer />
-    </main>
+    </section>
   );
 }
