@@ -589,11 +589,11 @@ export default function AdminGalleryPage() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-yellow-400 selection:text-black">
-      
+
       {/* ── BARRA SUPERIOR DE NAVEGACIÓN ── */}
       <header className="sticky top-0 z-40 bg-slate-900 border-b-2 border-slate-700 px-4 sm:px-8 py-4 shadow-2xl">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          
+
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full bg-slate-800 border-2 border-yellow-400 p-1 flex items-center justify-center shadow-lg shrink-0">
               <img src="/images/logos/logoSkaCubano.png" alt="Ska Cubano" className="w-full h-full object-contain" />
@@ -631,16 +631,15 @@ export default function AdminGalleryPage() {
 
       {/* ── CONTENEDOR PRINCIPAL DASHBOARD ── */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-8">
-        
+
         {/* PESTAÑAS PRINCIPALES DE GESTIÓN */}
         <div className="flex flex-wrap items-center gap-3 border-b-2 border-slate-800 pb-4">
           <button
             onClick={() => setActiveAdminTab("fotos")}
-            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg ${
-              activeAdminTab === "fotos"
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg ${activeAdminTab === "fotos"
                 ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.5)] scale-102"
                 : "bg-slate-900 text-slate-200 border-2 border-slate-700 hover:bg-slate-800 hover:text-yellow-400"
-            }`}
+              }`}
           >
             <span>📷 Gestión de Fotografías</span>
             <span className="px-2.5 py-0.5 rounded-md bg-slate-950 text-white border border-slate-700 text-xs font-bold">{data.fotos.length}</span>
@@ -648,11 +647,10 @@ export default function AdminGalleryPage() {
 
           <button
             onClick={() => setActiveAdminTab("integrantes")}
-            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg ${
-              activeAdminTab === "integrantes"
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg ${activeAdminTab === "integrantes"
                 ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.5)] scale-102"
                 : "bg-slate-900 text-slate-200 border-2 border-slate-700 hover:bg-slate-800 hover:text-yellow-400"
-            }`}
+              }`}
           >
             <span>👥 Integrantes y Músicos</span>
             <span className="px-2.5 py-0.5 rounded-md bg-slate-950 text-white border border-slate-700 text-xs font-bold">{data.integrantes.length}</span>
@@ -660,11 +658,10 @@ export default function AdminGalleryPage() {
 
           <button
             onClick={() => setActiveAdminTab("secciones")}
-            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg ${
-              activeAdminTab === "secciones"
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg ${activeAdminTab === "secciones"
                 ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.4)] scale-102"
                 : "bg-slate-900 text-slate-200 border-2 border-slate-700 hover:bg-slate-800 hover:text-yellow-400"
-            }`}
+              }`}
           >
             <span>📁 Secciones y Categorías</span>
             <span className="px-2.5 py-0.5 rounded-md bg-slate-950 text-white border border-slate-700 text-xs font-bold">{seccionesList.length}</span>
@@ -672,11 +669,10 @@ export default function AdminGalleryPage() {
 
           <button
             onClick={() => setActiveAdminTab("privado")}
-            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg ${
-              activeAdminTab === "privado"
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg ${activeAdminTab === "privado"
                 ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.5)] scale-102"
                 : "bg-slate-900 text-slate-200 border-2 border-slate-700 hover:bg-slate-800 hover:text-yellow-400"
-            }`}
+              }`}
           >
             <span>🔒 Enlaces Privados (Stage & Press Kit)</span>
             <span className="px-2.5 py-0.5 rounded-md bg-slate-950 text-white border border-slate-700 text-xs font-bold">{privateLinks.length}</span>
@@ -686,7 +682,7 @@ export default function AdminGalleryPage() {
         {/* ════════════ PESTAÑA 1: GESTIÓN DE FOTOGRAFÍAS ════════════ */}
         {activeAdminTab === "fotos" && (
           <div className="space-y-8">
-            
+
             {/* FORMULARIO DE SUBIDA DE FOTO */}
             <div className="bg-slate-900 border-2 border-slate-700 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
               <div className="flex items-center justify-between border-b-2 border-slate-800 pb-4">
@@ -702,7 +698,7 @@ export default function AdminGalleryPage() {
 
               <form onSubmit={handleUploadSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  
+
                   {/* Selector de Archivo */}
                   <div className="md:col-span-1">
                     <label className="block text-sm font-extrabold text-yellow-400 uppercase mb-2">
@@ -865,22 +861,20 @@ export default function AdminGalleryPage() {
                 >
                   <button
                     onClick={() => setFilterMember("todos")}
-                    className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold uppercase transition-all shrink-0 cursor-pointer ${
-                      filterMember === "todos"
+                    className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold uppercase transition-all shrink-0 cursor-pointer ${filterMember === "todos"
                         ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-md"
                         : "bg-slate-900 text-white border-2 border-slate-700 hover:border-yellow-400"
-                    }`}
+                      }`}
                   >
                     Todas ({data.fotos.length})
                   </button>
 
                   <button
                     onClick={() => setFilterMember("banda")}
-                    className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold uppercase transition-all shrink-0 cursor-pointer ${
-                      filterMember === "banda"
+                    className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold uppercase transition-all shrink-0 cursor-pointer ${filterMember === "banda"
                         ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-md"
                         : "bg-slate-900 text-white border-2 border-slate-700 hover:border-yellow-400"
-                    }`}
+                      }`}
                   >
                     📌 Banda General ({bandPhotosCount})
                   </button>
@@ -891,11 +885,10 @@ export default function AdminGalleryPage() {
                       <button
                         key={m.id}
                         onClick={() => setFilterMember(m.id)}
-                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all shrink-0 cursor-pointer ${
-                          filterMember === m.id
+                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all shrink-0 cursor-pointer ${filterMember === m.id
                             ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-md"
                             : "bg-slate-900 text-white border-2 border-slate-700 hover:border-yellow-400"
-                        }`}
+                          }`}
                       >
                         👤 {m.nombre} ({mCount})
                       </button>
@@ -908,11 +901,10 @@ export default function AdminGalleryPage() {
                       <button
                         key={s.id}
                         onClick={() => setFilterMember(s.id)}
-                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all shrink-0 cursor-pointer ${
-                          filterMember === s.id
+                        className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold transition-all shrink-0 cursor-pointer ${filterMember === s.id
                             ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-md"
                             : "bg-slate-900 text-white border-2 border-slate-700 hover:border-yellow-400"
-                        }`}
+                          }`}
                       >
                         📁 {s.nombre} ({sCount})
                       </button>
@@ -949,7 +941,7 @@ export default function AdminGalleryPage() {
                         <div>
                           <div className="relative aspect-[4/3] w-full bg-black overflow-hidden">
                             <img src={photo.url} alt="Miniatura" className="w-full h-full object-cover" />
-                            
+
                             <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-slate-950/95 border border-slate-600 text-xs font-extrabold text-yellow-300 shadow">
                               {memberAssigned ? `👤 ${memberAssigned.nombre}` : sectionAssigned ? `📁 ${sectionAssigned.nombre}` : "📌 Galería Banda"}
                             </div>
@@ -971,7 +963,7 @@ export default function AdminGalleryPage() {
                             <p className="text-sm font-bold text-white line-clamp-2 leading-relaxed">
                               {photo.descripcion || <span className="italic text-slate-400 font-normal">Sin descripción ES</span>}
                             </p>
-                            
+
                             {photo.descripcionEn && (
                               <div className="flex items-center gap-1.5 text-xs font-bold text-yellow-300 border-t border-slate-800 pt-2">
                                 <span>🇬🇧</span>
@@ -1168,7 +1160,7 @@ export default function AdminGalleryPage() {
         {/* ════════════ PESTAÑA 4: ENLACES PRIVADOS (STAGE SETTINGS & DOSSIER) ════════════ */}
         {activeAdminTab === "privado" && (
           <div className="space-y-8">
-            
+
             {/* FORMULARIO DE CREACIÓN DE ENLACE PRIVADO */}
             <div className="bg-slate-900 border-2 border-slate-700 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
               <div className="flex items-center justify-between border-b-2 border-slate-800 pb-4">
@@ -1376,11 +1368,10 @@ export default function AdminGalleryPage() {
 
                           <button
                             onClick={() => copyToClipboard(link.slug)}
-                            className={`px-4 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 ${
-                              copiedSlug === link.slug
+                            className={`px-4 py-2.5 rounded-xl font-extrabold text-xs uppercase tracking-wider transition-all cursor-pointer shadow-md flex items-center justify-center gap-2 ${copiedSlug === link.slug
                                 ? "bg-green-500 text-black"
                                 : "bg-yellow-400 text-black hover:bg-yellow-300"
-                            }`}
+                              }`}
                           >
                             <span>{copiedSlug === link.slug ? "✓ ¡Copiado!" : "📋 Copiar Enlace Público"}</span>
                           </button>
@@ -1666,7 +1657,7 @@ export default function AdminGalleryPage() {
             </div>
 
             <form onSubmit={handleSaveEditPhoto} className="space-y-4">
-              
+
               <div className="flex items-center gap-4 bg-slate-950 p-3 rounded-xl border border-slate-800">
                 <div className="w-20 h-16 rounded-lg overflow-hidden bg-black shrink-0">
                   <img src={editingPhoto.url} alt="Foto" className="w-full h-full object-cover" />

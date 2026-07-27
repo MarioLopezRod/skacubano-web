@@ -68,7 +68,7 @@ export default function BowloramaText({ text, className = "" }) {
                 <span
                   key={charIdx}
                   className="font-bowlorama inline-flex items-center justify-center leading-none text-[0.98em] mx-[0.03em]"
-                  style={{ transform: "translateY(0.04em)" }}
+                  style={{ transform: "translateY(0.40em)" }}
                 >
                   &
                 </span>

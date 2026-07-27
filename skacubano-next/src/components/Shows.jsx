@@ -18,7 +18,7 @@ export default function Shows() {
           <span className="text-yellow-400 text-xs font-mono tracking-[0.4em] uppercase block mb-3 font-bold drop-shadow">
             {t.shows.badge}
           </span>
-          <h2 className="text-4xl md:text-7xl text-[#faf6ee] tracking-wide leading-none uppercase drop-shadow-[0_6px_14px_rgba(0,0,0,0.9)] pb-4">
+          <h2 className="text-2xl xs:text-3xl sm:text-5xl md:text-7xl text-[#faf6ee] tracking-wide leading-none uppercase drop-shadow-[0_6px_14px_rgba(0,0,0,0.9)] pb-4">
             <BowloramaText text={t.shows.title} />
           </h2>
           <p className="mt-4 text-amber-100/80 font-serif italic text-sm md:text-base max-w-lg mx-auto leading-relaxed">

@@ -377,7 +377,7 @@ export default function Contact() {
           >
             {t.contact.badge}
           </p>
-          <h2 className="text-4xl md:text-6xl text-white tracking-wide leading-none pb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
+          <h2 className="text-2xl xs:text-3xl sm:text-5xl md:text-6xl text-white tracking-wide leading-none pb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]">
             <BowloramaText text={t.contact.title} />
           </h2>
           <p

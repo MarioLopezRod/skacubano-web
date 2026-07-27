@@ -161,13 +161,13 @@ export default function Albums() {
         <span className="text-[#d35400] text-xs font-mono tracking-[0.4em] uppercase block mb-3 font-bold drop-shadow">
           {t.albums.badge}
         </span>
-        <h2 className="text-4xl md:text-7xl text-[#2a1a0a] tracking-wide text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.15)] pb-4">
+        <h2 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-7xl text-[#2a1a0a] tracking-wide text-center drop-shadow-[0_4px_10px_rgba(0,0,0,0.15)] pb-4">
           <BowloramaText text={t.albums.title} />
         </h2>
         <div className="w-24 h-1.5 bg-[#d35400] mx-auto mt-6 rounded-full shadow-md" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 md:gap-x-40 max-w-5xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 md:gap-x-24 lg:gap-x-40 max-w-5xl mx-auto">
         
         {albums.map((album, index) => {
           const isLeftColumn = index % 2 === 0;
@@ -206,32 +206,31 @@ export default function Albums() {
                       transition={{ type: "spring", stiffness: 300, damping: 25 }}
                       
                       className={`
-                        absolute z-50 bg-white p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem]
+                        absolute z-50 bg-white p-4 sm:p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem]
                         shadow-[0_20px_50px_rgba(0,0,0,0.3)]
-                        flex gap-6 md:gap-8 items-center border-4 border-[#d35400]/10
+                        flex gap-5 sm:gap-6 md:gap-8 items-center border-4 border-[#d35400]/10
 
-                        /* MOBILE */
-                        top-full mt-6 left-1/2 -translate-x-1/2
+                        /* MÓVIL Y TABLET (HASTA LG: 1024px) */
+                        top-full mt-4 left-1/2 -translate-x-1/2
 
-                        /* DESKTOP */
-                        md:top-1/2 md:-translate-y-1/2 md:left-auto md:translate-x-0
-                        ${isLeftColumn ? "md:right-full md:mr-16" : "md:left-full md:ml-16"}
+                        /* ESCRITORIO (LG EN ADELANTE) */
+                        lg:top-1/2 lg:-translate-y-1/2 lg:inset-auto lg:translate-x-0
+                        ${isLeftColumn ? "lg:right-full lg:mr-12" : "lg:left-full lg:ml-12"}
                       `}
                     >
                      {/* FLECHA (FIX RESPONSIVE TOTAL) */}
                     <div className={`
                     absolute w-6 h-6 bg-white rotate-45 border-[#d35400]/10 z-0
                     
-                    /* 1. MÓVIL (Por defecto) */
+                    /* 1. MÓVIL Y TABLET (Por defecto hasta lg) */
                     -top-2 left-1/2 -translate-x-1/2 border-t-4 border-l-4
 
-                    /* 2. ESCRITORIO (Limpieza y nueva posición) */
-                    /* El md:inset-auto es vital: borra el 'top' y el 'left' del móvil */
-                    md:inset-auto md:top-1/2 md:-translate-y-1/2 md:translate-x-0
+                    /* 2. ESCRITORIO (LG de 1024px en adelante) */
+                    lg:inset-auto lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0
                     
                     ${isLeftColumn 
-                        ? "md:-right-3 md:border-t-4 md:border-r-4 md:border-b-0 md:border-l-0" 
-                        : "md:-left-3 md:border-b-4 md:border-l-4 md:border-t-0 md:border-r-0"
+                        ? "lg:-right-3 lg:border-t-4 lg:border-r-4 lg:border-b-0 lg:border-l-0" 
+                        : "lg:-left-3 lg:border-b-4 lg:border-l-4 lg:border-t-0 lg:border-r-0"
                     }
                     `} />
 

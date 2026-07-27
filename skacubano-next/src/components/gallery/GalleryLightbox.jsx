@@ -111,16 +111,22 @@ export default function GalleryLightbox({ photo, photos = [], onClose, onSelectP
           </div>
 
           {/* Bottom Caption Bar */}
-          <div className="w-full px-6 py-4 bg-[#14100c] border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <p className="text-sm font-sans text-amber-100/90 leading-relaxed max-w-3xl">
-              {(lang === "en" && photo.descripcionEn) ? photo.descripcionEn : (photo.descripcion || "Fotografía oficial de la orquesta Ska Cubano.")}
-            </p>
-            {photo.esPrincipal && (
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400/20 border border-yellow-400/50 text-yellow-300 text-xs font-mono font-semibold shrink-0 uppercase">
-                ★ FOTO PRINCIPAL
-              </span>
-            )}
-          </div>
+          {((lang === "en" ? photo.descripcionEn : photo.descripcion) || photo.esPrincipal) && (
+            <div className="w-full px-6 py-4 bg-[#14100c] border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              {(lang === "en" ? photo.descripcionEn : photo.descripcion) ? (
+                <p className="text-sm font-sans text-amber-100/90 leading-relaxed max-w-3xl">
+                  {lang === "en" && photo.descripcionEn ? photo.descripcionEn : photo.descripcion}
+                </p>
+              ) : (
+                <div />
+              )}
+              {photo.esPrincipal && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-400/20 border border-yellow-400/50 text-yellow-300 text-xs font-mono font-semibold shrink-0 uppercase">
+                  ★ FOTO PRINCIPAL
+                </span>
+              )}
+            </div>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>

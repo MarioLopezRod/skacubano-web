@@ -17,13 +17,14 @@ export async function POST(request) {
     }
 
     const formData = await request.formData();
+    const file = formData.get('file');
     const descripcion = formData.get('descripcion') || '';
     const descripcionEn = formData.get('descripcionEn') || '';
     const fecha = formData.get('fecha') || new Date().getFullYear().toString();
     const integranteId = formData.get('integranteId') === 'banda' ? null : formData.get('integranteId');
     const esPrincipal = formData.get('esPrincipal') === 'true';
 
-    if (!file) {
+    if (!file || typeof file === 'string') {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 

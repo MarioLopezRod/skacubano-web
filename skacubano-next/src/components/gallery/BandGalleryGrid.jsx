@@ -90,16 +90,20 @@ export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
           </button>
 
           {/* Pie de foto */}
-          <div className="absolute bottom-4 left-4 right-4 z-20 text-left">
-            <p className="text-sm sm:text-lg font-serif italic text-amber-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] line-clamp-2">
-              {(lang === "en" && currentPhoto.descripcionEn) ? currentPhoto.descripcionEn : (currentPhoto.descripcion || "Ska Cubano en directo")}
-            </p>
-            {currentPhoto.fecha && (
-              <span className="inline-block mt-1 text-[10px] sm:text-xs font-mono font-bold text-yellow-400 uppercase tracking-widest bg-black/60 px-2 py-0.5 rounded border border-yellow-400/30">
-                ★ {currentPhoto.fecha}
-              </span>
-            )}
-          </div>
+          {((lang === "en" ? currentPhoto.descripcionEn : currentPhoto.descripcion) || currentPhoto.fecha) && (
+            <div className="absolute bottom-4 left-4 right-4 z-20 text-left">
+              {(lang === "en" ? currentPhoto.descripcionEn : currentPhoto.descripcion) && (
+                <p className="text-sm sm:text-lg font-serif italic text-amber-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] line-clamp-2">
+                  {lang === "en" && currentPhoto.descripcionEn ? currentPhoto.descripcionEn : currentPhoto.descripcion}
+                </p>
+              )}
+              {currentPhoto.fecha && (
+                <span className="inline-block mt-1 text-[10px] sm:text-xs font-mono font-bold text-yellow-400 uppercase tracking-widest bg-black/60 px-2 py-0.5 rounded border border-yellow-400/30">
+                  ★ {currentPhoto.fecha}
+                </span>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

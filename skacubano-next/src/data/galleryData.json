@@ -38,7 +38,7 @@
       "slug": "megumi",
       "rol": "Saxofón Alto & Barítono",
       "bio": "Megumi Mesaku (Miss Megoo), virtuosa del saxofón de Japón con un potente estilo skatalita y presencia deslumbrante en vivo.",
-      "fotoPrincipalUrl": "/images/photos/galery/Megumi/live in Rabat.jpg"
+      "fotoPrincipalUrl": "/images/photos/galery/Megumi/IMG_4494Watermark.jpg"
     },
     {
       "id": "natty-bo",
@@ -200,15 +200,6 @@
       "esPrincipal": false
     },
     {
-      "id": "beny-6",
-      "url": "/images/photos/galery/BenyVilly/4.jpg",
-      "descripcion": "Beny cantando en vivo",
-      "fecha": "2006",
-      "integranteId": "beny-villy",
-      "orden": 6,
-      "esPrincipal": false
-    },
-    {
       "id": "carlos-1",
       "url": "/images/photos/galery/CarlosPeña/IMG_4575Watermark.jpg",
       "descripcion": "Carlos Peña interpretando un potente mambo ska",
@@ -299,15 +290,6 @@
       "esPrincipal": false
     },
     {
-      "id": "megumi-1",
-      "url": "/images/photos/galery/Megumi/live in Rabat.jpg",
-      "descripcion": "Miss Megoo (Megumi) en vivo en el festival de Rabat",
-      "fecha": "2008",
-      "integranteId": "megumi",
-      "orden": 1,
-      "esPrincipal": true
-    },
-    {
       "id": "megumi-2",
       "url": "/images/photos/galery/Megumi/DSC_2018.JPG",
       "descripcion": "Megumi afinando su saxofón alto",
@@ -332,7 +314,8 @@
       "fecha": "2010",
       "integranteId": "megumi",
       "orden": 4,
-      "esPrincipal": false
+      "esPrincipal": true,
+      "descripcionEn": ""
     },
     {
       "id": "natty-1",

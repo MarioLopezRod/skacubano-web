@@ -39,7 +39,7 @@ export default function History() {
             {t.history.badge}
           </span>
           <h2 
-            className="text-4xl md:text-7xl text-[#faf6ee] tracking-wide leading-none uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
+            className="text-2xl xs:text-3xl sm:text-5xl md:text-7xl text-[#faf6ee] tracking-wide leading-none uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
           >
             <BowloramaText text={t.history.title} />
           </h2>

@@ -4,12 +4,12 @@ export default function Footer() {
   return (
     <footer className="w-full bg-[#080605] py-4 px-6 border-t border-amber-900/20 text-amber-50/50 relative z-20">
       <div className="max-w-4xl mx-auto flex flex-col items-center justify-center gap-2 text-center">
-        
+
         {/* Logo compacto centrado */}
         <div className="flex items-center justify-center">
-          <img 
-            src="/images/logos/logoSkaCubano.png" 
-            alt="Ska Cubano" 
+          <img
+            src="/images/logos/logoSkaCubano.png"
+            alt="Ska Cubano"
             className="h-8 md:h-10 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] transition-transform duration-300 hover:scale-105"
           />
         </div>

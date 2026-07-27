@@ -112,16 +112,20 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
                   </div>
                 </div>
 
-                <div className="p-3 bg-[#14100c]">
-                  <p className="text-xs font-sans text-amber-100/90 line-clamp-2">
-                    {photo.descripcion || `Foto de ${member.nombre}`}
-                  </p>
-                  {photo.fecha && (
-                    <p className="text-[10px] font-mono text-yellow-400/70 mt-1 uppercase">
-                      ★ {photo.fecha}
-                    </p>
-                  )}
-                </div>
+                {(photo.descripcion || photo.fecha) && (
+                  <div className="p-3 bg-[#14100c]">
+                    {photo.descripcion && (
+                      <p className="text-xs font-sans text-amber-100/90 line-clamp-2">
+                        {photo.descripcion}
+                      </p>
+                    )}
+                    {photo.fecha && (
+                      <p className="text-[10px] font-mono text-yellow-400/70 mt-1 uppercase">
+                        ★ {photo.fecha}
+                      </p>
+                    )}
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>

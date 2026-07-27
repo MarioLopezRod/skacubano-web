@@ -83,7 +83,7 @@ export default function GallerySection() {
             <span>★</span>
           </div>
 
-          <h2 className="text-4xl md:text-7xl text-yellow-400 tracking-wide uppercase drop-shadow-[0_6px_16px_rgba(0,0,0,0.95)]">
+          <h2 className="text-2xl xs:text-3xl sm:text-5xl md:text-7xl text-yellow-400 tracking-wide uppercase drop-shadow-[0_6px_16px_rgba(0,0,0,0.95)]">
             <BowloramaText text={g.title} />
           </h2>
 
@@ -102,7 +102,7 @@ export default function GallerySection() {
         <div className="mb-12 flex items-center gap-3 w-full max-w-7xl mx-auto px-2">
           <button
             onClick={() => scrollTabs("left")}
-            className="w-10 h-10 rounded-full bg-black/85 border border-yellow-400/50 text-yellow-400 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all font-mono font-bold text-xl shadow-lg shrink-0 cursor-pointer hover:scale-110"
+            className="hidden md:flex w-10 h-10 rounded-full bg-black/85 border border-yellow-400/50 text-yellow-400 items-center justify-center hover:bg-yellow-400 hover:text-black transition-all font-mono font-bold text-xl shadow-lg shrink-0 cursor-pointer hover:scale-110"
             title="Desplazar a la izquierda"
           >
             ‹
@@ -158,7 +158,7 @@ export default function GallerySection() {
 
           <button
             onClick={() => scrollTabs("right")}
-            className="w-10 h-10 rounded-full bg-black/85 border border-yellow-400/50 text-yellow-400 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all font-mono font-bold text-xl shadow-lg shrink-0 cursor-pointer hover:scale-110"
+            className="hidden md:flex w-10 h-10 rounded-full bg-black/85 border border-yellow-400/50 text-yellow-400 items-center justify-center hover:bg-yellow-400 hover:text-black transition-all font-mono font-bold text-xl shadow-lg shrink-0 cursor-pointer hover:scale-110"
             title="Desplazar a la derecha"
           >
             ›

@@ -48,7 +48,7 @@ export default function PrivateDossierPage({ params }) {
     return (
       <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center p-4 selection:bg-yellow-400 selection:text-black">
         <div className="w-full max-w-md bg-slate-900 border-2 border-slate-700 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-center">
-          
+
           <div className="w-16 h-16 rounded-full bg-slate-800 border-2 border-yellow-400 p-2 mx-auto flex items-center justify-center shadow-lg">
             <img src="/images/logos/logoSkaCubano.png" alt="Ska Cubano" className="w-full h-full object-contain" />
           </div>
@@ -107,7 +107,7 @@ export default function PrivateDossierPage({ params }) {
   // ── PANTALLA DEL DOSSIER TÉCNICO Y ESCENARIO DESBLOQUEADO ──
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans selection:bg-yellow-400 selection:text-black">
-      
+
       {/* BARRA SUPERIOR DE CABECERA */}
       <header className="sticky top-0 z-40 bg-slate-900 border-b-2 border-slate-700 px-4 sm:px-8 py-4 shadow-xl">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
@@ -135,7 +135,7 @@ export default function PrivateDossierPage({ params }) {
 
       {/* CONTENIDO PRINCIPAL DEL DOSSIER */}
       <main className="max-w-7xl mx-auto px-4 sm:px-8 py-8 space-y-8">
-        
+
         {/* MÓDULO DE NOTAS TÉCNICAS */}
         {linkData.notasTecnicas && (
           <div className="bg-slate-900 border-2 border-yellow-500/50 rounded-2xl p-6 shadow-xl space-y-3">
