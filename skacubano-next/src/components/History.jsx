@@ -61,8 +61,7 @@ export default function History() {
             {/* Cinta adhesiva vintage en esquina superior */}
             <div className="absolute -top-3 right-10 sm:right-16 w-24 sm:w-28 h-6 bg-amber-100/30 backdrop-blur-sm border border-amber-200/40 -rotate-3 shadow-sm z-30" />
 
-            {/* Chincheta decorativa vintage */}
-            <div className="absolute -top-2.5 left-6 w-4 h-4 bg-amber-800 rounded-full border-2 border-white shadow-md z-30 group-hover:bg-[#d35400] transition-colors duration-300" />
+        
 
             {/* Encabezado del vídeo con tipografía corporativa */}
             <div className="mb-4 pt-2">
