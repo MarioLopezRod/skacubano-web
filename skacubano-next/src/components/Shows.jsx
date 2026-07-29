@@ -95,8 +95,7 @@ export default function Shows() {
           <div className="hidden md:grid grid-cols-12 items-center px-8 py-4 bg-[#140f0c] border-b border-yellow-900/25 text-yellow-500 font-mono text-xs tracking-widest uppercase">
             <div className="col-span-4">{t.shows.tableHeader.festival}</div>
             <div className="col-span-3">{t.shows.tableHeader.location}</div>
-            <div className="col-span-3">{t.shows.tableHeader.details}</div>
-            <div className="col-span-2 text-right">{t.shows.tableHeader.status}</div>
+            <div className="col-span-5">{t.shows.tableHeader.details}</div>
           </div>
 
           {/* Filas de la Cartelera */}
@@ -107,8 +106,8 @@ export default function Shows() {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.5, delay: index * 0.08, ease: "easeOut" }}
-                className="grid grid-cols-1 md:grid-cols-12 items-start md:items-center px-6 md:px-8 py-6 hover:bg-[#d35400]/10 transition-colors duration-200 group gap-3 md:gap-0"
+                transition={{ duration: 0.4, delay: index * 0.04, ease: "easeOut" }}
+                className="grid grid-cols-1 md:grid-cols-12 items-start md:items-center px-6 md:px-8 py-5 hover:bg-[#d35400]/10 transition-colors duration-200 group gap-3 md:gap-0"
               >
                 {/* Festival */}
                 <div className="col-span-1 md:col-span-4 md:pr-4">
@@ -118,7 +117,7 @@ export default function Shows() {
                 </div>
 
                 {/* Lugar */}
-                <div className="col-span-1 md:col-span-3 flex flex-col justify-center md:pr-2">
+                <div className="col-span-1 md:col-span-3 flex flex-col justify-center md:pr-4">
                   <span className="text-amber-50/90 font-serif italic text-sm">
                     {show.location}
                   </span>
@@ -128,19 +127,10 @@ export default function Shows() {
                 </div>
 
                 {/* Detalles */}
-                <div className="col-span-1 md:col-span-3 md:pr-4">
+                <div className="col-span-1 md:col-span-5 md:pr-2">
                   <p className="text-amber-100/70 text-xs md:text-sm leading-relaxed">
                     {show.details}
                   </p>
-                </div>
-
-                {/* Badge Sello */}
-                <div className="col-span-1 md:col-span-2 flex md:justify-end items-center mt-2 md:mt-0">
-                  <span
-                    className="inline-block px-3 py-1 text-[9px] font-bold font-mono tracking-widest uppercase border border-[#d35400]/50 text-yellow-400 rounded-sm bg-[#d35400]/10 group-hover:bg-[#d35400] group-hover:text-black group-hover:border-[#d35400] transition-all duration-300 shadow-sm"
-                  >
-                    {show.badge}
-                  </span>
                 </div>
               </motion.div>
             ))}

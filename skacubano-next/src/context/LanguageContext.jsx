@@ -119,7 +119,6 @@ export const translations = {
         festival: "FESTIVAL / TOUR",
         location: "LOCATION & STAGE",
         details: "PERFORMANCE DETAILS",
-        status: "STATUS",
       },
       tagline: "★ World Tours 2004 — 2014 • London to Santiago ★",
       data: [
@@ -128,42 +127,84 @@ export const translations = {
           location: "Pilton, United Kingdom",
           year: "Tour Milestones",
           details: "Main World Music stage. Considered one of the most energetic ska concerts of the festival.",
-          badge: "MYTHIC"
         },
         {
           festival: "WOMAD FESTIVAL",
           location: "UK, Spain, Australia",
           year: "Global Tour",
           details: "Headline performance across multiple international venues of the world music festival founded by Peter Gabriel.",
-          badge: "HEADLINER"
         },
         {
           festival: "FUJI ROCK FESTIVAL",
           location: "Naeba, Japan",
           year: "Asia Tour",
           details: "Packed crowd at Asia's most important mountain festival during their acclaimed Japanese tour.",
-          badge: "SOLD OUT"
         },
         {
           festival: "ROSKILDE FESTIVAL",
           location: "Roskilde, Denmark",
           year: "European Tour",
           details: "The heart of Northern Europe vibrating to the rhythm of traditional mambo-ska on a memorable night.",
-          badge: "LEGEND"
         },
         {
           festival: "BIG DAY OUT",
           location: "Sydney, Melbourne, Australia",
           year: "Oceania Tour",
           details: "Massive tour through major cities in Australia and New Zealand, marking a milestone down under.",
-          badge: "FEATURED"
         },
         {
           festival: "CHICAGO WORLD MUSIC",
           location: "Chicago, United States",
           year: "US Tour",
           details: "Conquering the North American audience in a series of concerts with an unparalleled display of brass and percussion.",
-          badge: "TRIUMPH"
+        },
+        {
+          festival: "IBOGA SUMMER FESTIVAL",
+          location: "Valencian Community, Spain",
+          year: "European Tour",
+          details: "National benchmark of Balkan rhythms, ska and fusion music celebrated in the Valencian Community.",
+        },
+        {
+          festival: "TERRITORIOS SEVILLA",
+          location: "Seville, Spain",
+          year: "Spain Tour",
+          details: "Andalusian independent and fusion music festival held at the Andalusian Center for Contemporary Art (CAAC).",
+        },
+        {
+          festival: "SZIGET FESTIVAL",
+          location: "Budapest, Hungary",
+          year: "European Tour",
+          details: "Vibrant performances on the famous Óbudai-Sziget island in Budapest.",
+        },
+        {
+          festival: "REGGAE GEEL",
+          location: "Geel, Belgium",
+          year: "European Tour",
+          details: "One of the oldest and most legendary reggae and ska festivals in Europe.",
+        },
+        {
+          festival: "FESTIVAL DU BOUT DU MONDE",
+          location: "Crozon, France",
+          year: "European Tour",
+          details: "Multicultural world music festival set on the stunning Crozon peninsula in Brittany.",
+        },
+        {
+          festival: "STERN GROVE FESTIVAL",
+          location: "San Francisco, United States",
+          year: "US Tour",
+          details: "Iconic outdoor concert in the heart of San Francisco.",
+        },
+        {
+          festival: "SAN DIEGO STREET SCENE",
+          location: "San Diego, United States",
+          year: "US Tour",
+          details: "Historic urban music festival held in California.",
+        },
+        {
+          festival: "NOBEL PEACE PRIZE CONCERT",
+          location: "Oslo, Norway",
+          year: "Historic Milestone",
+          details: "Had the great honor of performing at the official Nobel Peace Prize Concert in Oslo.",
         }
       ]
     },
@@ -234,7 +275,7 @@ export const translations = {
       videoBadge: "★ PRESENTACIÓN OFICIAL Y DOCUMENTAL ★",
       videoTitle: "La Historia de Ska Cubano",
       videoDesc: "Descubre el origen, la energía y la fusión del Ska jamaicano con el auténtico sabor del Son cubano en este vídeo de presentación oficial.",
-      quote: `"Aunque la banda hoy no está en activo, la fusión mágica del Ska jamaicano y el Son cubano sigue resonando en sus grabaciones y en la memoria of miles de fans en todo el mundo."`,
+      quote: `"Aunque la banda hoy no está en activo, la fusión mágica del Ska jamaicano y el Son cubano sigue resonando en sus grabaciones y en la memoria de miles de fans en todo el mundo."`,
       tag: "★ ORIGINAL SKA & SON ★",
       events: [
         {
@@ -308,7 +349,6 @@ export const translations = {
         festival: "FESTIVAL / GIRA",
         location: "LUGAR Y ETAPA",
         details: "DETALLES DE LA ACTUACIÓN",
-        status: "ESTADO",
       },
       tagline: "★ Giras mundiales 2004 — 2014 • Londres a Santiago ★",
       data: [
@@ -317,42 +357,84 @@ export const translations = {
           location: "Pilton, Reino Unido",
           year: "Hitos Giras",
           details: "Escenario principal de World Music. Considerado uno de los conciertos de ska más enérgicos del festival.",
-          badge: "MÍTICO"
         },
         {
           festival: "WOMAD FESTIVAL",
           location: "Reino Unido, España, Australia",
           year: "Gira Global",
           details: "Actuación estelar en múltiples sedes internacionales del festival de músicas del mundo fundado por Peter Gabriel.",
-          badge: "ESTELAR"
         },
         {
           festival: "FUJI ROCK FESTIVAL",
           location: "Naeba, Japón",
           year: "Tour Asia",
           details: "Lleno absoluto en los escenarios del festival de montaña más importante de Asia durante su aclamada gira japonesa.",
-          badge: "SOLD OUT"
         },
         {
           festival: "ROSKILDE FESTIVAL",
           location: "Roskilde, Dinamarca",
           year: "Gira Europea",
           details: "El corazón del norte de Europa vibrando al ritmo del mambo-ska tradicional en una noche memorable.",
-          badge: "LEYENDA"
         },
         {
           festival: "BIG DAY OUT",
           location: "Sídney, Melbourne, Australia",
           year: "Tour Oceanía",
           details: "Gira multitudinaria por las principales ciudades de Australia y Nueva Zelanda, marcando un hito en las antípodas.",
-          badge: "DESTACADO"
         },
         {
           festival: "CHICAGO WORLD MUSIC",
           location: "Chicago, Estados Unidos",
           year: "Tour EE.UU.",
           details: "Conquista del público norteamericano en una serie de conciertos con un derroche inigualable de vientos y percusión.",
-          badge: "TRIUNFO"
+        },
+        {
+          festival: "IBOGA SUMMER FESTIVAL",
+          location: "Comunidad Valenciana, España",
+          year: "Gira Europea",
+          details: "Referencia nacional de ritmos balcánicos, ska y mestizaje celebrado en la Comunidad Valenciana.",
+        },
+        {
+          festival: "TERRITORIOS SEVILLA",
+          location: "Sevilla, España",
+          year: "Gira España",
+          details: "Festival andaluz de música independiente y mestiza celebrado en el Centro Andaluz de Arte Contemporáneo.",
+        },
+        {
+          festival: "SZIGET FESTIVAL",
+          location: "Budapest, Hungría",
+          year: "Gira Europea",
+          details: "Presentaciones en la famosa isla de Óbudai-Sziget en Budapest.",
+        },
+        {
+          festival: "REGGAE GEEL",
+          location: "Geel, Bélgica",
+          year: "Gira Europea",
+          details: "Uno de los festivales dedicados al reggae y ska más antiguos de Europa.",
+        },
+        {
+          festival: "FESTIVAL DU BOUT DU MONDE",
+          location: "Crozon, Francia",
+          year: "Gira Europea",
+          details: "Evento multicultural de músicas del mundo situado en Crozon.",
+        },
+        {
+          festival: "STERN GROVE FESTIVAL",
+          location: "San Francisco, Estados Unidos",
+          year: "Tour EE.UU.",
+          details: "Concierto al aire libre en la ciudad de San Francisco.",
+        },
+        {
+          festival: "SAN DIEGO STREET SCENE",
+          location: "San Diego, Estados Unidos",
+          year: "Tour EE.UU.",
+          details: "Histórico festival urbano celebrado en California.",
+        },
+        {
+          festival: "NOBEL PEACE PRIZE CONCERT",
+          location: "Oslo, Noruega",
+          year: "Hito Histórico",
+          details: "Tuvieron el gran honor de actuar en el concierto oficial de la entrega del Premio Nobel de la Paz en Oslo.",
         }
       ]
     },

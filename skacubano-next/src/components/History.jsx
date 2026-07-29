@@ -60,9 +60,6 @@ export default function History() {
           <div className="bg-[#140e0a] rounded-sm p-4 sm:p-6 border-2 border-yellow-500/40 shadow-[0_15px_40px_rgba(0,0,0,0.7)] relative group hover:border-yellow-400/70 transition-colors duration-300">
             {/* Cinta adhesiva vintage en esquina superior */}
             <div className="absolute -top-3 right-10 sm:right-16 w-24 sm:w-28 h-6 bg-amber-100/30 backdrop-blur-sm border border-amber-200/40 -rotate-3 shadow-sm z-30" />
-
-        
-
             {/* Encabezado del vídeo con tipografía corporativa */}
             <div className="mb-4 pt-2">
               <span className="text-yellow-400 font-mono text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase block mb-1">
