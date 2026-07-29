@@ -28,41 +28,36 @@ export function ensureEnvConfigured() {
   let adminPassword = getEnvVariable('ADMIN_PASSWORD');
   let adminSecret = getEnvVariable('ADMIN_SECRET');
 
+  const defaultPassword = adminPassword || process.env.ADMIN_PASSWORD || 'skacubano2026';
+  const defaultSecret = adminSecret || process.env.ADMIN_SECRET || 'skacubano_default_secret_key_2026';
+
+  if (!process.env.ADMIN_PASSWORD) process.env.ADMIN_PASSWORD = defaultPassword;
+  if (!process.env.ADMIN_SECRET) process.env.ADMIN_SECRET = defaultSecret;
+
   if (!adminPassword || !adminSecret) {
-    const generatedSecret = crypto.randomBytes(32).toString('hex');
-    const defaultPassword = adminPassword || 'skacubano2026';
-    
     const newEnvLines = [];
     if (!adminPassword) newEnvLines.push(`ADMIN_PASSWORD=${defaultPassword}`);
-    if (!adminSecret) newEnvLines.push(`ADMIN_SECRET=${generatedSecret}`);
+    if (!adminSecret) newEnvLines.push(`ADMIN_SECRET=${defaultSecret}`);
 
     try {
       const existing = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
       fs.writeFileSync(envPath, `${existing}\n${newEnvLines.join('\n')}\n`.trim(), 'utf8');
-      
-      if (!process.env.ADMIN_PASSWORD) process.env.ADMIN_PASSWORD = defaultPassword;
-      if (!process.env.ADMIN_SECRET) process.env.ADMIN_SECRET = generatedSecret;
     } catch (e) {
-      console.error('Error writing .env.local:', e);
+      // Ignorar errores en sistemas de archivos de solo lectura (como Vercel)
+      console.warn('Cannot write to .env.local (read-only environment like Vercel):', e.message);
     }
   }
 }
 
 export function getAdminPassword() {
   ensureEnvConfigured();
-  const pass = getEnvVariable('ADMIN_PASSWORD');
-  if (!pass) {
-    throw new Error('ADMIN_PASSWORD is not set in environment or .env.local');
-  }
+  const pass = process.env.ADMIN_PASSWORD || getEnvVariable('ADMIN_PASSWORD') || 'skacubano2026';
   return pass;
 }
 
 export function getAdminSecret() {
   ensureEnvConfigured();
-  const secret = getEnvVariable('ADMIN_SECRET');
-  if (!secret) {
-    throw new Error('ADMIN_SECRET is not set in environment or .env.local');
-  }
+  const secret = process.env.ADMIN_SECRET || getEnvVariable('ADMIN_SECRET') || 'skacubano_default_secret_key_2026';
   return secret;
 }
 
@@ -110,4 +105,16 @@ export function verifySignedToken(token) {
   } catch (e) {
     return false;
   }
+}
+
+export async function getAdminTokenFromRequest(request) {
+  try {
+    const { cookies } = await import('next/headers');
+    const cookieStore = await cookies();
+    const token = cookieStore.get('skacubano_admin_token')?.value;
+    if (token) return token;
+  } catch (e) {
+    // Fallback if cookies() from next/headers is not available
+  }
+  return request?.cookies?.get?.('skacubano_admin_token')?.value || null;
 }
