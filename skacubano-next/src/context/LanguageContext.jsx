@@ -42,6 +42,9 @@ export const translations = {
     history: {
       badge: "— Our Journey —",
       title: "HISTORY",
+      videoBadge: "★ OFFICIAL PRESENTATION & DOCUMENTARY ★",
+      videoTitle: "The Story of Ska Cubano",
+      videoDesc: "Discover the origin, energy, and fusion of Jamaican Ska with the authentic flavor of Cuban Son in this official presentation video.",
       quote: `"Although the band is not active today, the magical fusion of Jamaican Ska and Cuban Son continues to resonate in their recordings and in the memory of thousands of fans worldwide."`,
       tag: "★ ORIGINAL SKA & SON ★",
       events: [
@@ -208,7 +211,10 @@ export const translations = {
     history: {
       badge: "— Nuestra Trayectoria —",
       title: "HISTORIA",
-      quote: `"Aunque la banda hoy no está en activo, la fusión mágica del Ska jamaicano y el Son cubano sigue resonando en sus grabaciones y en la memoria de miles de fans en todo el mundo."`,
+      videoBadge: "★ PRESENTACIÓN OFICIAL Y DOCUMENTAL ★",
+      videoTitle: "La Historia de Ska Cubano",
+      videoDesc: "Descubre el origen, la energía y la fusión del Ska jamaicano con el auténtico sabor del Son cubano en este vídeo de presentación oficial.",
+      quote: `"Aunque la banda hoy no está en activo, la fusión mágica del Ska jamaicano y el Son cubano sigue resonando en sus grabaciones y en la memoria of miles de fans en todo el mundo."`,
       tag: "★ ORIGINAL SKA & SON ★",
       events: [
         {

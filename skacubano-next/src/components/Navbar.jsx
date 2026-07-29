@@ -141,24 +141,37 @@ export default function Navbar() {
         {/* DESKTOP / TABLET NAV GRID (3 columnas: 1fr | auto (centrado exacto) | 1fr) */}
         <div className="hidden md:grid grid-cols-[1fr_auto_1fr] items-center w-full">
           
-          {/* COLUMNA 1 (IZQUIERDA): Logo desktop */}
+          {/* COLUMNA 1 (IZQUIERDA): Logo desktop con alta visibilidad y contraste */}
           <div className="flex items-center justify-start">
             <Link
               href="/"
               onClick={(e) => handleSmoothScroll(e, "/")}
               title="Volver al Inicio"
               aria-label="Volver al Inicio"
-              className={`w-10 h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-full bg-[#18110b] border-2 border-yellow-500/40 hover:border-yellow-400 hover:bg-[#d35400] transition-all duration-300 flex items-center justify-center p-1.5 shadow-[0_4px_15px_rgba(0,0,0,0.8)] group cursor-pointer ${
+              className={`flex items-center gap-3 group cursor-pointer transition-all duration-300 ${
                 scrolled
                   ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
                   : "opacity-0 -translate-x-4 scale-90 pointer-events-none"
               }`}
             >
-              <img
-                src="/images/logos/logoSkaCubano.png"
-                alt="Ska Cubano Logo"
-                className="w-full h-full object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] group-hover:scale-110 transition-transform duration-300"
-              />
+              {/* Insignia Circular del Logo con fondo claro de alto contraste */}
+              <div className="relative w-11 h-11 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-[#faf6ee] border-2 border-yellow-400 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.4)] group-hover:shadow-[0_0_22px_rgba(211,84,0,0.7)] group-hover:border-yellow-300 group-hover:scale-105 transition-all duration-300 shrink-0">
+                <img
+                  src="/images/logos/logoCircular.png"
+                  alt="Ska Cubano Logo"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+
+              {/* Marca en Texto Retro (Ska Cubano) */}
+              <div className="hidden xl:flex flex-col justify-center leading-none">
+                <span className="font-bowlorama text-base lg:text-lg text-yellow-400 tracking-wide uppercase drop-shadow-[0_2px_6px_rgba(0,0,0,0.9)] group-hover:text-yellow-300 transition-colors">
+                  SKA CUBANO
+                </span>
+                <span className="text-[8px] font-mono text-amber-200/80 tracking-[0.25em] uppercase font-bold mt-0.5">
+                  OFFICIAL SITE
+                </span>
+              </div>
             </Link>
           </div>
 
@@ -235,22 +248,27 @@ export default function Navbar() {
 
         {/* CONTROLES MOBILE */}
         <div className="flex md:hidden items-center justify-between w-full">
-          {/* Logo mobile circular animado */}
+          {/* Logo mobile circular animado de alto contraste */}
           <Link
             href="/"
             onClick={(e) => handleSmoothScroll(e, "/")}
             title="Volver al Inicio"
-            className={`w-10 h-10 rounded-full bg-[#18110b] border-2 border-yellow-500/40 p-1 flex items-center justify-center transition-all duration-500 ease-out transform ${
+            className={`flex items-center gap-2.5 transition-all duration-500 ease-out transform ${
               scrolled
                 ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
                 : "opacity-0 -translate-x-4 scale-90 pointer-events-none"
             }`}
           >
-            <img
-              src="/images/logos/logoSkaCubano.png"
-              alt="Ska Cubano Logo"
-              className="w-full h-full object-contain"
-            />
+            <div className="w-10 h-10 rounded-full bg-[#faf6ee] border-2 border-yellow-400 p-0.5 flex items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.4)] shrink-0">
+              <img
+                src="/images/logos/logoCircular.png"
+                alt="Ska Cubano Logo"
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <span className="font-bowlorama text-sm text-yellow-400 tracking-wider uppercase drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+              SKA CUBANO
+            </span>
           </Link>
 
           <div className="flex items-center gap-3 ml-auto">

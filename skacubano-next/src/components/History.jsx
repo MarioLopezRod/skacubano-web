@@ -32,7 +32,7 @@ export default function History() {
 
       <div className="relative z-10 max-w-5xl mx-auto">
         {/* Cabecera de la sección */}
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-10 md:mb-14">
           <span 
             className="text-yellow-400 text-xs font-mono tracking-[0.4em] uppercase block mb-3 drop-shadow font-bold"
           >
@@ -45,6 +45,54 @@ export default function History() {
           </h2>
           <div className="w-20 h-1 bg-[#d35400] mx-auto mt-6 shadow-md rounded-full" />
         </div>
+
+        {/* Vídeo Principal de Presentación de la Banda */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="mb-14 md:mb-20 max-w-4xl mx-auto relative px-2 sm:px-0"
+        >
+          <div className="bg-[#140e0a] rounded-sm p-4 sm:p-6 border-2 border-yellow-500/40 shadow-[0_15px_40px_rgba(0,0,0,0.7)] relative group hover:border-yellow-400/70 transition-colors duration-300">
+            {/* Cinta adhesiva vintage en esquina superior */}
+            <div className="absolute -top-3 right-10 sm:right-16 w-24 sm:w-28 h-6 bg-amber-100/30 backdrop-blur-sm border border-amber-200/40 -rotate-3 shadow-sm z-30" />
+
+            {/* Chincheta decorativa vintage */}
+            <div className="absolute -top-2.5 left-6 w-4 h-4 bg-amber-800 rounded-full border-2 border-white shadow-md z-30 group-hover:bg-[#d35400] transition-colors duration-300" />
+
+            {/* Encabezado del vídeo con tipografía corporativa */}
+            <div className="mb-4 pt-2">
+              <span className="text-yellow-400 font-mono text-[10px] sm:text-xs font-bold tracking-[0.3em] uppercase block mb-1">
+                {t.history.videoBadge || "★ PRESENTACIÓN OFICIAL Y DOCUMENTAL ★"}
+              </span>
+              <h3 className="text-xl sm:text-2xl md:text-4xl text-[#faf6ee] tracking-wide uppercase leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                <BowloramaText text={t.history.videoTitle || "La Historia de Ska Cubano"} />
+              </h3>
+              <div className="w-16 h-1 bg-[#d35400] mt-2 shadow-sm rounded-full" />
+            </div>
+
+            {/* Contenedor del Vídeo HTML5 */}
+            <div className="relative aspect-video w-full rounded-xs overflow-hidden bg-black shadow-2xl border-2 border-yellow-500/30 group-hover:border-yellow-400/50 transition-colors duration-300">
+              <video 
+                controls 
+                preload="metadata" 
+                poster="/images/hero/SkaImagen11.jpg"
+                className="w-full h-full object-contain"
+              >
+                <source src="/videos/ska-cubano-promo.mp4" type="video/mp4" />
+                Tu navegador no soporta el reproductor de vídeo HTML5.
+              </video>
+            </div>
+
+            {/* Descripción del vídeo */}
+            <div className="mt-4 pt-3 border-t border-yellow-500/20">
+              <p className="text-amber-100/90 font-serif text-sm sm:text-base leading-relaxed">
+                {t.history.videoDesc || "Descubre el origen, la energía y la fusión del Ska jamaicano con el auténtico sabor del Son cubano en este vídeo de presentación oficial."}
+              </p>
+            </div>
+          </div>
+        </motion.div>
 
         {/* Línea de Tiempo Compacta */}
         <div className="relative w-full">
