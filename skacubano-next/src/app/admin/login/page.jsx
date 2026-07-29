@@ -40,7 +40,7 @@ export default function AdminLoginPage() {
   return (
     <main className="min-h-screen bg-cuban-gallery-blue text-[#faf6ee] flex flex-col justify-between items-center p-4 relative overflow-hidden">
       {/* Subtle texture overlay */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none opacity-15 z-0"
         style={{
           backgroundImage: "radial-gradient(#facc15 1.5px, transparent 1.5px)",
@@ -104,7 +104,7 @@ export default function AdminLoginPage() {
 
         <div className="pt-4 border-t border-white/10">
           <Link
-            href="/galeria"
+            href="/#gallery"
             className="text-xs font-mono text-yellow-400/80 hover:text-yellow-300 transition-colors uppercase font-semibold"
           >
             ← Volver a la Galeria Publica
