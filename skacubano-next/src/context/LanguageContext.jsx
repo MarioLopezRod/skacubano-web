@@ -92,6 +92,26 @@ export const translations = {
       badge: "— Historic Concerts —",
       title: "TOURS & SHOWS",
       subtitle: "Ska Cubano has toured over 30 countries, bringing their explosive live show to the world's most prestigious music stages.",
+      videos: [
+        {
+          id: "ISKzBoIjls8",
+          title: "Live at the Nobel Peace Prize Concert",
+          location: "Oslo, Norway (2005)",
+          description: "A legendary performance introduced by Salma Hayek to a global audience of millions following the band's BBC World Music Award nomination."
+        },
+        {
+          id: "RrD1GKeGcgc",
+          title: "Ska Cubano Live Show",
+          location: "Festival Stage Performance",
+          description: "Experience the band's raw, infectious energy and brass-heavy mambo-ska backbeat driving festival crowds wild."
+        },
+        {
+          id: "CmoXFLzOiFc",
+          title: "Freedom Sounds 2019 Live",
+          location: "Cologne, Germany (2019)",
+          description: "Ska Cubano performs Cleopatra at Freedom Sounds festival in Cologne, Germany in 2019."
+        }
+      ],
       tableHeader: {
         festival: "FESTIVAL / TOUR",
         location: "LOCATION & STAGE",
@@ -258,6 +278,26 @@ export const translations = {
       badge: "— Conciertos Históricos —",
       title: "GIRAS Y SHOWS",
       subtitle: "Ska Cubano ha recorrido más de 30 países, llevando su directo explosivo a los escenarios más prestigiosos de la música mundial.",
+      videos: [
+        {
+          id: "ISKzBoIjls8",
+          title: "Directo en el Concierto del Premio Nobel de la Paz",
+          location: "Oslo, Noruega (2005)",
+          description: "Una actuación legendaria presentada por Salma Hayek ante una audiencia global de millones tras la nominación de la banda al premio BBC World Music Award."
+        },
+        {
+          id: "RrD1GKeGcgc",
+          title: "Espectáculo en Directo de Ska Cubano",
+          location: "Actuación en Escenario de Festival",
+          description: "Vive la energía pura y contagiosa de la banda con su potente ritmo mambo-ska repleto de metales que enloquece al público en los festivales."
+        },
+        {
+          id: "CmoXFLzOiFc",
+          title: "Freedom Sounds 2019 en Directo",
+          location: "Colonia, Alemania (2019)",
+          description: "Ska Cubano interpreta Cleopatra en el festival Freedom Sounds en Colonia, Alemania, en 2019."
+        }
+      ],
       tableHeader: {
         festival: "FESTIVAL / GIRA",
         location: "LUGAR Y ETAPA",

@@ -17,12 +17,12 @@ export default function History() {
   const { t } = useLanguage();
 
   return (
-    <section 
-      id="history" 
+    <section
+      id="history"
       className="relative w-full bg-cuban-blue px-4 py-16 md:py-24 overflow-hidden border-t border-yellow-800/20"
     >
       {/* Superposición sutil para riqueza visual */}
-      <div 
+      <div
         className="absolute inset-0 pointer-events-none opacity-20 z-0"
         style={{
           backgroundImage: "radial-gradient(#d35400 1px, transparent 1px)",
@@ -33,12 +33,12 @@ export default function History() {
       <div className="relative z-10 max-w-5xl mx-auto">
         {/* Cabecera de la sección */}
         <div className="text-center mb-12 md:mb-16">
-          <span 
+          <span
             className="text-yellow-400 text-xs font-mono tracking-[0.4em] uppercase block mb-3 drop-shadow font-bold"
           >
             {t.history.badge}
           </span>
-          <h2 
+          <h2
             className="text-2xl xs:text-3xl sm:text-5xl md:text-7xl text-[#faf6ee] tracking-wide leading-none uppercase drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)]"
           >
             <BowloramaText text={t.history.title} />
@@ -58,12 +58,12 @@ export default function History() {
               const photoData = eventPhotos[index] || eventPhotos[0];
 
               return (
-                <div 
+                <div
                   key={index}
                   className="flex flex-col md:flex-row items-center relative w-full"
                 >
                   {/* Punto indicador sobre la línea de tiempo */}
-                  <div 
+                  <div
                     className="absolute left-4 md:left-1/2 w-5 h-5 rounded-full bg-[#d35400] border-4 border-yellow-400 -translate-x-1/2 top-6 z-20 shadow-lg"
                   />
 
@@ -82,31 +82,30 @@ export default function History() {
                       </div>
 
                       {/* Chincheta decorativa */}
-                      <div className="absolute -top-2 left-6 w-3.5 h-3.5 bg-amber-800 rounded-full border-2 border-white shadow-md group-hover:bg-[#d35400] transition-colors duration-300" />
-                      
+
                       {/* Año destacado */}
-                      <span 
+                      <span
                         className="font-alfa text-3xl md:text-4xl text-[#d35400] tracking-tight block mb-1 leading-none"
                       >
                         {event.year}
                       </span>
 
                       {/* Título */}
-                      <h3 
+                      <h3
                         className="text-lg md:text-xl text-zinc-900 uppercase tracking-wide mb-1 flex items-center"
                       >
                         <BowloramaText text={event.title} />
                       </h3>
 
                       {/* Subtítulo */}
-                      <span 
+                      <span
                         className="text-[11px] uppercase font-mono tracking-wider text-amber-900/80 block mb-2 font-semibold"
                       >
                         {event.subtitle}
                       </span>
 
                       {/* Texto */}
-                      <p 
+                      <p
                         className="text-zinc-800 font-serif text-xs md:text-sm leading-relaxed"
                       >
                         {event.text}
@@ -127,10 +126,10 @@ export default function History() {
                       <div className="absolute -top-2.5 right-8 w-16 h-5 bg-amber-100/30 backdrop-blur-sm border border-amber-200/40 rotate-6 shadow-sm z-10" />
 
                       <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xs bg-black">
-                        <img 
-                          src={photoData.photo} 
+                        <img
+                          src={photoData.photo}
                           alt={photoData.caption}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100" 
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                         <span className="absolute bottom-2 left-2.5 text-[10px] font-mono font-bold text-yellow-300 drop-shadow">
@@ -147,7 +146,7 @@ export default function History() {
         </div>
 
         {/* Cita final o frase retro */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
