@@ -54,35 +54,39 @@ export default function BowloramaText({ text, className = "" }) {
 
   return (
     <span className={`inline-flex flex-wrap items-center justify-center gap-x-[0.3em] ${className}`}>
-      {words.map((word, wordIdx) => (
-        <span key={wordIdx} className="inline-flex items-center justify-center whitespace-nowrap">
-          {Array.from(word).map((char, charIdx) => {
-            if (char === "¡") {
-              return <InvertedExclamationCircle key={charIdx} />;
-            }
-            if (char === "!") {
-              return <ExclamationCircle key={charIdx} />;
-            }
-            if (char === "&") {
+      {words.map((word, wordIdx) => {
+        const fontClass = "font-retro50s";
+
+        return (
+          <span key={wordIdx} className="inline-flex items-center justify-center whitespace-nowrap">
+            {Array.from(word).map((char, charIdx) => {
+              if (char === "¡") {
+                return <InvertedExclamationCircle key={charIdx} />;
+              }
+              if (char === "!") {
+                return <ExclamationCircle key={charIdx} />;
+              }
+              if (char === "&") {
+                return (
+                  <span
+                    key={charIdx}
+                    className={`${fontClass} inline-flex items-center justify-center leading-none text-[0.98em] mx-[0.03em]`}
+                    style={{ transform: "translateY(0.05em)" }}
+                  >
+                    &
+                  </span>
+                );
+              }
+
               return (
-                <span
-                  key={charIdx}
-                  className="font-bowlorama inline-flex items-center justify-center leading-none text-[0.98em] mx-[0.03em]"
-                  style={{ transform: "translateY(0.40em)" }}
-                >
-                  &
+                <span key={charIdx} className={`${fontClass} inline-flex items-center justify-center leading-none`}>
+                  {char}
                 </span>
               );
-            }
-
-            return (
-              <span key={charIdx} className="font-bowlorama inline-flex items-center justify-center leading-none">
-                {char}
-              </span>
-            );
-          })}
-        </span>
-      ))}
+            })}
+          </span>
+        );
+      })}
     </span>
   );
 }

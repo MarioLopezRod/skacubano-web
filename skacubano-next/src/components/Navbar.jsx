@@ -157,7 +157,7 @@ export default function Navbar() {
               {/* Insignia Circular del Logo con fondo claro de alto contraste */}
               <div className="relative w-11 h-11 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-[#faf6ee] border-2 border-yellow-400 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.4)] group-hover:shadow-[0_0_22px_rgba(211,84,0,0.7)] group-hover:border-yellow-300 group-hover:scale-105 transition-all duration-300 shrink-0">
                 <img
-                  src="/images/logos/logoCircular.png"
+                  src="/images/logos/logoSkaCubano_vectorizado.svg"
                   alt="Ska Cubano Logo"
                   className="w-full h-full object-contain"
                 />
@@ -261,7 +261,7 @@ export default function Navbar() {
           >
             <div className="w-10 h-10 rounded-full bg-[#faf6ee] border-2 border-yellow-400 p-0.5 flex items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.4)] shrink-0">
               <img
-                src="/images/logos/logoCircular.png"
+                src="/images/logos/logoSkaCubano_vectorizado.svg"
                 alt="Ska Cubano Logo"
                 className="w-full h-full object-contain"
               />

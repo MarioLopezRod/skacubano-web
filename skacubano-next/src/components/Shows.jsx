@@ -111,7 +111,7 @@ export default function Shows() {
               >
                 {/* Festival */}
                 <div className="col-span-1 md:col-span-4 md:pr-4">
-                  <h3 className="font-bowlorama text-[#faf6ee] text-base md:text-lg lg:text-xl group-hover:text-yellow-400 transition-colors tracking-wide leading-snug">
+                  <h3 className="font-retro50s text-[#faf6ee] text-base md:text-lg lg:text-xl group-hover:text-yellow-400 transition-colors tracking-wide leading-snug">
                     {show.festival}
                   </h3>
                 </div>

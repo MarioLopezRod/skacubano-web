@@ -64,7 +64,7 @@ export default function AdminLoginPage() {
           <div className="inline-block px-3 py-1 rounded-full bg-black/80 border border-yellow-400/40 text-[10px] font-mono font-bold text-yellow-400 uppercase tracking-widest">
             ★ ACCESO RESTRINGIDO ★
           </div>
-          <h1 className="font-bowlorama text-3xl text-yellow-400 uppercase tracking-wide drop-shadow">
+          <h1 className="font-retro50s text-3xl text-yellow-400 uppercase tracking-wide drop-shadow">
             PANEL DE ADMIN
           </h1>
           <p className="text-xs font-sans text-amber-100/80">

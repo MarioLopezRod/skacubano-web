@@ -70,7 +70,7 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
 
       {/* Member Additional Photos Grid */}
       <div className="space-y-6">
-        <h3 className="font-bowlorama text-2xl text-yellow-400 uppercase tracking-wide flex items-center gap-3 drop-shadow">
+        <h3 className="font-retro50s text-2xl text-yellow-400 uppercase tracking-wide flex items-center gap-3 drop-shadow">
           <span>GALERIA DE FOTOS DE {member.nombre.toUpperCase()}</span>
           <div className="h-[2px] flex-1 bg-yellow-400/20" />
         </h3>

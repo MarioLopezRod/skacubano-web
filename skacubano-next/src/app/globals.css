@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Alfa+Slab+One&family=Bebas+Neue&family=Lilita+One&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Boogaloo&family=Righteous&family=Fugaz+One&family=Alfa+Slab+One&family=Bebas+Neue&family=Abril+Fatface&family=Lilita+One&display=swap');
 @import "flag-icons/css/flag-icons.min.css";
 @import "tailwindcss";
 
@@ -31,11 +31,15 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-boogaloo: 'Boogaloo', cursive;
   --font-lilita: 'Lilita One', cursive;
   --font-bebas: 'Bebas Neue', sans-serif;
   --font-alfa: 'Alfa Slab One', serif;
   --font-abril: 'Abril Fatface', serif;
-  --font-bowlorama: 'Bowlorama', 'Bebas Neue', sans-serif;
+  --font-righteous: 'Righteous', cursive;
+  --font-fugaz: 'Fugaz One', cursive;
+  --font-retro50s: 'Boogaloo', 'Righteous', cursive;
+  --font-bowlorama: 'Bowlorama', 'Boogaloo', sans-serif;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -101,7 +105,13 @@ body {
 }
 
 .font-bowlorama {
-  font-family: 'Bowlorama', 'Alfa Slab One', cursive;
+  font-family: 'Bowlorama', 'Boogaloo', cursive;
+}
+
+.font-retro50s,
+.font-boogaloo {
+  font-family: 'Boogaloo', 'Righteous', cursive, sans-serif;
+  letter-spacing: 0.04em;
 }
 
 /* ── Cuban Postal Stamp & Vintage Card Styling ── */

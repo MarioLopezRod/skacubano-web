@@ -55,28 +55,28 @@ export default function Hero() {
         />
       ))}
 
-      {/* Capa de ambiente retro cubano-jamaicano */}
+      {/* Capa de ambiente retro cubano-jamaicano - Tono suave para destacar fotos */}
       <div
         className="absolute inset-0 z-10 pointer-events-none"
         style={{
-          background: "linear-gradient(to bottom, rgba(13,9,6,0.85) 0%, rgba(18,12,7,0.55) 50%, rgba(13,9,6,0.98) 100%)"
+          background: "linear-gradient(to bottom, rgba(13,9,6,0.45) 0%, rgba(18,12,7,0.20) 50%, rgba(13,9,6,0.65) 100%)"
         }}
       />
 
       {/* Contenido principal (Logo + Eslogan) centrado verticalmente en la zona superior/media */}
       <div className="relative z-20 max-w-4xl mx-auto px-6 text-center flex-1 flex flex-col items-center justify-center gap-6 sm:gap-8 pt-20 sm:pt-24 pb-4">
 
-        {/* LOGO OFICIAL */}
+        {/* LOGO OFICIAL (Tamaño ajustado y retocado sin bordes blancos) */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="w-full max-w-[260px] xs:max-w-xs sm:max-w-md md:max-w-lg lg:max-w-xl shrink-0"
+          className="w-full max-w-[170px] xs:max-w-[200px] sm:max-w-[240px] md:max-w-[280px] lg:max-w-[320px] shrink-0"
         >
           <img
-            src="/images/logos/logoSkaCubano.png"
+            src="/images/logos/logoSkaCubano_vectorizado.svg"
             alt="Ska Cubano Big Band Logo"
-            className="w-full h-auto drop-shadow-[0_12px_35px_rgba(0,0,0,0.95)] mx-auto hover:scale-102 transition-transform duration-300"
+            className="w-full h-auto drop-shadow-[0_8px_20px_rgba(0,0,0,0.7)] mx-auto hover:scale-102 transition-transform duration-300"
           />
         </motion.div>
 
