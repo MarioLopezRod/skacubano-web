@@ -57,10 +57,10 @@ export const translations = {
         },
         {
           year: "2004",
-          title: "THE BIG BAND",
-          subtitle: "London - Caribbean Connection",
-          text: "In late 2004, the band consolidates in London with top-tier Caribbean and international musicians, including Rey Crespo and Ernesto Estruch (Havana), Dr. Sleepy (Montserrat), Eddie 'Tan Tan' Thornton (Jamaica), Miss Megoo (Japan) and Trevor Edwards (London), with Beny Billy constantly traveling from Cuba for tours and recordings.",
-          stamp: "LONDON • 2004"
+          title: "DEBUT ALBUM & BIG BAND",
+          subtitle: "Release of 'Ska Cubano' & London Connection",
+          text: "In 2004, the band releases their self-titled debut album, 'Ska Cubano'. Later that year, the line-up consolidates in London with top-tier Caribbean and international musicians, including Rey Crespo and Ernesto Estruch (Havana), Dr. Sleepy (Montserrat), Eddie 'Tan Tan' Thornton (Jamaica), Miss Megoo (Japan) and Trevor Edwards (London), with Beny Billy constantly traveling from Cuba for tours and recordings.",
+          stamp: "DEBUT ALBUM • 2004"
         },
         {
           year: "2005",
@@ -232,7 +232,8 @@ export const translations = {
       description: "The explosive clash of classic Jamaican ska and infectious Cuban rhythms.",
       quickLinks: "Quick Links",
       rights: "Ska Cubano. All rights reserved.",
-      legacyText: "Santiago de Cuba to London • 2001 — Present"
+      legacyText: "Santiago de Cuba to London • 2001 — Present",
+      designedBy: "Designed & Developed by"
     }
   },
   es: {
@@ -287,10 +288,10 @@ export const translations = {
         },
         {
           year: "2004",
-          title: "LA BIG BAND",
-          subtitle: "Conexión Londres - Caribe",
-          text: "A finales de 2004, la banda se consolida en Londres con músicos caribeños e internacionales de primer nivel, incluyendo a Rey Crespo y Ernesto Estruch (La Habana), Dr. Sleepy (Montserrat), Eddie 'Tan Tan' Thornton (Jamaica), Miss Megoo (Japón) y Trevor Edwards (Londres), con Beny Billy viajando constantemente desde Cuba para giras y grabaciones.",
-          stamp: "LONDRES • 2004"
+          title: "ÁLBUM DEBUT Y LA BIG BAND",
+          subtitle: "Lanzamiento de 'Ska Cubano' y Conexión Londres-Caribe",
+          text: "En 2004 ve la luz su primer álbum homónimo, 'Ska Cubano'. Ese mismo año la banda se consolida en Londres reuniendo a músicos caribeños e internacionales de primer nivel, incluyendo a Rey Crespo y Ernesto Estruch (La Habana), Dr. Sleepy (Montserrat), Eddie 'Tan Tan' Thornton (Jamaica), Miss Megoo (Japón) y Trevor Edwards (Londres), con Beny Billy viajando constantemente desde Cuba para giras y grabaciones.",
+          stamp: "ÁLBUM DEBUT • 2004"
         },
         {
           year: "2005",
@@ -462,7 +463,8 @@ export const translations = {
       description: "La explosiva colisión entre el ska jamaicano clásico y los ritmos contagiosos de Cuba.",
       quickLinks: "Enlaces Rápidos",
       rights: "Ska Cubano. Todos los derechos reservados.",
-      legacyText: "Santiago de Cuba a Londres • 2001 — Presente"
+      legacyText: "Santiago de Cuba a Londres • 2001 — Presente",
+      designedBy: "Diseñado y Desarrollado por"
     }
   }
 };

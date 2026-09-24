@@ -1,6 +1,10 @@
 "use client";
 
+import { useLanguage } from "../context/LanguageContext";
+
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className="w-full bg-[#080605] py-4 px-6 border-t border-amber-900/20 text-amber-50/50 relative z-20">
       <div className="max-w-4xl mx-auto flex flex-col items-center justify-center gap-2 text-center">
@@ -16,7 +20,7 @@ export default function Footer() {
 
         {/* Copyright y Créditos totalmente centrados */}
         <p className="text-[11px] sm:text-xs font-mono tracking-wider text-amber-50/50 leading-tight text-center">
-          © 2026 Skacubano · Designed & Developed by{" "}
+          © 2026 Skacubano · {t.footer.designedBy || "Diseñado y Desarrollado por"}{" "}
           <a
             href="https://www.linkedin.com/in/mario-l%C3%B3pez-rodr%C3%ADguez-863349306/"
             target="_blank"

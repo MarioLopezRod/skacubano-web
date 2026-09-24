@@ -6,8 +6,8 @@ import BowloramaText from "./BowloramaText";
 
 // Fotos históricas asignadas a cada hito para completar el espacio opuesto
 const eventPhotos = [
-  { photo: "/images/photos/beny_natty_santiago.jpg", caption: "Santiago de Cuba 2001 • Primeros ensayos" },
-  { photo: "/images/hero/SkaImagen11.jpg", caption: "Londres 2004 • Consolidación de la Big Band" },
+  { photo: "/images/photos/galery/banda/banda_2001.jpg", caption: "Santiago de Cuba 2001 • Primeros ensayos" },
+  { photo: "/images/hero/SkaImagen11.jpg", caption: "2004 • Primer álbum 'Ska Cubano' & Big Band" },
   { photo: "/images/albums/caramba.jpg", caption: "¡Ay Caramba! • Premio BBC World Music" },
   { photo: "/images/albums/mamboska.jpg", caption: "Mambo Ska 2010 • Sonido de alto octanaje" },
   { photo: "/images/hero/SkaImagen16.jpg", caption: "World Tour • Glastonbury & WOMAD" },

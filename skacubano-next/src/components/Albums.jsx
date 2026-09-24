@@ -13,19 +13,19 @@ const albums = [
     } 
   },
   { 
-    id: 2, title: "Ajiaco!", cover: "/images/albums/ajiaco.jpg", year: "2007",
-    links: { 
-      sp: "https://open.spotify.com/intl-es/album/4l0RKxCjk4xB9a4lsQ6SXK?si=cFJxv-07QR-5Hrrx_oADYQ",
-      yt: "https://www.youtube.com/watch?v=40_2h7Vkpo8&list=OLAK5uy_kOaE4-Bqj6IwANG6RfDGqqQmewJ1T7I8g",
-      ap: "https://music.apple.com/es/album/ajiaco-the-remix-album/705272102" 
-    } 
-  },
-  { 
-    id: 3, title: "¡Ay Caramba!", cover: "/images/albums/caramba.jpg", year: "2005",
+    id: 2, title: "¡Ay Caramba!", cover: "/images/albums/caramba.jpg", year: "2005",
     links: { 
       sp: "https://open.spotify.com/intl-es/album/6dGWSlqez8ptLOJBCt1ymW?si=afdcvAJvT2OK5qXWkgrZXA",
       yt: "https://www.youtube.com/watch?v=nwLyUCy7O7A&list=OLAK5uy_k0ldgoIleSHm7Ljh7-cr_NnXXH-dyWLVY",
       ap: "https://music.apple.com/es/album/ay-caramba/902312351" 
+    } 
+  },
+  { 
+    id: 3, title: "Ajiaco!", cover: "/images/albums/ajiaco.jpg", year: "2007",
+    links: { 
+      sp: "https://open.spotify.com/intl-es/album/4l0RKxCjk4xB9a4lsQ6SXK?si=cFJxv-07QR-5Hrrx_oADYQ",
+      yt: "https://www.youtube.com/watch?v=40_2h7Vkpo8&list=OLAK5uy_kOaE4-Bqj6IwANG6RfDGqqQmewJ1T7I8g",
+      ap: "https://music.apple.com/es/album/ajiaco-the-remix-album/705272102" 
     } 
   },
   { 
