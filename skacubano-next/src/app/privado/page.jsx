@@ -1,12 +1,17 @@
 "use client";
 
-import { useState, use } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function PrivateDossierPage({ params }) {
-  const resolvedParams = use(params);
-  const slug = resolvedParams.slug;
+// En la web compilada (estática) todas las URLs /privado/<slug> sirven esta misma página
+// (ver .htaccess), así que el slug se lee de la URL del navegador.
+function getSlugFromUrl() {
+  const parts = window.location.pathname.split("/").filter(Boolean);
+  return decodeURIComponent(parts[1] || "");
+}
+
+export default function PrivateDossierPage() {
 
   const [password, setPassword] = useState("");
   const [authenticated, setAuthenticated] = useState(false);
@@ -26,7 +31,7 @@ export default function PrivateDossierPage({ params }) {
       const res = await fetch("/api/private-links/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ slug, clave: password }),
+        body: JSON.stringify({ slug: getSlugFromUrl(), clave: password }),
       });
 
       const json = await res.json();

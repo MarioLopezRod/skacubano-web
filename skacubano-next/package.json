@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:php": "php -S localhost:8000 -t public public/api/dev-router.php",
     "build": "next build",
-    "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {

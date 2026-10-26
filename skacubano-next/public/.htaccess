@@ -1,0 +1,47 @@
+# Configuración de Apache para la web de Ska Cubano (names.co.uk)
+Options -Indexes
+# Las páginas compiladas son ficheros .html junto a carpetas con el mismo nombre (admin.html y admin/):
+# sin esto Apache redirigiría /admin a /admin/ antes de aplicar las reglas de abajo
+DirectorySlash Off
+DirectoryIndex index.html index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Carpeta de datos (JSON y config.php con la contraseña): nunca accesible desde fuera
+  RewriteRule ^data(/|$) - [F,L]
+
+  # API en PHP
+  RewriteRule ^api(/.*)?$ api/index.php [L,QSA]
+
+  # Enlaces privados: /privado/<slug> sirve siempre la misma página, que lee el slug de la URL
+  RewriteRule ^privado/[^/]+/?$ privado.html [L]
+
+  # URLs sin extensión: /galeria -> galeria.html, /admin/login -> admin/login.html
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+  RewriteRule ^(.+?)/?$ $1.html [L]
+</IfModule>
+
+ErrorDocument 404 /404.html
+
+# Caché para imágenes, vídeos, fuentes y JS/CSS compilados (estos últimos llevan hash en el nombre)
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 month"
+  ExpiresByType video/mp4 "access plus 1 month"
+  ExpiresByType font/ttf "access plus 1 year"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+<IfModule mod_headers.c>
+  <FilesMatch "^_next/static/">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript application/json image/svg+xml
+</IfModule>

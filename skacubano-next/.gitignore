@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# datos y subidas generados por la API PHP al probar en local
+/public/data/
+/public/uploads/gallery/
