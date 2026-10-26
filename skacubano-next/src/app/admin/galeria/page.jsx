@@ -468,7 +468,7 @@ export default function AdminGalleryPage() {
       formData.append("notasTecnicas", privateNotas);
 
       for (let i = 0; i < privateFiles.length; i++) {
-        formData.append("files", privateFiles[i]);
+        formData.append("files[]", privateFiles[i]);
       }
 
       const res = await fetch("/api/private-links", {
@@ -517,11 +517,12 @@ export default function AdminGalleryPage() {
       formData.append("existingFotos", JSON.stringify(editPrivateExistingFotos));
 
       for (let i = 0; i < editPrivateNewFiles.length; i++) {
-        formData.append("files", editPrivateNewFiles[i]);
+        formData.append("files[]", editPrivateNewFiles[i]);
       }
 
+      // POST en lugar de PUT: PHP solo procesa formularios con ficheros en peticiones POST
       const res = await fetch(`/api/private-links/${editingPrivateLink.id}`, {
-        method: "PUT",
+        method: "POST",
         body: formData,
       });
 

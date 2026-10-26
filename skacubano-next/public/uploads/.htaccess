@@ -1,0 +1,9 @@
+# Las subidas del panel de admin nunca se ejecutan como código
+<FilesMatch "\.(php|phtml|php\d|phar|cgi|pl|py|sh)$">
+  Require all denied
+</FilesMatch>
+<IfModule mod_php.c>
+  php_flag engine off
+</IfModule>
+RemoveHandler .php .phtml .phar
+RemoveType .php .phtml .phar
