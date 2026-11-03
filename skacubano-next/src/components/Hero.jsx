@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import { motion, useScroll, useTransform, useMotionValue, useReducedMotion } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
+import { LOGO_HANDOFF_SCROLL, LOGO_FADE_START } from "../lib/logoScroll";
 
 const images = [
   "/images/hero/SkaImagen2.jpg",
@@ -27,6 +28,52 @@ const images = [
 export default function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { t } = useLanguage();
+
+  // ── Logo que sube y se encoge hasta el logo del navbar al hacer scroll ──
+  const logoAnchorRef = useRef(null);
+  const reduceMotion = useReducedMotion();
+  const { scrollY } = useScroll();
+  // Distancias medidas en pantalla: { dx, dy, scale } entre el logo del Hero y el del navbar
+  const logoMetrics = useMotionValue(null);
+
+  useEffect(() => {
+    const measure = () => {
+      const anchor = logoAnchorRef.current;
+      // Hay un logo de navbar para escritorio y otro para móvil; se usa el que está visible
+      const target = Array.from(document.querySelectorAll("[data-nav-logo]")).find(
+        (el) => el.getBoundingClientRect().width > 0
+      );
+      if (!anchor || !target) return;
+      const a = anchor.getBoundingClientRect();
+      const b = target.getBoundingClientRect();
+      // El ancla no lleva transformaciones: su posición en el documento es fija
+      const heroCenterX = a.left + a.width / 2;
+      const heroCenterDocY = a.top + window.scrollY + a.height / 2;
+      logoMetrics.set({
+        dx: b.left + b.width / 2 - heroCenterX,
+        // El navbar es fixed: su centro no depende del scroll
+        dy: b.top + b.height / 2 - heroCenterDocY + LOGO_HANDOFF_SCROLL,
+        scale: b.width / a.width,
+      });
+    };
+    measure();
+    window.addEventListener("resize", measure);
+    const img = logoAnchorRef.current?.querySelector("img");
+    img?.addEventListener("load", measure);
+    return () => {
+      window.removeEventListener("resize", measure);
+      img?.removeEventListener("load", measure);
+    };
+  }, [logoMetrics]);
+
+  const progress = (y) => Math.min(Math.max(y / LOGO_HANDOFF_SCROLL, 0), 1);
+  // Mientras sube, compensa el propio scroll de la página para acabar justo encima del logo del navbar
+  const logoX = useTransform([scrollY, logoMetrics], ([y, m]) => (m && !reduceMotion ? progress(y) * m.dx : 0));
+  const logoY = useTransform([scrollY, logoMetrics], ([y, m]) => (m && !reduceMotion ? progress(y) * m.dy : 0));
+  const logoScale = useTransform([scrollY, logoMetrics], ([y, m]) =>
+    m && !reduceMotion ? 1 + progress(y) * (m.scale - 1) : 1
+  );
+  const logoOpacity = useTransform(scrollY, [LOGO_FADE_START, LOGO_HANDOFF_SCROLL], [1, 0]);
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -67,18 +114,28 @@ export default function Hero() {
       <div className="relative z-20 max-w-4xl mx-auto px-6 text-center flex-1 flex flex-col items-center justify-center gap-6 sm:gap-8 pt-20 sm:pt-24 pb-4">
 
         {/* LOGO OFICIAL (Tamaño ajustado y retocado sin bordes blancos) */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-          className="w-full max-w-[170px] xs:max-w-[200px] sm:max-w-[240px] md:max-w-[280px] lg:max-w-[320px] shrink-0"
+        {/* Ancla sin transformaciones (sirve para medir) > capa que sigue al scroll > animación de entrada */}
+        <div
+          ref={logoAnchorRef}
+          className="w-full max-w-[140px] xs:max-w-[160px] sm:max-w-[190px] md:max-w-[220px] lg:max-w-[250px] shrink-0"
         >
-          <img
-            src="/images/logos/logoSkaCubano_vectorizado.svg"
-            alt="Ska Cubano Big Band Logo"
-            className="w-full h-auto drop-shadow-[0_8px_20px_rgba(0,0,0,0.7)] mx-auto hover:scale-102 transition-transform duration-300"
-          />
-        </motion.div>
+          <motion.div
+            style={{ x: logoX, y: logoY, scale: logoScale, opacity: logoOpacity }}
+            className="will-change-transform"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+            >
+              <img
+                src="/images/logos/logoSkaCubano_vectorizado.svg"
+                alt="Ska Cubano Big Band Logo"
+                className="w-full h-auto drop-shadow-[0_8px_20px_rgba(0,0,0,0.7)] mx-auto"
+              />
+            </motion.div>
+          </motion.div>
+        </div>
 
         {/* Eslogan / Subtítulo informativo */}
         <motion.p

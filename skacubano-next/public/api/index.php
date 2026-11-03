@@ -68,6 +68,11 @@ function route($method, $s, $putFiles)
         }
     }
 
+    if ($first === 'shows' && $n === 1) {
+        if ($method === 'GET') return shows_get();
+        if ($method === 'PUT') return shows_save();
+    }
+
     if ($first === 'private-links') {
         if ($n === 1 && $method === 'GET') return private_links_list();
         if ($n === 1 && $method === 'POST') return private_link_create();
@@ -463,6 +468,120 @@ function section_delete($id)
     unset($f);
 
     save_gallery_data($data);
+    json_response(['success' => true, 'data' => $data]);
+}
+
+/* ── Shows (cartelera y vídeos de YouTube) ─────────────────────────── */
+
+function get_shows_data()
+{
+    $data = load_json_store('shows.json', ['shows' => [], 'videos' => []]);
+    if (!isset($data['shows']) || !is_array($data['shows'])) $data['shows'] = [];
+    if (!isset($data['videos']) || !is_array($data['videos'])) $data['videos'] = [];
+    return $data;
+}
+
+// Lectura pública: la pide cada visitante, así que se deja cachear (navegador/proxy) y responde 304 si no ha cambiado
+function shows_get()
+{
+    $path = DATA_DIR . '/shows.json';
+    $data = get_shows_data();
+    $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $etag = '"' . md5($json) . '"';
+
+    header('Cache-Control: public, max-age=60, stale-while-revalidate=300');
+    header('ETag: ' . $etag);
+    if (file_exists($path)) {
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($path)) . ' GMT');
+    }
+    if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
+        http_response_code(304);
+        exit;
+    }
+    http_response_code(200);
+    header('Content-Type: application/json; charset=utf-8');
+    echo $json;
+    exit;
+}
+
+// Texto bilingüe {es, en}: recorta espacios y limita longitud
+function clean_bilingual($value, $maxLen)
+{
+    $out = [];
+    foreach (['es', 'en'] as $lang) {
+        $v = is_array($value) && isset($value[$lang]) && is_scalar($value[$lang]) ? trim((string) $value[$lang]) : '';
+        $out[$lang] = mb_substr($v, 0, $maxLen, 'UTF-8');
+    }
+    return $out;
+}
+
+function clean_item_id($id, $prefix, $i)
+{
+    $id = is_string($id) ? $id : '';
+    return preg_match('/^[a-zA-Z0-9_-]{1,64}$/', $id) ? $id : $prefix . '_' . now_ms() . '_' . $i;
+}
+
+// Acepta un ID de YouTube (11 caracteres) o una URL de YouTube y devuelve el ID, o null si no es válido
+function extract_youtube_id($value)
+{
+    $value = trim((string) $value);
+    if (preg_match('/^[A-Za-z0-9_-]{11}$/', $value)) return $value;
+    if (preg_match('#(?:youtube\.com/(?:watch\?(?:.*&)?v=|embed/|shorts/|live/)|youtu\.be/)([A-Za-z0-9_-]{11})#', $value, $m)) return $m[1];
+    return null;
+}
+
+// Guardado completo (lista de shows + vídeos en su orden). El orden del array es el orden en la web.
+function shows_save()
+{
+    require_admin();
+    $body = read_json_body();
+    if (!isset($body['shows']) || !is_array($body['shows']) || !isset($body['videos']) || !is_array($body['videos'])) {
+        json_response(['error' => 'Formato no válido'], 400);
+    }
+    if (count($body['shows']) > 200 || count($body['videos']) > 24) {
+        json_response(['error' => 'Demasiados elementos'], 400);
+    }
+
+    $shows = [];
+    foreach (array_values($body['shows']) as $i => $s) {
+        if (!is_array($s)) continue;
+        $show = [
+            'id' => clean_item_id(isset($s['id']) ? $s['id'] : '', 'show', $i),
+            'festival' => clean_bilingual(isset($s['festival']) ? $s['festival'] : null, 150),
+            'location' => clean_bilingual(isset($s['location']) ? $s['location'] : null, 150),
+            'year' => clean_bilingual(isset($s['year']) ? $s['year'] : null, 60),
+            'details' => clean_bilingual(isset($s['details']) ? $s['details'] : null, 600),
+        ];
+        if ($show['festival']['es'] === '' || $show['festival']['en'] === '') {
+            json_response(['error' => 'Cada show necesita el nombre en español e inglés (fila ' . ($i + 1) . ')'], 400);
+        }
+        $shows[] = $show;
+    }
+
+    $videos = [];
+    foreach (array_values($body['videos']) as $i => $v) {
+        if (!is_array($v)) continue;
+        $youtubeId = extract_youtube_id(isset($v['youtubeId']) ? $v['youtubeId'] : '');
+        if ($youtubeId === null) {
+            json_response(['error' => 'Enlace o ID de YouTube no válido (vídeo ' . ($i + 1) . ')'], 400);
+        }
+        $video = [
+            'id' => clean_item_id(isset($v['id']) ? $v['id'] : '', 'video', $i),
+            'youtubeId' => $youtubeId,
+            'title' => clean_bilingual(isset($v['title']) ? $v['title'] : null, 150),
+            'location' => clean_bilingual(isset($v['location']) ? $v['location'] : null, 150),
+            'description' => clean_bilingual(isset($v['description']) ? $v['description'] : null, 600),
+        ];
+        if ($video['title']['es'] === '' || $video['title']['en'] === '') {
+            json_response(['error' => 'Cada vídeo necesita título en español e inglés (vídeo ' . ($i + 1) . ')'], 400);
+        }
+        $videos[] = $video;
+    }
+
+    $data = ['shows' => $shows, 'videos' => $videos];
+    if (!save_json_store('shows.json', $data)) {
+        json_response(['error' => 'No se pudo guardar'], 500);
+    }
     json_response(['success' => true, 'data' => $data]);
 }
 

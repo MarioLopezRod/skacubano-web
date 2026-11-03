@@ -1,0 +1,320 @@
+{
+  "shows": [
+    {
+      "id": "show_1",
+      "festival": {
+        "es": "GLASTONBURY FESTIVAL",
+        "en": "GLASTONBURY FESTIVAL"
+      },
+      "location": {
+        "es": "Pilton, Reino Unido",
+        "en": "Pilton, United Kingdom"
+      },
+      "year": {
+        "es": "Hitos Giras",
+        "en": "Tour Milestones"
+      },
+      "details": {
+        "es": "Escenario principal de World Music. Considerado uno de los conciertos de ska más enérgicos del festival.",
+        "en": "Main World Music stage. Considered one of the most energetic ska concerts of the festival."
+      }
+    },
+    {
+      "id": "show_2",
+      "festival": {
+        "es": "WOMAD FESTIVAL",
+        "en": "WOMAD FESTIVAL"
+      },
+      "location": {
+        "es": "Reino Unido, España, Australia",
+        "en": "UK, Spain, Australia"
+      },
+      "year": {
+        "es": "Gira Global",
+        "en": "Global Tour"
+      },
+      "details": {
+        "es": "Actuación estelar en múltiples sedes internacionales del festival de músicas del mundo fundado por Peter Gabriel.",
+        "en": "Headline performance across multiple international venues of the world music festival founded by Peter Gabriel."
+      }
+    },
+    {
+      "id": "show_3",
+      "festival": {
+        "es": "FUJI ROCK FESTIVAL",
+        "en": "FUJI ROCK FESTIVAL"
+      },
+      "location": {
+        "es": "Naeba, Japón",
+        "en": "Naeba, Japan"
+      },
+      "year": {
+        "es": "Tour Asia",
+        "en": "Asia Tour"
+      },
+      "details": {
+        "es": "Lleno absoluto en los escenarios del festival de montaña más importante de Asia durante su aclamada gira japonesa.",
+        "en": "Packed crowd at Asia's most important mountain festival during their acclaimed Japanese tour."
+      }
+    },
+    {
+      "id": "show_4",
+      "festival": {
+        "es": "ROSKILDE FESTIVAL",
+        "en": "ROSKILDE FESTIVAL"
+      },
+      "location": {
+        "es": "Roskilde, Dinamarca",
+        "en": "Roskilde, Denmark"
+      },
+      "year": {
+        "es": "Gira Europea",
+        "en": "European Tour"
+      },
+      "details": {
+        "es": "El corazón del norte de Europa vibrando al ritmo del mambo-ska tradicional en una noche memorable.",
+        "en": "The heart of Northern Europe vibrating to the rhythm of traditional mambo-ska on a memorable night."
+      }
+    },
+    {
+      "id": "show_5",
+      "festival": {
+        "es": "BIG DAY OUT",
+        "en": "BIG DAY OUT"
+      },
+      "location": {
+        "es": "Sídney, Melbourne, Australia",
+        "en": "Sydney, Melbourne, Australia"
+      },
+      "year": {
+        "es": "Tour Oceanía",
+        "en": "Oceania Tour"
+      },
+      "details": {
+        "es": "Gira multitudinaria por las principales ciudades de Australia y Nueva Zelanda, marcando un hito en las antípodas.",
+        "en": "Massive tour through major cities in Australia and New Zealand, marking a milestone down under."
+      }
+    },
+    {
+      "id": "show_6",
+      "festival": {
+        "es": "CHICAGO WORLD MUSIC",
+        "en": "CHICAGO WORLD MUSIC"
+      },
+      "location": {
+        "es": "Chicago, Estados Unidos",
+        "en": "Chicago, United States"
+      },
+      "year": {
+        "es": "Tour EE.UU.",
+        "en": "US Tour"
+      },
+      "details": {
+        "es": "Conquista del público norteamericano en una serie de conciertos con un derroche inigualable de vientos y percusión.",
+        "en": "Conquering the North American audience in a series of concerts with an unparalleled display of brass and percussion."
+      }
+    },
+    {
+      "id": "show_7",
+      "festival": {
+        "es": "IBOGA SUMMER FESTIVAL",
+        "en": "IBOGA SUMMER FESTIVAL"
+      },
+      "location": {
+        "es": "Comunidad Valenciana, España",
+        "en": "Valencian Community, Spain"
+      },
+      "year": {
+        "es": "Gira Europea",
+        "en": "European Tour"
+      },
+      "details": {
+        "es": "Referencia nacional de ritmos balcánicos, ska y mestizaje celebrado en la Comunidad Valenciana.",
+        "en": "National benchmark of Balkan rhythms, ska and fusion music celebrated in the Valencian Community."
+      }
+    },
+    {
+      "id": "show_8",
+      "festival": {
+        "es": "TERRITORIOS SEVILLA",
+        "en": "TERRITORIOS SEVILLA"
+      },
+      "location": {
+        "es": "Sevilla, España",
+        "en": "Seville, Spain"
+      },
+      "year": {
+        "es": "Gira España",
+        "en": "Spain Tour"
+      },
+      "details": {
+        "es": "Festival andaluz de música independiente y mestiza celebrado en el Centro Andaluz de Arte Contemporáneo.",
+        "en": "Andalusian independent and fusion music festival held at the Andalusian Center for Contemporary Art (CAAC)."
+      }
+    },
+    {
+      "id": "show_9",
+      "festival": {
+        "es": "SZIGET FESTIVAL",
+        "en": "SZIGET FESTIVAL"
+      },
+      "location": {
+        "es": "Budapest, Hungría",
+        "en": "Budapest, Hungary"
+      },
+      "year": {
+        "es": "Gira Europea",
+        "en": "European Tour"
+      },
+      "details": {
+        "es": "Presentaciones en la famosa isla de Óbudai-Sziget en Budapest.",
+        "en": "Vibrant performances on the famous Óbudai-Sziget island in Budapest."
+      }
+    },
+    {
+      "id": "show_10",
+      "festival": {
+        "es": "REGGAE GEEL",
+        "en": "REGGAE GEEL"
+      },
+      "location": {
+        "es": "Geel, Bélgica",
+        "en": "Geel, Belgium"
+      },
+      "year": {
+        "es": "Gira Europea",
+        "en": "European Tour"
+      },
+      "details": {
+        "es": "Uno de los festivales dedicados al reggae y ska más antiguos de Europa.",
+        "en": "One of the oldest and most legendary reggae and ska festivals in Europe."
+      }
+    },
+    {
+      "id": "show_11",
+      "festival": {
+        "es": "FESTIVAL DU BOUT DU MONDE",
+        "en": "FESTIVAL DU BOUT DU MONDE"
+      },
+      "location": {
+        "es": "Crozon, Francia",
+        "en": "Crozon, France"
+      },
+      "year": {
+        "es": "Gira Europea",
+        "en": "European Tour"
+      },
+      "details": {
+        "es": "Evento multicultural de músicas del mundo situado en Crozon.",
+        "en": "Multicultural world music festival set on the stunning Crozon peninsula in Brittany."
+      }
+    },
+    {
+      "id": "show_12",
+      "festival": {
+        "es": "STERN GROVE FESTIVAL",
+        "en": "STERN GROVE FESTIVAL"
+      },
+      "location": {
+        "es": "San Francisco, Estados Unidos",
+        "en": "San Francisco, United States"
+      },
+      "year": {
+        "es": "Tour EE.UU.",
+        "en": "US Tour"
+      },
+      "details": {
+        "es": "Concierto al aire libre en la ciudad de San Francisco.",
+        "en": "Iconic outdoor concert in the heart of San Francisco."
+      }
+    },
+    {
+      "id": "show_13",
+      "festival": {
+        "es": "SAN DIEGO STREET SCENE",
+        "en": "SAN DIEGO STREET SCENE"
+      },
+      "location": {
+        "es": "San Diego, Estados Unidos",
+        "en": "San Diego, United States"
+      },
+      "year": {
+        "es": "Tour EE.UU.",
+        "en": "US Tour"
+      },
+      "details": {
+        "es": "Histórico festival urbano celebrado en California.",
+        "en": "Historic urban music festival held in California."
+      }
+    },
+    {
+      "id": "show_14",
+      "festival": {
+        "es": "NOBEL PEACE PRIZE CONCERT",
+        "en": "NOBEL PEACE PRIZE CONCERT"
+      },
+      "location": {
+        "es": "Oslo, Noruega",
+        "en": "Oslo, Norway"
+      },
+      "year": {
+        "es": "Hito Histórico",
+        "en": "Historic Milestone"
+      },
+      "details": {
+        "es": "Tuvieron el gran honor de actuar en el concierto oficial de la entrega del Premio Nobel de la Paz en Oslo.",
+        "en": "Had the great honor of performing at the official Nobel Peace Prize Concert in Oslo."
+      }
+    }
+  ],
+  "videos": [
+    {
+      "id": "video_1",
+      "youtubeId": "ISKzBoIjls8",
+      "title": {
+        "es": "Directo en el Concierto del Premio Nobel de la Paz",
+        "en": "Live at the Nobel Peace Prize Concert"
+      },
+      "location": {
+        "es": "Oslo, Noruega (2005)",
+        "en": "Oslo, Norway (2005)"
+      },
+      "description": {
+        "es": "Una actuación legendaria presentada por Salma Hayek ante una audiencia global de millones tras la nominación de la banda al premio BBC World Music Award.",
+        "en": "A legendary performance introduced by Salma Hayek to a global audience of millions following the band's BBC World Music Award nomination."
+      }
+    },
+    {
+      "id": "video_2",
+      "youtubeId": "RrD1GKeGcgc",
+      "title": {
+        "es": "Espectáculo en Directo de Ska Cubano",
+        "en": "Ska Cubano Live Show"
+      },
+      "location": {
+        "es": "Actuación en Escenario de Festival",
+        "en": "Festival Stage Performance"
+      },
+      "description": {
+        "es": "Vive la energía pura y contagiosa de la banda con su potente ritmo mambo-ska repleto de metales que enloquece al público en los festivales.",
+        "en": "Experience the band's raw, infectious energy and brass-heavy mambo-ska backbeat driving festival crowds wild."
+      }
+    },
+    {
+      "id": "video_3",
+      "youtubeId": "CmoXFLzOiFc",
+      "title": {
+        "es": "Freedom Sounds 2019 en Directo",
+        "en": "Freedom Sounds 2019 Live"
+      },
+      "location": {
+        "es": "Colonia, Alemania (2019)",
+        "en": "Cologne, Germany (2019)"
+      },
+      "description": {
+        "es": "Ska Cubano interpreta Cleopatra en el festival Freedom Sounds en Colonia, Alemania, en 2019.",
+        "en": "Ska Cubano performs Cleopatra at Freedom Sounds festival in Cologne, Germany in 2019."
+      }
+    }
+  ]
+}

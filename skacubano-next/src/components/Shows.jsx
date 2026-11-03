@@ -1,32 +1,55 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
+import { useShowsData, pickLang } from "../lib/showsData";
 import BowloramaText from "./BowloramaText";
 
-const showVideos = [
-  {
-    id: "ISKzBoIjls8",
-    title: "Live at the Nobel Peace Prize Concert",
-    location: "Oslo, Norway (2005)",
-    description: "A legendary performance introduced by Salma Hayek to a global audience of millions following the band's BBC World Music Award nomination.",
-  },
-  {
-    id: "RrD1GKeGcgc",
-    title: "Ska Cubano Live Show",
-    location: "Festival Stage Performance",
-    description: "Experience the band's raw, infectious energy and brass-heavy mambo-ska backbeat driving festival crowds wild.",
-  },
-  {
-    id: "CmoXFLzOiFc",
-    title: "Freedom Sounds 2019 Live",
-    location: "Cologne, Germany (2019)",
-    description: "Ska Cubano performs Cleopatra at Freedom Sounds festival in Cologne, Germany in 2019.",
-  },
-];
+// Miniatura + botón de play: el reproductor de YouTube (pesado) solo se carga si el visitante lo pulsa
+function YouTubeLite({ youtubeId, title, playLabel }) {
+  const [playing, setPlaying] = useState(false);
+
+  if (playing) {
+    return (
+      <iframe
+        className="absolute inset-0 w-full h-full border-0"
+        src={`https://www.youtube-nocookie.com/embed/${youtubeId}?rel=0&autoplay=1`}
+        title={title}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={() => setPlaying(true)}
+      aria-label={`${playLabel}: ${title}`}
+      className="absolute inset-0 w-full h-full group/play cursor-pointer"
+    >
+      <img
+        src={`https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        className="w-full h-full object-cover opacity-90 group-hover/play:opacity-100 transition-opacity"
+      />
+      <span className="absolute inset-0 flex items-center justify-center">
+        <span className="w-16 h-11 rounded-xl bg-[#d35400]/90 group-hover/play:bg-[#d35400] flex items-center justify-center shadow-[0_6px_20px_rgba(0,0,0,0.6)] group-hover/play:scale-110 transition-transform">
+          <svg className="w-6 h-6 text-white ml-0.5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M8 5v14l11-7z" />
+          </svg>
+        </span>
+      </span>
+    </button>
+  );
+}
 
 export default function Shows() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { shows, videos } = useShowsData();
 
   return (
     <section
@@ -50,7 +73,9 @@ export default function Shows() {
 
         {/* VIDEOS GRID CONTAINER */}
         <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-8 mb-16 md:mb-24">
-          {(t.shows.videos || showVideos).map((video, idx) => (
+          {videos.map((video, idx) => {
+            const title = pickLang(video.title, lang);
+            return (
             <motion.div
               key={video.id}
               initial={{ opacity: 0, y: 30 }}
@@ -61,31 +86,26 @@ export default function Shows() {
             >
               {/* Responsive Video Wrapper */}
               <div className="relative w-full aspect-video bg-black">
-                <iframe
-                  className="absolute inset-0 w-full h-full border-0"
-                  src={`https://www.youtube.com/embed/${video.id}?rel=0`}
-                  title={video.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
+                <YouTubeLite youtubeId={video.youtubeId} title={title} playLabel={t.shows.playVideo} />
               </div>
 
               {/* Video Text Content */}
               <div className="p-5 flex-1 flex flex-col justify-between">
                 <div>
                   <span className="text-[10px] font-mono text-[#faab15]/80 uppercase tracking-widest block mb-1">
-                    {video.location}
+                    {pickLang(video.location, lang)}
                   </span>
                   <h3 className="text-lg font-bold text-white group-hover:text-yellow-400 transition-colors leading-snug">
-                    {video.title}
+                    {title}
                   </h3>
                   <p className="mt-3 text-white/60 text-xs md:text-[13px] leading-relaxed">
-                    {video.description}
+                    {pickLang(video.description, lang)}
                   </p>
                 </div>
               </div>
             </motion.div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Listado de Shows (Estilo Cartelera Retro de Club) */}
@@ -100,36 +120,36 @@ export default function Shows() {
 
           {/* Filas de la Cartelera */}
           <div className="divide-y divide-yellow-900/15">
-            {t.shows.data.map((show, index) => (
+            {shows.map((show, index) => (
               <motion.div
-                key={index}
+                key={show.id}
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.4, delay: index * 0.04, ease: "easeOut" }}
+                transition={{ duration: 0.4, delay: Math.min(index, 10) * 0.04, ease: "easeOut" }}
                 className="grid grid-cols-1 md:grid-cols-12 items-start md:items-center px-6 md:px-8 py-5 hover:bg-[#d35400]/10 transition-colors duration-200 group gap-3 md:gap-0"
               >
                 {/* Festival */}
                 <div className="col-span-1 md:col-span-4 md:pr-4">
                   <h3 className="font-retro50s text-[#faf6ee] text-base md:text-lg lg:text-xl group-hover:text-yellow-400 transition-colors tracking-wide leading-snug">
-                    {show.festival}
+                    {pickLang(show.festival, lang)}
                   </h3>
                 </div>
 
                 {/* Lugar */}
                 <div className="col-span-1 md:col-span-3 flex flex-col justify-center md:pr-4">
                   <span className="text-amber-50/90 font-serif italic text-sm">
-                    {show.location}
+                    {pickLang(show.location, lang)}
                   </span>
                   <span className="text-[#d35400] font-mono text-[10px] tracking-widest uppercase mt-0.5 font-bold">
-                    {show.year}
+                    {pickLang(show.year, lang)}
                   </span>
                 </div>
 
                 {/* Detalles */}
                 <div className="col-span-1 md:col-span-5 md:pr-2">
                   <p className="text-amber-100/70 text-xs md:text-sm leading-relaxed">
-                    {show.details}
+                    {pickLang(show.details, lang)}
                   </p>
                 </div>
               </motion.div>

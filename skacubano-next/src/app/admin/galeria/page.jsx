@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { compressImage } from "@/components/gallery/ImageCompressor";
+import ShowsAdmin from "@/components/admin/ShowsAdmin";
 
 export default function AdminGalleryPage() {
   const router = useRouter();
@@ -13,7 +14,8 @@ export default function AdminGalleryPage() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [data, setData] = useState({ integrantes: [], fotos: [], secciones: [] });
   const [privateLinks, setPrivateLinks] = useState([]);
-  const [activeAdminTab, setActiveAdminTab] = useState("fotos"); // "fotos", "integrantes", "secciones", "privado"
+  const [activeAdminTab, setActiveAdminTab] = useState("fotos"); // "fotos", "integrantes", "secciones", "privado", "shows"
+  const [showsCount, setShowsCount] = useState(null);
   const [filterMember, setFilterMember] = useState("todos");
 
   // Upload Photo State
@@ -678,6 +680,19 @@ export default function AdminGalleryPage() {
             <span>🔒 Enlaces Privados (Stage & Press Kit)</span>
             <span className="px-2.5 py-0.5 rounded-md bg-slate-950 text-white border border-slate-700 text-xs font-bold">{privateLinks.length}</span>
           </button>
+
+          <button
+            onClick={() => setActiveAdminTab("shows")}
+            className={`flex items-center gap-2.5 px-6 py-3.5 rounded-xl font-extrabold text-xs sm:text-sm uppercase tracking-wider transition-all cursor-pointer shadow-lg ${activeAdminTab === "shows"
+                ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-[0_0_20px_rgba(250,204,21,0.5)] scale-102"
+                : "bg-slate-900 text-slate-200 border-2 border-slate-700 hover:bg-slate-800 hover:text-yellow-400"
+              }`}
+          >
+            <span>🎤 Shows y Vídeos</span>
+            {showsCount !== null && (
+              <span className="px-2.5 py-0.5 rounded-md bg-slate-950 text-white border border-slate-700 text-xs font-bold">{showsCount}</span>
+            )}
+          </button>
         </div>
 
         {/* ════════════ PESTAÑA 1: GESTIÓN DE FOTOGRAFÍAS ════════════ */}
@@ -1157,6 +1172,9 @@ export default function AdminGalleryPage() {
             </div>
           </div>
         )}
+
+        {/* ════════════ PESTAÑA 5: SHOWS Y VÍDEOS ════════════ */}
+        {activeAdminTab === "shows" && <ShowsAdmin onCountChange={setShowsCount} />}
 
         {/* ════════════ PESTAÑA 4: ENLACES PRIVADOS (STAGE SETTINGS & DOSSIER) ════════════ */}
         {activeAdminTab === "privado" && (

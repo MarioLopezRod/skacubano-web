@@ -95,118 +95,13 @@ export const translations = {
       badge: "— Historic Concerts —",
       title: "TOURS & SHOWS",
       subtitle: "Ska Cubano has toured over 30 countries, bringing their explosive live show to the world's most prestigious music stages.",
-      videos: [
-        {
-          id: "ISKzBoIjls8",
-          title: "Live at the Nobel Peace Prize Concert",
-          location: "Oslo, Norway (2005)",
-          description: "A legendary performance introduced by Salma Hayek to a global audience of millions following the band's BBC World Music Award nomination."
-        },
-        {
-          id: "RrD1GKeGcgc",
-          title: "Ska Cubano Live Show",
-          location: "Festival Stage Performance",
-          description: "Experience the band's raw, infectious energy and brass-heavy mambo-ska backbeat driving festival crowds wild."
-        },
-        {
-          id: "CmoXFLzOiFc",
-          title: "Freedom Sounds 2019 Live",
-          location: "Cologne, Germany (2019)",
-          description: "Ska Cubano performs Cleopatra at Freedom Sounds festival in Cologne, Germany in 2019."
-        }
-      ],
       tableHeader: {
         festival: "FESTIVAL / TOUR",
         location: "LOCATION & STAGE",
         details: "PERFORMANCE DETAILS",
       },
       tagline: "★ World Tours 2004 — 2014 • London to Santiago ★",
-      data: [
-        {
-          festival: "GLASTONBURY FESTIVAL",
-          location: "Pilton, United Kingdom",
-          year: "Tour Milestones",
-          details: "Main World Music stage. Considered one of the most energetic ska concerts of the festival.",
-        },
-        {
-          festival: "WOMAD FESTIVAL",
-          location: "UK, Spain, Australia",
-          year: "Global Tour",
-          details: "Headline performance across multiple international venues of the world music festival founded by Peter Gabriel.",
-        },
-        {
-          festival: "FUJI ROCK FESTIVAL",
-          location: "Naeba, Japan",
-          year: "Asia Tour",
-          details: "Packed crowd at Asia's most important mountain festival during their acclaimed Japanese tour.",
-        },
-        {
-          festival: "ROSKILDE FESTIVAL",
-          location: "Roskilde, Denmark",
-          year: "European Tour",
-          details: "The heart of Northern Europe vibrating to the rhythm of traditional mambo-ska on a memorable night.",
-        },
-        {
-          festival: "BIG DAY OUT",
-          location: "Sydney, Melbourne, Australia",
-          year: "Oceania Tour",
-          details: "Massive tour through major cities in Australia and New Zealand, marking a milestone down under.",
-        },
-        {
-          festival: "CHICAGO WORLD MUSIC",
-          location: "Chicago, United States",
-          year: "US Tour",
-          details: "Conquering the North American audience in a series of concerts with an unparalleled display of brass and percussion.",
-        },
-        {
-          festival: "IBOGA SUMMER FESTIVAL",
-          location: "Valencian Community, Spain",
-          year: "European Tour",
-          details: "National benchmark of Balkan rhythms, ska and fusion music celebrated in the Valencian Community.",
-        },
-        {
-          festival: "TERRITORIOS SEVILLA",
-          location: "Seville, Spain",
-          year: "Spain Tour",
-          details: "Andalusian independent and fusion music festival held at the Andalusian Center for Contemporary Art (CAAC).",
-        },
-        {
-          festival: "SZIGET FESTIVAL",
-          location: "Budapest, Hungary",
-          year: "European Tour",
-          details: "Vibrant performances on the famous Óbudai-Sziget island in Budapest.",
-        },
-        {
-          festival: "REGGAE GEEL",
-          location: "Geel, Belgium",
-          year: "European Tour",
-          details: "One of the oldest and most legendary reggae and ska festivals in Europe.",
-        },
-        {
-          festival: "FESTIVAL DU BOUT DU MONDE",
-          location: "Crozon, France",
-          year: "European Tour",
-          details: "Multicultural world music festival set on the stunning Crozon peninsula in Brittany.",
-        },
-        {
-          festival: "STERN GROVE FESTIVAL",
-          location: "San Francisco, United States",
-          year: "US Tour",
-          details: "Iconic outdoor concert in the heart of San Francisco.",
-        },
-        {
-          festival: "SAN DIEGO STREET SCENE",
-          location: "San Diego, United States",
-          year: "US Tour",
-          details: "Historic urban music festival held in California.",
-        },
-        {
-          festival: "NOBEL PEACE PRIZE CONCERT",
-          location: "Oslo, Norway",
-          year: "Historic Milestone",
-          details: "Had the great honor of performing at the official Nobel Peace Prize Concert in Oslo.",
-        }
-      ]
+      playVideo: "Play video",
     },
     // Contact
     contact: {
@@ -326,118 +221,13 @@ export const translations = {
       badge: "— Conciertos Históricos —",
       title: "GIRAS Y SHOWS",
       subtitle: "Ska Cubano ha recorrido más de 30 países, llevando su directo explosivo a los escenarios más prestigiosos de la música mundial.",
-      videos: [
-        {
-          id: "ISKzBoIjls8",
-          title: "Directo en el Concierto del Premio Nobel de la Paz",
-          location: "Oslo, Noruega (2005)",
-          description: "Una actuación legendaria presentada por Salma Hayek ante una audiencia global de millones tras la nominación de la banda al premio BBC World Music Award."
-        },
-        {
-          id: "RrD1GKeGcgc",
-          title: "Espectáculo en Directo de Ska Cubano",
-          location: "Actuación en Escenario de Festival",
-          description: "Vive la energía pura y contagiosa de la banda con su potente ritmo mambo-ska repleto de metales que enloquece al público en los festivales."
-        },
-        {
-          id: "CmoXFLzOiFc",
-          title: "Freedom Sounds 2019 en Directo",
-          location: "Colonia, Alemania (2019)",
-          description: "Ska Cubano interpreta Cleopatra en el festival Freedom Sounds en Colonia, Alemania, en 2019."
-        }
-      ],
       tableHeader: {
         festival: "FESTIVAL / GIRA",
         location: "LUGAR Y ETAPA",
         details: "DETALLES DE LA ACTUACIÓN",
       },
       tagline: "★ Giras mundiales 2004 — 2014 • Londres a Santiago ★",
-      data: [
-        {
-          festival: "GLASTONBURY FESTIVAL",
-          location: "Pilton, Reino Unido",
-          year: "Hitos Giras",
-          details: "Escenario principal de World Music. Considerado uno de los conciertos de ska más enérgicos del festival.",
-        },
-        {
-          festival: "WOMAD FESTIVAL",
-          location: "Reino Unido, España, Australia",
-          year: "Gira Global",
-          details: "Actuación estelar en múltiples sedes internacionales del festival de músicas del mundo fundado por Peter Gabriel.",
-        },
-        {
-          festival: "FUJI ROCK FESTIVAL",
-          location: "Naeba, Japón",
-          year: "Tour Asia",
-          details: "Lleno absoluto en los escenarios del festival de montaña más importante de Asia durante su aclamada gira japonesa.",
-        },
-        {
-          festival: "ROSKILDE FESTIVAL",
-          location: "Roskilde, Dinamarca",
-          year: "Gira Europea",
-          details: "El corazón del norte de Europa vibrando al ritmo del mambo-ska tradicional en una noche memorable.",
-        },
-        {
-          festival: "BIG DAY OUT",
-          location: "Sídney, Melbourne, Australia",
-          year: "Tour Oceanía",
-          details: "Gira multitudinaria por las principales ciudades de Australia y Nueva Zelanda, marcando un hito en las antípodas.",
-        },
-        {
-          festival: "CHICAGO WORLD MUSIC",
-          location: "Chicago, Estados Unidos",
-          year: "Tour EE.UU.",
-          details: "Conquista del público norteamericano en una serie de conciertos con un derroche inigualable de vientos y percusión.",
-        },
-        {
-          festival: "IBOGA SUMMER FESTIVAL",
-          location: "Comunidad Valenciana, España",
-          year: "Gira Europea",
-          details: "Referencia nacional de ritmos balcánicos, ska y mestizaje celebrado en la Comunidad Valenciana.",
-        },
-        {
-          festival: "TERRITORIOS SEVILLA",
-          location: "Sevilla, España",
-          year: "Gira España",
-          details: "Festival andaluz de música independiente y mestiza celebrado en el Centro Andaluz de Arte Contemporáneo.",
-        },
-        {
-          festival: "SZIGET FESTIVAL",
-          location: "Budapest, Hungría",
-          year: "Gira Europea",
-          details: "Presentaciones en la famosa isla de Óbudai-Sziget en Budapest.",
-        },
-        {
-          festival: "REGGAE GEEL",
-          location: "Geel, Bélgica",
-          year: "Gira Europea",
-          details: "Uno de los festivales dedicados al reggae y ska más antiguos de Europa.",
-        },
-        {
-          festival: "FESTIVAL DU BOUT DU MONDE",
-          location: "Crozon, Francia",
-          year: "Gira Europea",
-          details: "Evento multicultural de músicas del mundo situado en Crozon.",
-        },
-        {
-          festival: "STERN GROVE FESTIVAL",
-          location: "San Francisco, Estados Unidos",
-          year: "Tour EE.UU.",
-          details: "Concierto al aire libre en la ciudad de San Francisco.",
-        },
-        {
-          festival: "SAN DIEGO STREET SCENE",
-          location: "San Diego, Estados Unidos",
-          year: "Tour EE.UU.",
-          details: "Histórico festival urbano celebrado en California.",
-        },
-        {
-          festival: "NOBEL PEACE PRIZE CONCERT",
-          location: "Oslo, Noruega",
-          year: "Hito Histórico",
-          details: "Tuvieron el gran honor de actuar en el concierto oficial de la entrega del Premio Nobel de la Paz en Oslo.",
-        }
-      ]
+      playVideo: "Reproducir vídeo",
     },
     // Contact
     contact: {
