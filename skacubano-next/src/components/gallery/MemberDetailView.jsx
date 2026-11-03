@@ -32,7 +32,7 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
       </div>
 
       {/* Member Hero Banner with Cuban Vintage Paper Texture */}
-      <div className="relative overflow-hidden rounded-3xl border-2 border-yellow-500/40 bg-cuban-paper p-6 sm:p-10 shadow-2xl text-[#171717]">
+      <div className="relative overflow-hidden rounded-3xl border-2 border-[#b09070] bg-parchment p-6 sm:p-10 shadow-2xl text-[#171717]">
         <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-8">
           {/* Main Profile Photo Badge Frame */}
           <div className="relative w-48 h-60 sm:w-56 sm:h-68 rounded-2xl overflow-hidden border-4 border-[#14100c] shadow-[0_10px_30px_rgba(0,0,0,0.5)] shrink-0 group">
@@ -95,12 +95,21 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-black p-1.5">
                   <div className="relative w-full h-full overflow-hidden rounded-lg">
+                    {/* Fondo difuminado con la misma foto, para que las verticales se vean enteras sin huecos negros */}
+                    <Image
+                      src={photo.url}
+                      alt=""
+                      aria-hidden="true"
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover scale-110 blur-xl opacity-60"
+                    />
                     <Image
                       src={photo.url}
                       alt={photo.descripcion || member.nombre}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      className="object-contain transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-70 group-hover:opacity-90 transition-opacity" />
 

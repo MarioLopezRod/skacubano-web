@@ -60,13 +60,22 @@ export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
               transition={{ duration: 0.4 }}
               className="relative w-full h-full"
             >
+              {/* Fondo difuminado con la misma foto, para que las verticales se vean enteras sin huecos negros */}
+              <Image
+                src={currentPhoto.url}
+                alt=""
+                aria-hidden="true"
+                fill
+                sizes="100vw"
+                className="object-cover scale-110 blur-2xl opacity-60"
+              />
               <Image
                 src={currentPhoto.url}
                 alt={currentPhoto.descripcion || "Foto Ska Cubano"}
                 fill
                 priority
                 sizes="100vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
+                className="object-contain transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
             </motion.div>

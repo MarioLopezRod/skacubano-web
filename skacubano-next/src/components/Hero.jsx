@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
 
-const images = [
+// Fotos por defecto si desde el panel de admin no se ha marcado ninguna para el carrusel
+const defaultImages = [
   "/images/hero/SkaImagen2.jpg",
   "/images/hero/SkaImagen1.jpg",
   "/images/hero/SkaImagen3.jpg",
@@ -25,16 +26,40 @@ const images = [
 ];
 
 export default function Hero() {
+  // null mientras se cargan las fotos, para no mostrar las de por defecto y cambiarlas justo después
+  const [images, setImages] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const { t } = useLanguage();
 
   useEffect(() => {
+    let cancelled = false;
+
+    const loadImages = async () => {
+      try {
+        const res = await fetch("/api/gallery");
+        const json = await res.json();
+        const carrusel = (json.fotos || []).filter((f) => f.enCarrusel).map((f) => f.url);
+        if (!cancelled) setImages(carrusel.length > 0 ? carrusel : defaultImages);
+      } catch (err) {
+        if (!cancelled) setImages(defaultImages);
+      }
+    };
+
+    loadImages();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!images || images.length < 2) return;
+
     const intervalId = setInterval(() => {
       setCurrentImageIndex((currentIndex) => (currentIndex + 1) % images.length);
     }, 8000);
 
     return () => clearInterval(intervalId);
-  }, []);
+  }, [images]);
 
   return (
     <section
@@ -44,14 +69,13 @@ export default function Hero() {
     >
 
       {/* Carrusel de imágenes de fondo */}
-      {images.map((image, index) => (
+      {(images || []).map((image, index) => (
         <img
           key={image}
           src={image}
           alt={`Ska Cubano ${index + 1}`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${index === currentImageIndex ? "opacity-100 scale-105" : "opacity-0 scale-100"
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${index === currentImageIndex ? "opacity-100" : "opacity-0"
             }`}
-          style={{ transitionProperty: "opacity, transform", transitionDuration: "1000ms" }}
         />
       ))}
 
