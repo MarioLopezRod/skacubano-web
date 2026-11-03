@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
+import { LOGO_HANDOFF_SCROLL, LOGO_FADE_START } from "../lib/logoScroll";
 
 const handleSmoothScroll = (e, href, callback = null) => {
   if (href === "/") {
@@ -110,12 +112,17 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { lang, toggleLanguage, t } = useLanguage();
 
+  // El logo del navbar aparece justo cuando llega el logo grande del Hero (ver Hero.jsx)
+  const { scrollY } = useScroll();
+  const navLogoOpacity = useTransform(scrollY, [LOGO_FADE_START, LOGO_HANDOFF_SCROLL], [0, 1]);
+
   useEffect(() => {
     const onScroll = () => {
-      // Reveal header logo and solid background once scrolled past the main Hero section
-      setScrolled(window.scrollY > 220);
+      // Fondo sólido y logo clicable una vez que el logo del Hero ha llegado al navbar
+      setScrolled(window.scrollY > LOGO_HANDOFF_SCROLL);
     };
-    window.addEventListener("scroll", onScroll);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -143,20 +150,19 @@ export default function Navbar() {
           
           {/* COLUMNA 1 (IZQUIERDA): Logo desktop con alta visibilidad y contraste */}
           <div className="flex items-center justify-start">
+            <motion.div style={{ opacity: navLogoOpacity }} className={scrolled ? "" : "pointer-events-none"}>
             <Link
               href="/"
               onClick={(e) => handleSmoothScroll(e, "/")}
               title="Volver al Inicio"
               aria-label="Volver al Inicio"
-              className={`flex items-center gap-3 group cursor-pointer transition-all duration-300 ${
-                scrolled
-                  ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
-                  : "opacity-0 -translate-x-4 scale-90 pointer-events-none"
-              }`}
+              tabIndex={scrolled ? 0 : -1}
+              className="flex items-center gap-3 group cursor-pointer"
             >
               {/* Insignia Circular del Logo con fondo claro de alto contraste */}
               <div className="relative w-11 h-11 md:w-12 md:h-12 lg:w-14 lg:h-14 rounded-full bg-[#faf6ee] border-2 border-yellow-400 p-1 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.4)] group-hover:shadow-[0_0_22px_rgba(211,84,0,0.7)] group-hover:border-yellow-300 group-hover:scale-105 transition-all duration-300 shrink-0">
                 <img
+                  data-nav-logo
                   src="/images/logos/logoSkaCubano_vectorizado.svg"
                   alt="Ska Cubano Logo"
                   className="w-full h-full object-contain"
@@ -173,6 +179,7 @@ export default function Navbar() {
                 </span>
               </div>
             </Link>
+            </motion.div>
           </div>
 
           {/* COLUMNA 2 (CENTRO EXACTO MATEMÁTICO): Menú de navegación tradicional */}
@@ -249,18 +256,17 @@ export default function Navbar() {
         {/* CONTROLES MOBILE */}
         <div className="flex md:hidden items-center justify-between w-full">
           {/* Logo mobile circular animado de alto contraste */}
+          <motion.div style={{ opacity: navLogoOpacity }} className={scrolled ? "" : "pointer-events-none"}>
           <Link
             href="/"
             onClick={(e) => handleSmoothScroll(e, "/")}
             title="Volver al Inicio"
-            className={`flex items-center gap-2.5 transition-all duration-500 ease-out transform ${
-              scrolled
-                ? "opacity-100 translate-x-0 scale-100 pointer-events-auto"
-                : "opacity-0 -translate-x-4 scale-90 pointer-events-none"
-            }`}
+            tabIndex={scrolled ? 0 : -1}
+            className="flex items-center gap-2.5"
           >
             <div className="w-10 h-10 rounded-full bg-[#faf6ee] border-2 border-yellow-400 p-0.5 flex items-center justify-center shadow-[0_0_12px_rgba(245,158,11,0.4)] shrink-0">
               <img
+                data-nav-logo
                 src="/images/logos/logoSkaCubano_vectorizado.svg"
                 alt="Ska Cubano Logo"
                 className="w-full h-full object-contain"
@@ -270,6 +276,7 @@ export default function Navbar() {
               SKA CUBANO
             </span>
           </Link>
+          </motion.div>
 
           <div className="flex items-center gap-3 ml-auto">
             <button
