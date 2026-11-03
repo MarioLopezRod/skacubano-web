@@ -21,7 +21,9 @@ los visitantes):
 
 - `data/galleryData.json`: integrantes, fotos y secciones de la galería.
 - `data/privateLinks.json`: enlaces privados (riders técnicos) y sus claves.
-- `data/config.php`: contraseña del panel de admin.
+- `data/config.php`: contraseña del panel de admin (guardada como hash, nunca en texto plano).
+- `data/login_attempts.json`: intentos fallidos de contraseña, para bloquear durante 15 minutos una IP
+  tras 5 fallos.
 
 La primera vez que se usa la API, si estos ficheros no existen, se crean a partir de `public/api/seed/`.
 
@@ -67,14 +69,22 @@ En local los datos se guardan en `public/data/` y las fotos subidas en `public/u
 
 ## Cambiar la contraseña del panel de admin
 
-Editar en el servidor el fichero `data/config.php` (por FTP o SSH) y cambiar el valor de `admin_password`:
+Desde el panel: botón **🔑 Contraseña** de la barra superior. Pide la contraseña actual y la nueva dos veces
+(mínimo 10 caracteres). Al cambiarla se cierran las sesiones abiertas en otros dispositivos.
+
+### Si se olvida la contraseña
+
+Editar en el servidor el fichero `data/config.php` (por FTP o SSH): borrar la línea de `admin_password_hash`
+y añadir una con la contraseña nueva en texto plano:
 
 ```php
 return array (
   'admin_password' => 'nueva-contraseña',
   'admin_secret' => '...',
+  ...
 );
 ```
 
+Al entrar con ella en `/admin/login`, se vuelve a guardar como hash y desaparece el texto plano.
 Si además se cambia `admin_secret` (cualquier texto largo y aleatorio), se cierran las sesiones abiertas
 de todos los administradores.

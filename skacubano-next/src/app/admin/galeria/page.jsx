@@ -24,6 +24,7 @@ export default function AdminGalleryPage() {
   const [uploadFecha, setUploadFecha] = useState("");
   const [uploadIntegranteId, setUploadIntegranteId] = useState("banda");
   const [uploadEsPrincipal, setUploadEsPrincipal] = useState(false);
+  const [uploadEnCarrusel, setUploadEnCarrusel] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState("");
 
@@ -34,6 +35,7 @@ export default function AdminGalleryPage() {
   const [editFecha, setEditFecha] = useState("");
   const [editIntegranteId, setEditIntegranteId] = useState("banda");
   const [editEsPrincipal, setEditEsPrincipal] = useState(false);
+  const [editEnCarrusel, setEditEnCarrusel] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
 
   // Member State
@@ -69,6 +71,15 @@ export default function AdminGalleryPage() {
   const [editPrivateExistingFotos, setEditPrivateExistingFotos] = useState([]);
   const [editPrivateNewFiles, setEditPrivateNewFiles] = useState([]);
   const [savingEditPrivateLink, setSavingEditPrivateLink] = useState(false);
+
+  // Change Password Modal State
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [passwordStatus, setPasswordStatus] = useState("");
 
   useEffect(() => {
     checkAdmin();
@@ -125,6 +136,50 @@ export default function AdminGalleryPage() {
     router.push("/admin/login");
   };
 
+  const openPasswordModal = () => {
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+    setShowPasswordFields(false);
+    setPasswordStatus("");
+    setShowPasswordModal(true);
+  };
+
+  const handleChangePassword = async (e) => {
+    e.preventDefault();
+    if (newPassword.length < 10) {
+      setPasswordStatus("❌ La nueva contraseña debe tener al menos 10 caracteres");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordStatus("❌ Las contraseñas nuevas no coinciden");
+      return;
+    }
+
+    setSavingPassword(true);
+    setPasswordStatus("");
+    try {
+      const res = await fetch("/api/admin/password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setPasswordStatus("✓ Contraseña cambiada. Se han cerrado las sesiones abiertas en otros dispositivos.");
+      } else {
+        setPasswordStatus(`❌ ${json.error || "No se pudo cambiar la contraseña"}`);
+      }
+    } catch (err) {
+      setPasswordStatus("❌ Error de red al cambiar la contraseña");
+    } finally {
+      setSavingPassword(false);
+    }
+  };
+
   const scrollFilterTrack = (direction) => {
     if (filterTrackRef.current) {
       const amount = direction === "left" ? -280 : 280;
@@ -165,6 +220,7 @@ export default function AdminGalleryPage() {
       formData.append("fecha", uploadFecha);
       formData.append("integranteId", uploadIntegranteId);
       formData.append("esPrincipal", uploadEsPrincipal ? "true" : "false");
+      formData.append("enCarrusel", uploadEnCarrusel ? "true" : "false");
 
       const res = await fetch("/api/gallery", {
         method: "POST",
@@ -180,6 +236,7 @@ export default function AdminGalleryPage() {
         setUploadDescripcionEn("");
         setUploadFecha("");
         setUploadEsPrincipal(false);
+        setUploadEnCarrusel(false);
         setUploadStatus("✓ Fotografía subida exitosamente");
         setTimeout(() => setUploadStatus(""), 3000);
       } else {
@@ -234,8 +291,30 @@ export default function AdminGalleryPage() {
     setEditDescripcion(photo.descripcion || "");
     setEditDescripcionEn(photo.descripcionEn || "");
     setEditFecha(photo.fecha || "");
-    setEditIntegranteId(photo.integranteId || "banda");
+    setEditIntegranteId(photo.soloCarrusel ? "carrusel" : photo.integranteId || "banda");
     setEditEsPrincipal(!!photo.esPrincipal);
+    setEditEnCarrusel(!!photo.enCarrusel);
+  };
+
+  // Añade o quita una foto del carrusel de la portada sin abrir el modal de edición
+  const handleToggleCarrusel = async (photo) => {
+    const enCarrusel = !photo.enCarrusel;
+    setData((prev) => ({
+      ...prev,
+      fotos: prev.fotos.map((p) => (p.id === photo.id ? { ...p, enCarrusel } : p)),
+    }));
+
+    try {
+      const res = await fetch(`/api/gallery/photo/${photo.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ enCarrusel }),
+      });
+      if (!res.ok) throw new Error("Toggle failed");
+    } catch (err) {
+      alert("Error al actualizar el carrusel");
+      fetchData();
+    }
   };
 
   const handleSaveEditPhoto = async (e) => {
@@ -253,6 +332,7 @@ export default function AdminGalleryPage() {
           fecha: editFecha,
           integranteId: editIntegranteId,
           esPrincipal: editEsPrincipal,
+          enCarrusel: editEnCarrusel,
         }),
       });
       const json = await res.json();
@@ -564,7 +644,9 @@ export default function AdminGalleryPage() {
   const getFilteredPhotos = () => {
     let list = data.fotos;
     if (filterMember === "banda") {
-      list = list.filter((f) => !f.integranteId);
+      list = list.filter((f) => !f.integranteId && !f.soloCarrusel);
+    } else if (filterMember === "carrusel") {
+      list = list.filter((f) => f.enCarrusel);
     } else if (filterMember !== "todos") {
       list = list.filter((f) => f.integranteId === filterMember || f.seccionId === filterMember);
     }
@@ -585,7 +667,7 @@ export default function AdminGalleryPage() {
   if (!authenticated) return null;
 
   const filteredPhotos = getFilteredPhotos();
-  const bandPhotosCount = data.fotos.filter((f) => !f.integranteId).length;
+  const bandPhotosCount = data.fotos.filter((f) => !f.integranteId && !f.soloCarrusel).length;
   const seccionesList = data.secciones || [{ id: "banda", nombre: "Galería General de la Banda", slug: "banda" }];
 
   return (
@@ -611,7 +693,7 @@ export default function AdminGalleryPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/"
               target="_blank"
@@ -619,6 +701,12 @@ export default function AdminGalleryPage() {
             >
               🌐 Ver Sitio Web
             </Link>
+            <button
+              onClick={openPasswordModal}
+              className="px-4 py-2 rounded-xl border border-slate-600 bg-slate-800 hover:bg-yellow-400 hover:text-black text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md cursor-pointer"
+            >
+              🔑 Contraseña
+            </button>
             <button
               onClick={handleLogout}
               className="px-4 py-2 rounded-xl border border-red-500/60 bg-red-950/80 hover:bg-red-600 text-white font-bold text-xs sm:text-sm uppercase tracking-wider transition-all shadow-md cursor-pointer"
@@ -741,6 +829,7 @@ export default function AdminGalleryPage() {
                           className="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-bold focus:outline-none focus:border-yellow-400"
                         >
                           <option value="banda">★ Galería General de la Banda</option>
+                          <option value="carrusel">🎞️ Carrusel de Fotos (Portada)</option>
                           <optgroup label="Integrantes de la Banda">
                             {data.integrantes.map((m) => (
                               <option key={m.id} value={m.id}>
@@ -803,7 +892,7 @@ export default function AdminGalleryPage() {
                       </div>
                     </div>
 
-                    {uploadIntegranteId !== "banda" && (
+                    {uploadIntegranteId !== "banda" && uploadIntegranteId !== "carrusel" && (
                       <div className="flex items-center gap-2.5 pt-1">
                         <input
                           type="checkbox"
@@ -814,6 +903,25 @@ export default function AdminGalleryPage() {
                         />
                         <label htmlFor="checkEsPrincipal" className="text-sm text-yellow-300 font-extrabold cursor-pointer">
                           Establecer como Foto Principal de Perfil del Integrante
+                        </label>
+                      </div>
+                    )}
+
+                    {uploadIntegranteId === "carrusel" ? (
+                      <p className="text-sm text-orange-300 font-bold pt-1">
+                        🎞️ Esta foto solo aparecerá en el carrusel de la portada, no en la galería.
+                      </p>
+                    ) : (
+                      <div className="flex items-center gap-2.5 pt-1">
+                        <input
+                          type="checkbox"
+                          id="checkEnCarrusel"
+                          checked={uploadEnCarrusel}
+                          onChange={(e) => setUploadEnCarrusel(e.target.checked)}
+                          className="w-5 h-5 accent-orange-500 rounded cursor-pointer"
+                        />
+                        <label htmlFor="checkEnCarrusel" className="text-sm text-orange-300 font-extrabold cursor-pointer">
+                          🎞️ Mostrar también en el carrusel de la portada
                         </label>
                       </div>
                     )}
@@ -880,6 +988,16 @@ export default function AdminGalleryPage() {
                     📌 Banda General ({bandPhotosCount})
                   </button>
 
+                  <button
+                    onClick={() => setFilterMember("carrusel")}
+                    className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold uppercase transition-all shrink-0 cursor-pointer ${filterMember === "carrusel"
+                        ? "bg-yellow-400 text-black border-2 border-yellow-300 shadow-md"
+                        : "bg-slate-900 text-white border-2 border-slate-700 hover:border-yellow-400"
+                      }`}
+                  >
+                    🎞️ Carrusel Portada ({data.fotos.filter((f) => f.enCarrusel).length})
+                  </button>
+
                   {data.integrantes.map((m) => {
                     const mCount = data.fotos.filter((f) => f.integranteId === m.id).length;
                     return (
@@ -944,12 +1062,18 @@ export default function AdminGalleryPage() {
                             <img src={photo.url} alt="Miniatura" className="w-full h-full object-cover" />
 
                             <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-slate-950/95 border border-slate-600 text-xs font-extrabold text-yellow-300 shadow">
-                              {memberAssigned ? `👤 ${memberAssigned.nombre}` : sectionAssigned ? `📁 ${sectionAssigned.nombre}` : "📌 Galería Banda"}
+                              {photo.soloCarrusel ? "🎞️ Solo Carrusel" : memberAssigned ? `👤 ${memberAssigned.nombre}` : sectionAssigned ? `📁 ${sectionAssigned.nombre}` : "📌 Galería Banda"}
                             </div>
 
                             {photo.esPrincipal && (
                               <div className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-yellow-400 text-black text-xs font-extrabold uppercase shadow">
                                 ★ Principal
+                              </div>
+                            )}
+
+                            {photo.enCarrusel && (
+                              <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-orange-500 text-black text-xs font-extrabold uppercase shadow">
+                                🎞️ Carrusel
                               </div>
                             )}
 
@@ -1001,6 +1125,20 @@ export default function AdminGalleryPage() {
                             >
                               ✏️ Editar
                             </button>
+
+                            {/* Las fotos "solo carrusel" no se pueden sacar del carrusel: se cambian de destino desde Editar */}
+                            {!photo.soloCarrusel && (
+                              <button
+                                onClick={() => handleToggleCarrusel(photo)}
+                                className={`px-2.5 py-1.5 rounded-lg border font-extrabold text-xs uppercase transition-colors cursor-pointer ${photo.enCarrusel
+                                    ? "bg-orange-500 border-orange-400 text-black hover:bg-orange-400"
+                                    : "bg-slate-800 border-slate-600 text-slate-300 hover:border-orange-400 hover:text-orange-300"
+                                  }`}
+                                title={photo.enCarrusel ? "Quitar del carrusel de la portada" : "Mostrar también en el carrusel de la portada"}
+                              >
+                                🎞️
+                              </button>
+                            )}
 
                             <button
                               onClick={() => handleDeletePhoto(photo.id)}
@@ -1115,7 +1253,7 @@ export default function AdminGalleryPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {seccionesList.map((sec) => {
                 const isDefaultBanda = sec.id === "banda";
-                const secPhotosCount = data.fotos.filter((f) => f.seccionId === sec.id || (!f.integranteId && isDefaultBanda)).length;
+                const secPhotosCount = data.fotos.filter((f) => f.seccionId === sec.id || (!f.integranteId && !f.soloCarrusel && isDefaultBanda)).length;
 
                 return (
                   <div
@@ -1645,6 +1783,105 @@ export default function AdminGalleryPage() {
         </div>
       )}
 
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
+          <div className="w-full max-w-md p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
+            <div className="flex items-center justify-between border-b-2 border-slate-800 pb-3">
+              <h3 className="font-extrabold text-lg text-yellow-400 uppercase">
+                🔑 Cambiar Contraseña
+              </h3>
+              <button onClick={() => setShowPasswordModal(false)} className="text-slate-400 hover:text-white font-extrabold text-lg cursor-pointer">
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label htmlFor="currentPassword" className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                  Contraseña actual:
+                </label>
+                <input
+                  id="currentPassword"
+                  type={showPasswordFields ? "text" : "password"}
+                  autoComplete="current-password"
+                  required
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-semibold focus:outline-none focus:border-yellow-400"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="newPassword" className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                  Nueva contraseña:
+                </label>
+                <input
+                  id="newPassword"
+                  type={showPasswordFields ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  minLength={10}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-semibold focus:outline-none focus:border-yellow-400"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                  Repite la nueva contraseña:
+                </label>
+                <input
+                  id="confirmPassword"
+                  type={showPasswordFields ? "text" : "password"}
+                  autoComplete="new-password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-semibold focus:outline-none focus:border-yellow-400"
+                />
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <input
+                  type="checkbox"
+                  id="showPasswordFields"
+                  checked={showPasswordFields}
+                  onChange={(e) => setShowPasswordFields(e.target.checked)}
+                  className="w-5 h-5 accent-yellow-400 cursor-pointer"
+                />
+                <label htmlFor="showPasswordFields" className="text-sm text-slate-200 font-bold cursor-pointer">
+                  Mostrar contraseñas
+                </label>
+              </div>
+
+              {passwordStatus && (
+                <p className={`text-sm font-bold ${passwordStatus.startsWith("✓") ? "text-green-400" : "text-red-300"}`}>
+                  {passwordStatus}
+                </p>
+              )}
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t-2 border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowPasswordModal(false)}
+                  className="px-5 py-2.5 rounded-xl bg-slate-800 text-white text-xs font-extrabold uppercase hover:bg-slate-700 cursor-pointer"
+                >
+                  Cerrar
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingPassword}
+                  className="px-5 py-2.5 rounded-xl bg-yellow-400 text-black text-xs font-extrabold uppercase hover:bg-yellow-300 disabled:opacity-50 cursor-pointer"
+                >
+                  {savingPassword ? "Guardando..." : "Guardar contraseña"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {editingPhoto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
           <div className="w-full max-w-lg p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
@@ -1716,6 +1953,7 @@ export default function AdminGalleryPage() {
                     className="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-bold focus:outline-none focus:border-yellow-400"
                   >
                     <option value="banda">★ Galería General de la Banda</option>
+                    <option value="carrusel">🎞️ Carrusel de Fotos (Portada)</option>
                     <optgroup label="Integrantes">
                       {data.integrantes.map((m) => (
                         <option key={m.id} value={m.id}>
@@ -1736,7 +1974,7 @@ export default function AdminGalleryPage() {
                 </div>
               </div>
 
-              {editIntegranteId !== "banda" && (
+              {editIntegranteId !== "banda" && editIntegranteId !== "carrusel" && (
                 <div className="flex items-center gap-2.5 pt-1">
                   <input
                     type="checkbox"
@@ -1747,6 +1985,21 @@ export default function AdminGalleryPage() {
                   />
                   <label htmlFor="editCheckPrincipal" className="text-sm text-yellow-300 font-extrabold cursor-pointer">
                     Establecer como Foto Principal de Perfil del Integrante
+                  </label>
+                </div>
+              )}
+
+              {editIntegranteId !== "carrusel" && (
+                <div className="flex items-center gap-2.5 pt-1">
+                  <input
+                    type="checkbox"
+                    id="editCheckCarrusel"
+                    checked={editEnCarrusel}
+                    onChange={(e) => setEditEnCarrusel(e.target.checked)}
+                    className="w-5 h-5 accent-orange-500 cursor-pointer"
+                  />
+                  <label htmlFor="editCheckCarrusel" className="text-sm text-orange-300 font-extrabold cursor-pointer">
+                    🎞️ Mostrar también en el carrusel de la portada
                   </label>
                 </div>
               )}

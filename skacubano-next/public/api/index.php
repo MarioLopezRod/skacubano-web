@@ -11,6 +11,9 @@ if (!defined('PUBLIC_DIR')) {
     define('PUBLIC_DIR', getenv('SKACUBANO_PUBLIC_DIR') ?: dirname(__DIR__));
 }
 
+// Valor del selector de destino de una foto que solo va al carrusel de la portada
+const CARRUSEL_ID = 'carrusel';
+
 require __DIR__ . '/lib/helpers.php';
 require __DIR__ . '/lib/auth.php';
 
@@ -49,6 +52,7 @@ function route($method, $s, $putFiles)
         if ($s[1] === 'check' && $method === 'GET') return admin_check();
         if ($s[1] === 'login' && $method === 'POST') return admin_login();
         if ($s[1] === 'logout' && $method === 'POST') return admin_logout();
+        if ($s[1] === 'password' && $method === 'POST') return admin_change_password();
     }
 
     if ($first === 'gallery') {
@@ -91,15 +95,52 @@ function admin_check()
 
 function admin_login()
 {
+    reject_if_locked();
     $body = read_json_body();
     $password = isset($body['password']) ? (string) $body['password'] : '';
-    $adminPassword = get_admin_password();
 
-    if ($password !== '' && $adminPassword !== '' && hash_equals($adminPassword, $password)) {
+    if (verify_admin_password($password)) {
+        clear_failed_logins();
         set_admin_cookie(create_signed_token(), 60 * 60 * 24 * 7);
         json_response(['success' => true, 'message' => 'Authenticated successfully']);
     }
+    register_failed_login();
     json_response(['error' => 'Contraseña incorrecta'], 401);
+}
+
+function admin_change_password()
+{
+    require_admin();
+    // Solo JSON: un formulario de otra web no puede enviar este tipo de petición sin permiso del navegador
+    if (!isset($_SERVER['CONTENT_TYPE']) || stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== 0) {
+        json_response(['error' => 'Petición no válida'], 400);
+    }
+    reject_if_locked();
+
+    $body = read_json_body();
+    $current = isset($body['currentPassword']) ? (string) $body['currentPassword'] : '';
+    $new = isset($body['newPassword']) ? (string) $body['newPassword'] : '';
+
+    if (!verify_admin_password($current)) {
+        register_failed_login();
+        json_response(['error' => 'La contraseña actual no es correcta'], 401);
+    }
+    clear_failed_logins();
+
+    $invalid = validate_new_admin_password($new);
+    if ($invalid !== null) {
+        json_response(['error' => $invalid], 400);
+    }
+    if ($new === $current) {
+        json_response(['error' => 'La nueva contraseña debe ser distinta de la actual'], 400);
+    }
+
+    // Se cambia también el secreto: se cierran las sesiones abiertas en otros dispositivos
+    if (!set_admin_password($new, true)) {
+        json_response(['error' => 'No se pudo guardar la nueva contraseña'], 500);
+    }
+    set_admin_cookie(create_signed_token(), 60 * 60 * 24 * 7);
+    json_response(['success' => true]);
 }
 
 function admin_logout()
@@ -120,6 +161,15 @@ function gallery_upload()
     $integranteId = isset($_POST['integranteId']) && $_POST['integranteId'] !== 'banda' && $_POST['integranteId'] !== ''
         ? $_POST['integranteId'] : null;
     $esPrincipal = isset($_POST['esPrincipal']) && $_POST['esPrincipal'] === 'true';
+    $enCarrusel = isset($_POST['enCarrusel']) && $_POST['enCarrusel'] === 'true';
+
+    // Destino "carrusel": la foto solo se muestra en el carrusel de la portada, no en la galería
+    $soloCarrusel = $integranteId === CARRUSEL_ID;
+    if ($soloCarrusel) {
+        $integranteId = null;
+        $esPrincipal = false;
+        $enCarrusel = true;
+    }
 
     $files = uploaded_files('file');
     $file = isset($files[0]) ? $files[0] : null;
@@ -161,6 +211,8 @@ function gallery_upload()
         'integranteId' => $integranteId,
         'orden' => $maxOrder + 1,
         'esPrincipal' => $esPrincipal,
+        'enCarrusel' => $enCarrusel,
+        'soloCarrusel' => $soloCarrusel,
     ];
 
     if ($esPrincipal && $integranteId) {
@@ -234,8 +286,13 @@ function photo_update($id)
 
     $current = $data['fotos'][$index];
     $currentMember = isset($current['integranteId']) ? $current['integranteId'] : null;
+    $soloCarrusel = !empty($current['soloCarrusel']);
     if (array_key_exists('integranteId', $body)) {
-        $targetMemberId = ($body['integranteId'] === 'banda' || $body['integranteId'] === '') ? null : $body['integranteId'];
+        $soloCarrusel = $body['integranteId'] === CARRUSEL_ID;
+        $targetMemberId = ($body['integranteId'] === 'banda' || $body['integranteId'] === '' || $soloCarrusel) ? null : $body['integranteId'];
+        if ($soloCarrusel) {
+            $body['esPrincipal'] = false;
+        }
     } else {
         $targetMemberId = $currentMember;
     }
@@ -250,6 +307,9 @@ function photo_update($id)
     $photo['fecha'] = array_key_exists('fecha', $body) ? $body['fecha'] : (isset($current['fecha']) ? $current['fecha'] : '');
     $photo['integranteId'] = $targetMemberId;
     $photo['esPrincipal'] = array_key_exists('esPrincipal', $body) ? (bool) $body['esPrincipal'] : !empty($current['esPrincipal']);
+    // Fotos que se muestran en el carrusel de la portada (hero)
+    $photo['enCarrusel'] = $soloCarrusel || (array_key_exists('enCarrusel', $body) ? (bool) $body['enCarrusel'] : !empty($current['enCarrusel']));
+    $photo['soloCarrusel'] = $soloCarrusel;
     $data['fotos'][$index] = $photo;
 
     save_gallery_data($data);

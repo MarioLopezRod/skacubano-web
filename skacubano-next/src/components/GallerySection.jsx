@@ -42,7 +42,8 @@ export default function GallerySection() {
       const res = await fetch("/api/gallery");
       const json = await res.json();
       if (json.integrantes && json.fotos) {
-        setData(json);
+        // Las fotos subidas solo para el carrusel de la portada no se muestran en la galería
+        setData({ ...json, fotos: json.fotos.filter((f) => !f.soloCarrusel) });
       }
     } catch (err) {
       console.error("Error fetching gallery:", err);

@@ -4,11 +4,29 @@
 const ADMIN_COOKIE = 'skacubano_admin_token';
 const ADMIN_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-// La configuración (contraseña y secreto) vive en DATA_DIR/config.php, fuera del código desplegado,
-// para que subir una nueva versión de la web no la sobrescriba. Si no existe se crea la primera vez.
-function load_config()
+// Contraseña con la que se crea config.php la primera vez
+const DEFAULT_ADMIN_PASSWORD = 'skacubano2026';
+const MIN_ADMIN_PASSWORD_LENGTH = 10;
+// bcrypt solo tiene en cuenta los primeros 72 bytes
+const MAX_ADMIN_PASSWORD_BYTES = 72;
+
+// Protección contra fuerza bruta: tras 5 fallos desde la misma IP, bloqueo de 15 minutos
+const LOGIN_MAX_ATTEMPTS = 5;
+const LOGIN_LOCK_SECONDS = 15 * 60;
+
+// Caché de la configuración durante la petición, compartida por load_config() y save_config()
+function &config_cache()
 {
     static $config = null;
+    return $config;
+}
+
+// La configuración (contraseña y secreto) vive en DATA_DIR/config.php, fuera del código desplegado,
+// para que subir una nueva versión de la web no la sobrescriba. Si no existe se crea la primera vez.
+// La contraseña se guarda como hash (password_hash) en 'admin_password_hash'.
+function load_config()
+{
+    $config = &config_cache();
     if ($config !== null) {
         return $config;
     }
@@ -16,16 +34,12 @@ function load_config()
     $path = DATA_DIR . '/config.php';
     if (!file_exists($path)) {
         $initial = [
-            'admin_password' => 'skacubano2026',
+            'admin_password_hash' => password_hash(DEFAULT_ADMIN_PASSWORD, PASSWORD_DEFAULT),
             'admin_secret' => bin2hex(random_bytes(32)),
         ];
-        $php = "<?php\n"
-            . "// Configuración del panel de admin de Ska Cubano.\n"
-            . "// Para cambiar la contraseña, edita 'admin_password' y guarda el fichero.\n"
-            . "// Si cambias 'admin_secret', se cerrará la sesión de todos los administradores.\n"
-            . 'return ' . var_export($initial, true) . ";\n";
-        @file_put_contents($path, $php, LOCK_EX);
-        $config = $initial;
+        if (!save_config($initial)) {
+            $config = $initial;
+        }
         return $config;
     }
 
@@ -34,10 +48,135 @@ function load_config()
     return $config;
 }
 
-function get_admin_password()
+function save_config($newConfig)
+{
+    $path = DATA_DIR . '/config.php';
+    $php = "<?php\n"
+        . "// Configuración del panel de admin de Ska Cubano. La contraseña se cambia desde el panel.\n"
+        . "// Si se olvida: borra la línea 'admin_password_hash' y añade 'admin_password' => 'nueva-contraseña',\n"
+        . "// (al entrar con ella se guarda de nuevo como hash).\n"
+        . "// Si cambias 'admin_secret', se cerrará la sesión de todos los administradores.\n"
+        . 'return ' . var_export($newConfig, true) . ";\n";
+
+    // Escritura atómica para no dejar nunca config.php a medias
+    $tmp = $path . '.tmp' . getmypid();
+    if (file_put_contents($tmp, $php, LOCK_EX) === false || !rename($tmp, $path)) {
+        @unlink($tmp);
+        return false;
+    }
+    // Sin esto, OPcache podría seguir usando la versión anterior del fichero durante unos segundos
+    if (function_exists('opcache_invalidate')) {
+        @opcache_invalidate($path, true);
+    }
+
+    $config = &config_cache();
+    $config = $newConfig;
+    return true;
+}
+
+function verify_admin_password($password)
+{
+    $password = (string) $password;
+    if ($password === '') {
+        return false;
+    }
+    $config = load_config();
+
+    // Contraseña en texto plano: config.php antiguo o restablecido a mano. Si es correcta, se pasa a hash.
+    if (isset($config['admin_password']) && (string) $config['admin_password'] !== '') {
+        if (!hash_equals((string) $config['admin_password'], $password)) {
+            return false;
+        }
+        set_admin_password($password, false);
+        return true;
+    }
+
+    return !empty($config['admin_password_hash']) && password_verify($password, $config['admin_password_hash']);
+}
+
+// Guarda la nueva contraseña como hash. Con $rotateSecret se cierran las demás sesiones abiertas.
+function set_admin_password($password, $rotateSecret)
 {
     $config = load_config();
-    return isset($config['admin_password']) ? (string) $config['admin_password'] : '';
+    unset($config['admin_password']);
+    $config['admin_password_hash'] = password_hash($password, PASSWORD_DEFAULT);
+    if ($rotateSecret || empty($config['admin_secret'])) {
+        $config['admin_secret'] = bin2hex(random_bytes(32));
+    }
+    return save_config($config);
+}
+
+// Devuelve el motivo si la nueva contraseña no es válida, o null si lo es
+function validate_new_admin_password($password)
+{
+    if (strlen($password) > MAX_ADMIN_PASSWORD_BYTES) {
+        return 'La contraseña es demasiado larga';
+    }
+    if (mb_strlen($password, 'UTF-8') < MIN_ADMIN_PASSWORD_LENGTH) {
+        return 'La nueva contraseña debe tener al menos ' . MIN_ADMIN_PASSWORD_LENGTH . ' caracteres';
+    }
+    if ($password === DEFAULT_ADMIN_PASSWORD) {
+        return 'La nueva contraseña no puede ser la contraseña inicial';
+    }
+    return null;
+}
+
+/* ── Límite de intentos de contraseña ──────────────────────────────── */
+
+function login_attempts_key()
+{
+    return hash('sha256', isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
+}
+
+// Segundos que faltan para poder volver a intentarlo, o 0 si no hay bloqueo
+function login_lock_remaining()
+{
+    $attempts = load_json_store('login_attempts.json', []);
+    $key = login_attempts_key();
+    if (!isset($attempts[$key])) {
+        return 0;
+    }
+    $entry = $attempts[$key];
+    $elapsed = time() - (int) $entry['first'];
+    if ($elapsed >= LOGIN_LOCK_SECONDS || (int) $entry['count'] < LOGIN_MAX_ATTEMPTS) {
+        return 0;
+    }
+    return LOGIN_LOCK_SECONDS - $elapsed;
+}
+
+function register_failed_login()
+{
+    $attempts = load_json_store('login_attempts.json', []);
+    $now = time();
+    // Se descartan las entradas caducadas para que el fichero no crezca
+    $attempts = array_filter($attempts, function ($entry) use ($now) {
+        return $now - (int) $entry['first'] < LOGIN_LOCK_SECONDS;
+    });
+    $key = login_attempts_key();
+    if (!isset($attempts[$key])) {
+        $attempts[$key] = ['count' => 0, 'first' => $now];
+    }
+    $attempts[$key]['count']++;
+    save_json_store('login_attempts.json', $attempts);
+}
+
+function clear_failed_logins()
+{
+    $attempts = load_json_store('login_attempts.json', []);
+    $key = login_attempts_key();
+    if (isset($attempts[$key])) {
+        unset($attempts[$key]);
+        save_json_store('login_attempts.json', $attempts);
+    }
+}
+
+function reject_if_locked()
+{
+    $remaining = login_lock_remaining();
+    if ($remaining > 0) {
+        $minutes = (int) ceil($remaining / 60);
+        json_response(['error' => 'Demasiados intentos fallidos. Prueba de nuevo en ' . $minutes . ' min.'], 429);
+    }
 }
 
 function get_admin_secret()
