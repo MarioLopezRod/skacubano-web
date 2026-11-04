@@ -56,7 +56,7 @@ function route($method, $s, $putFiles)
     }
 
     if ($first === 'gallery') {
-        if ($n === 1 && $method === 'GET') return json_response(get_gallery_data());
+        if ($n === 1 && $method === 'GET') return json_public_cached(get_gallery_data(), DATA_DIR . '/galleryData.json');
         if ($n === 1 && $method === 'POST') return gallery_upload();
         if ($n === 2 && $s[1] === 'reorder' && $method === 'PUT') return gallery_reorder();
         if ($n === 2 && $s[1] === 'member' && $method === 'POST') return member_create();
@@ -544,24 +544,7 @@ function get_shows_data()
 // Lectura pública: la pide cada visitante, así que se deja cachear (navegador/proxy) y responde 304 si no ha cambiado
 function shows_get()
 {
-    $path = DATA_DIR . '/shows.json';
-    $data = get_shows_data();
-    $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-    $etag = '"' . md5($json) . '"';
-
-    header('Cache-Control: public, max-age=60, stale-while-revalidate=300');
-    header('ETag: ' . $etag);
-    if (file_exists($path)) {
-        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($path)) . ' GMT');
-    }
-    if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
-        http_response_code(304);
-        exit;
-    }
-    http_response_code(200);
-    header('Content-Type: application/json; charset=utf-8');
-    echo $json;
-    exit;
+    json_public_cached(get_shows_data(), DATA_DIR . '/shows.json');
 }
 
 // Texto bilingüe {es, en}: recorta espacios y limita longitud

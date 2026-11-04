@@ -108,7 +108,8 @@ export default function AdminGalleryPage() {
 
   const fetchData = async () => {
     try {
-      const res = await fetch("/api/gallery");
+      // no-store: el admin siempre ve la versión real, no la cacheada para el público
+      const res = await fetch("/api/gallery", { cache: "no-store" });
       const json = await res.json();
       if (json.integrantes && json.fotos) {
         if (!json.secciones) {

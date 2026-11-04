@@ -54,11 +54,14 @@ export default function BowloramaText({ text, className = "" }) {
 
   return (
     <span className={`inline-flex flex-wrap items-center justify-center gap-x-[0.3em] ${className}`}>
+      {/* Texto completo para buscadores y lectores de pantalla: las letras sueltas de abajo, sin
+          espacios entre palabras, se leerían como "TOURSSHOWS" */}
+      <span className="sr-only">{textStr}</span>
       {words.map((word, wordIdx) => {
         const fontClass = "font-retro50s";
 
         return (
-          <span key={wordIdx} className="inline-flex items-center justify-center whitespace-nowrap">
+          <span key={wordIdx} aria-hidden="true" className="inline-flex items-center justify-center whitespace-nowrap">
             {Array.from(word).map((char, charIdx) => {
               if (char === "¡") {
                 return <InvertedExclamationCircle key={charIdx} />;

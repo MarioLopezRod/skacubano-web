@@ -10,6 +10,28 @@ function json_response($data, $status = 200)
     exit;
 }
 
+// Respuesta JSON pública que el navegador puede guardar 1 minuto. Responde 304 (sin cuerpo)
+// si el navegador ya tiene la misma versión. Para lecturas que pide cada visitante.
+function json_public_cached($data, $sourceFile = null)
+{
+    $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    $etag = '"' . md5($json) . '"';
+
+    header('Cache-Control: public, max-age=60, stale-while-revalidate=300');
+    header('ETag: ' . $etag);
+    if ($sourceFile && file_exists($sourceFile)) {
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($sourceFile)) . ' GMT');
+    }
+    if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
+        http_response_code(304);
+        exit;
+    }
+    http_response_code(200);
+    header('Content-Type: application/json; charset=utf-8');
+    echo $json;
+    exit;
+}
+
 // Milisegundos desde epoch, como Date.now() en JavaScript
 function now_ms()
 {
