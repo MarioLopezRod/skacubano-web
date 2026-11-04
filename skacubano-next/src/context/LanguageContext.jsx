@@ -89,6 +89,13 @@ export const translations = {
     albums: {
       badge: "— Musical Selection —",
       title: "DISCOGRAPHY",
+      tracklist: "Tracklist",
+      play: "Play",
+      pause: "Pause",
+      listenOn: "Listen on",
+      songs: "songs",
+      types: { studio: "Studio album", remix: "Remix album" },
+      playAlbum: "Play a preview of",
     },
     // Shows
     shows: {
@@ -215,6 +222,13 @@ export const translations = {
     albums: {
       badge: "— Selección Musical —",
       title: "DISCOGRAFIA",
+      tracklist: "Tracklist",
+      play: "Reproducir",
+      pause: "Pausar",
+      listenOn: "Escúchalo en",
+      songs: "canciones",
+      types: { studio: "Álbum de estudio", remix: "Álbum de remezclas" },
+      playAlbum: "Escuchar un fragmento de",
     },
     // Shows
     shows: {

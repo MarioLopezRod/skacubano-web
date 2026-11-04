@@ -6,7 +6,8 @@
     "dev": "next dev",
     "dev:php": "php -S localhost:8000 -t public public/api/dev-router.php",
     "build": "next build",
-    "lint": "eslint"
+    "lint": "eslint",
+    "tracklists": "node scripts/fetch-tracklists.mjs"
   },
   "dependencies": {
     "autoprefixer": "^10.5.0",
