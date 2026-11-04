@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 const LanguageContext = createContext();
 
@@ -37,6 +38,8 @@ export const translations = {
       exploreBtn: "Explore Music",
       storyBtn: "Our Story",
       scrollDown: "Scroll Down",
+      heading: "Ska Cubano – Jamaican ska and Cuban son, from Santiago de Cuba to London",
+      photoAlt: "Ska Cubano live on stage",
     },
     // History
     history: {
@@ -170,6 +173,8 @@ export const translations = {
       exploreBtn: "Explorar Música",
       storyBtn: "Nuestra Historia",
       scrollDown: "Desplazar Abajo",
+      heading: "Ska Cubano – ska jamaicano y son cubano, de Santiago de Cuba a Londres",
+      photoAlt: "Ska Cubano en directo",
     },
     // History
     history: {
@@ -273,11 +278,36 @@ export const translations = {
   }
 };
 
+// La portada existe en dos direcciones: "/" (inglés) y "/es" (español), cada una con su HTML ya traducido
+const isSpanishHome = (path) => path === "/es" || path === "/es/";
+const isHome = (path) => path === "/" || isSpanishHome(path);
+
 export function LanguageProvider({ children }) {
-  const [lang, setLang] = useState("en");
+  const pathname = usePathname() || "/";
+  // El idioma inicial sale de la URL, así /es se genera en español al compilar
+  const [lang, setLang] = useState(() => (isSpanishHome(pathname) ? "es" : "en"));
+
+  // Al navegar a una de las portadas, el idioma sigue a la URL. En el resto de páginas se mantiene el elegido.
+  // (Se ajusta durante el render al cambiar la URL, como recomienda React, en vez de en un efecto)
+  const [lastPathname, setLastPathname] = useState(pathname);
+  if (pathname !== lastPathname) {
+    setLastPathname(pathname);
+    if (isHome(pathname)) setLang(isSpanishHome(pathname) ? "es" : "en");
+  }
+
+  // Idioma del documento (lectores de pantalla, traductor del navegador y buscadores)
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   const toggleLanguage = () => {
-    setLang((prev) => (prev === "en" ? "es" : "en"));
+    const next = lang === "en" ? "es" : "en";
+    setLang(next);
+    // En la portada, cambia también la dirección (/ ↔ /es) conservando la sección (#music, #shows…)
+    if (isHome(window.location.pathname)) {
+      const target = (next === "es" ? "/es" : "/") + window.location.hash;
+      window.history.replaceState(window.history.state, "", target);
+    }
   };
 
   const t = translations[lang];

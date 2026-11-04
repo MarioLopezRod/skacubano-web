@@ -106,7 +106,7 @@ function ListenLinks({ album, t }) {
             rel="noopener noreferrer"
             className="group/link inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#2a1a0a] hover:text-[#d35400] transition-colors"
           >
-            <img src={l.icon} alt="" className="w-4 h-4 object-contain grayscale-[35%] group-hover/link:grayscale-0 transition" />
+            <img src={l.icon} alt="" loading="lazy" decoding="async" className="w-4 h-4 object-contain grayscale-[35%] group-hover/link:grayscale-0 transition" />
             <span className="border-b border-dotted border-[#2a1a0a]/40 group-hover/link:border-[#d35400]">{l.name}</span>
           </a>
         ))}
@@ -254,7 +254,7 @@ export default function Albums() {
                     >
                       {/* Etiqueta central con la portada */}
                       <div className="relative w-14 h-14 rounded-full border-[3px] border-[#d35400] overflow-hidden bg-[#d35400]">
-                        <img src={album.cover} alt="" className="w-full h-full object-cover" />
+                        <img src={album.cover} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
                         <span className="absolute inset-0 m-auto w-2 h-2 rounded-full bg-[#1a1a1a]" />
                       </div>
                     </div>
@@ -262,7 +262,7 @@ export default function Albums() {
 
                   {/* PORTADA */}
                   <div className="relative z-20 w-full h-full shadow-lg bg-slate-800">
-                    <img src={album.cover} alt={album.title} className="w-full h-full object-cover" />
+                    <img src={album.cover} alt={`${album.title} (${album.year}) – Ska Cubano`} loading="lazy" decoding="async" className="w-full h-full object-cover" />
                     {/* Icono de play/pausa al pasar el ratón */}
                     <span className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/25 transition-colors">
                       <span className="w-12 h-12 rounded-full bg-[#d35400] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">

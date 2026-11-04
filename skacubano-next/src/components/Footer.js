@@ -14,6 +14,8 @@ export default function Footer() {
           <img
             src="/images/logos/logoSkaCubano.png"
             alt="Ska Cubano"
+            loading="lazy"
+            decoding="async"
             className="h-8 md:h-10 w-auto object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] transition-transform duration-300 hover:scale-105"
           />
         </div>
