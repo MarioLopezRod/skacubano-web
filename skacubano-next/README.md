@@ -40,6 +40,21 @@ npm run dev       # web en http://localhost:3000 (reenvía /api/* a PHP)
 En local los datos se guardan en `public/data/` y las fotos subidas en `public/uploads/gallery/`
 (ninguna de las dos carpetas se sube al repositorio).
 
+## Web de prueba en Vercel (solo test, no es el proyecto final)
+
+Estos ficheros existen **solo** para que funcione la web de prueba en `skacubano-web-test.vercel.app`.
+No se usan en names.co.uk y se pueden borrar cuando ya no haga falta esa prueba:
+
+| Fichero | Para qué sirve en Vercel |
+| --- | --- |
+| `vercel.json` | Ejecuta la API con el runtime `vercel-php` y reescribe `/api/*` y `/privado/<slug>` |
+| `api/index.php` | Entrada de la API en Vercel: datos en `/tmp` y contraseña desde variables de entorno |
+| `scripts/vercel-postbuild.mjs` + script `build:vercel` | Quita el PHP y los JSON semilla de los ficheros estáticos |
+
+En Vercel hay que definir las variables `ADMIN_PASSWORD` y `ADMIN_SECRET` (texto largo aleatorio).
+Vercel no guarda ficheros de forma permanente: se puede ver la galería e iniciar sesión, pero los cambios
+hechos desde el panel (fotos, integrantes, contraseña) se pierden al cabo de un rato.
+
 ## Compilar y subir al hosting (names.co.uk)
 
 1. Compilar:
