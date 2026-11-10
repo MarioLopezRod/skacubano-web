@@ -1,6 +1,7 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { SITE_NAME, SITE_URL, seoText } from "../lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -12,39 +13,33 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// Valores por defecto para todas las páginas. Cada página completa o sustituye lo suyo
+// (portada: src/app/page.jsx y src/app/es/page.jsx). Iconos e imagen para redes salen de los
+// ficheros de esta carpeta: favicon.ico, icon.png, apple-icon.png y opengraph-image.jpg.
 export const metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://skacubano.com"),
-  title: "Ska Cubano",
-  description: "Ska Cubano official website",
-  icons: {
-    icon: "/images/logos/logoSkaCubano.png",
-    shortcut: "/images/logos/logoSkaCubano.png",
-    apple: "/images/logos/logoSkaCubano.png",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: seoText.en.title,
+    template: `%s | ${SITE_NAME}`,
   },
+  description: seoText.en.description,
+  applicationName: SITE_NAME,
+  category: "music",
+  robots: { index: true, follow: true },
+  formatDetection: { telephone: false, email: false, address: false },
   openGraph: {
-    title: "Ska Cubano",
-    description: "Ska Cubano official website",
-    images: [
-      {
-        url: "/images/logos/logoSkaCubano.png",
-        alt: "Ska Cubano Logo",
-      },
-    ],
+    type: "website",
+    siteName: SITE_NAME,
+    locale: seoText.en.locale,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Ska Cubano",
-    description: "Ska Cubano official website",
-    images: ["/images/logos/logoSkaCubano.png"],
+    site: "@skcubano",
   },
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "Ska Cubano",
-  "logo": "/images/logos/logoSkaCubano.png",
-  "image": "/images/logos/logoSkaCubano.png",
+export const viewport = {
+  themeColor: "#0d0a07",
 };
 
 export default function RootLayout({ children }) {
@@ -54,15 +49,16 @@ export default function RootLayout({ children }) {
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        {/* Las fuentes de Google se piden desde globals.css: conectar antes acelera la primera carga */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+      </head>
       <body className="min-h-full flex flex-col bg-[#0d0a07] text-[#faf6ee]">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
         <Providers>
           {children}
         </Providers>
       </body>
     </html>
   );
-}
+}

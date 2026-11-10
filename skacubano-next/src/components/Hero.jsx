@@ -115,16 +115,26 @@ export default function Hero() {
       style={{ height: "100dvh", minHeight: "100vh" }}
     >
 
-      {/* Carrusel de imágenes de fondo */}
-      {(images || []).map((image, index) => (
-        <img
-          key={image}
-          src={image}
-          alt={`Ska Cubano ${index + 1}`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${index === currentImageIndex ? "opacity-100" : "opacity-0"
-            }`}
-        />
-      ))}
+      {/* Carrusel de imágenes de fondo. Solo se montan la foto actual, la siguiente (precargada para
+          el cambio) y la anterior (para el fundido): así no se descargan todas las fotos al entrar. */}
+      {(images || []).map((image, index) => {
+        const total = images.length;
+        const isCurrent = index === currentImageIndex;
+        const isNext = index === (currentImageIndex + 1) % total;
+        const isPrev = index === (currentImageIndex - 1 + total) % total;
+        if (!isCurrent && !isNext && !isPrev) return null;
+        return (
+          <img
+            key={image}
+            src={image}
+            alt={isCurrent ? t.hero.photoAlt : ""}
+            fetchPriority={isCurrent && currentImageIndex === 0 ? "high" : "low"}
+            decoding="async"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${isCurrent ? "opacity-100" : "opacity-0"
+              }`}
+          />
+        );
+      })}
 
       {/* Capa de ambiente retro cubano-jamaicano - Tono suave para destacar fotos */}
       <div
@@ -136,6 +146,9 @@ export default function Hero() {
 
       {/* Contenido principal (Logo + Eslogan) centrado verticalmente en la zona superior/media */}
       <div className="relative z-20 max-w-4xl mx-auto px-6 text-center flex-1 flex flex-col items-center justify-center gap-6 sm:gap-8 pt-20 sm:pt-24 pb-4">
+
+        {/* Título principal de la página para buscadores y lectores de pantalla (visualmente ya está el logo) */}
+        <h1 className="sr-only">{t.hero.heading}</h1>
 
         {/* LOGO OFICIAL (Tamaño ajustado y retocado sin bordes blancos) */}
         {/* Ancla sin transformaciones (sirve para medir) > capa que sigue al scroll > animación de entrada */}
@@ -154,7 +167,7 @@ export default function Hero() {
             >
               <img
                 src="/images/logos/logoSkaCubano_vectorizado.svg"
-                alt="Ska Cubano Big Band Logo"
+                alt="Ska Cubano"
                 className="w-full h-auto drop-shadow-[0_8px_20px_rgba(0,0,0,0.7)] mx-auto"
               />
             </motion.div>

@@ -7,7 +7,8 @@
     "dev:php": "php -S localhost:8000 -t public public/api/dev-router.php",
     "build": "next build",
     "build:vercel": "next build && node scripts/vercel-postbuild.mjs",
-    "lint": "eslint"
+    "lint": "eslint",
+    "tracklists": "node scripts/fetch-tracklists.mjs"
   },
   "dependencies": {
     "autoprefixer": "^10.5.0",

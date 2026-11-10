@@ -1,78 +1,209 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-
-const albums = [
-  { 
-    id: 1, title: "Ska Cubano", cover: "/images/albums/skacubano.jpg", year: "2004",
-    links: { 
-      sp: "https://open.spotify.com/intl-es/album/3N58JMWyiCXtS0uJB5Kvxt?si=jB9p9RSnTsGstRTSSgQAbw",
-      yt: "https://www.youtube.com/watch?v=wnMAwJ4KaPM&list=OLAK5uy_ll4KrcoDJi0_RU3fwPh0zAePNQo33j5KQ",
-      ap: "https://music.apple.com/es/album/ska-cubano/949685364" 
-    } 
-  },
-  { 
-    id: 2, title: "¡Ay Caramba!", cover: "/images/albums/caramba.jpg", year: "2005",
-    links: { 
-      sp: "https://open.spotify.com/intl-es/album/6dGWSlqez8ptLOJBCt1ymW?si=afdcvAJvT2OK5qXWkgrZXA",
-      yt: "https://www.youtube.com/watch?v=nwLyUCy7O7A&list=OLAK5uy_k0ldgoIleSHm7Ljh7-cr_NnXXH-dyWLVY",
-      ap: "https://music.apple.com/es/album/ay-caramba/902312351" 
-    } 
-  },
-  { 
-    id: 3, title: "Ajiaco!", cover: "/images/albums/ajiaco.jpg", year: "2007",
-    links: { 
-      sp: "https://open.spotify.com/intl-es/album/4l0RKxCjk4xB9a4lsQ6SXK?si=cFJxv-07QR-5Hrrx_oADYQ",
-      yt: "https://www.youtube.com/watch?v=40_2h7Vkpo8&list=OLAK5uy_kOaE4-Bqj6IwANG6RfDGqqQmewJ1T7I8g",
-      ap: "https://music.apple.com/es/album/ajiaco-the-remix-album/705272102" 
-    } 
-  },
-  { 
-    id: 4, title: "Mambo Ska", cover: "/images/albums/mamboska.jpg", year: "2010",
-    links: { 
-      sp: "https://open.spotify.com/intl-es/album/7qfCYynbJSqc6OzpLQwRy6?si=x5ulwQg5TsuDsn1MhpTHvg",
-      yt: "https://www.youtube.com/watch?v=Es62wlmIlyE&list=OLAK5uy_m0kRcur0qgsmu9v5gZDePEDx4pXJiCFGg",
-      ap: "https://music.apple.com/es/album/mambo-ska/1617405456" 
-    } 
-  },
-];
-
 import { useLanguage } from "../context/LanguageContext";
+import { albums } from "../data/albums";
 import BowloramaText from "./BowloramaText";
 
+// Barras de ecualizador animadas para la canción que está sonando
+function PlayingBars({ playing }) {
+  return (
+    <span className="flex items-end justify-center gap-[2px] w-4 h-3" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <span
+          key={i}
+          className="w-[3px] bg-[#d35400] rounded-sm origin-bottom animate-[eq_0.9s_ease-in-out_infinite]"
+          style={{ height: "100%", animationDelay: `${i * 0.18}s`, animationPlayState: playing ? "running" : "paused" }}
+        />
+      ))}
+    </span>
+  );
+}
+
+// Lista de canciones del disco, enmarcada y a dos columnas como en el diseño en pergamino.
+// Cada canción con fragmento se puede escuchar aquí mismo.
+function Tracklist({ album, current, playing, progress, onToggle, t }) {
+  if (album.tracks.length === 0) return null;
+  return (
+    <div className="pt-5">
+    <div className="border border-[#2a1a0a]/30 rounded-sm px-3 pt-3 pb-2 sm:px-4">
+      <h4 className="font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-[#2a1a0a] pb-2 mb-1 border-b border-[#2a1a0a]/20">
+        {t.albums.tracklist}
+      </h4>
+      <ol className="sm:columns-2 sm:gap-x-6 font-mono">
+        {album.tracks.map((track, i) => {
+          const isCurrent = current?.albumId === album.id && current.index === i;
+          const canPlay = Boolean(track.previewUrl);
+          const label = `${isCurrent && playing ? t.albums.pause : t.albums.play}: ${track.title}`;
+          return (
+            <li key={`${i}-${track.title}`} className="relative break-inside-avoid">
+              <button
+                type="button"
+                disabled={!canPlay}
+                onClick={() => onToggle(album, i)}
+                aria-label={label}
+                aria-pressed={isCurrent && playing}
+                className={`group/track w-full flex items-baseline gap-2 px-1 py-1 text-left text-[11px] leading-snug transition-colors ${
+                  canPlay ? "cursor-pointer hover:bg-[#d35400]/10" : "cursor-default opacity-60"
+                } ${isCurrent ? "bg-[#d35400]/10" : ""}`}
+              >
+                <span className="w-5 shrink-0 flex justify-start self-center text-[10px] text-[#2a1a0a]/60 tabular-nums">
+                  {isCurrent ? (
+                    <PlayingBars playing={playing} />
+                  ) : (
+                    <>
+                      <span className={canPlay ? "group-hover/track:hidden" : ""}>{String(i + 1).padStart(2, "0")}.</span>
+                      {canPlay && (
+                        <svg className="hidden group-hover/track:block w-3 h-3 text-[#d35400]" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      )}
+                    </>
+                  )}
+                </span>
+                <span className={`min-w-0 ${isCurrent ? "text-[#d35400] font-bold" : "text-[#2a1a0a]"}`}>{track.title}</span>
+                <span className="flex-1" aria-hidden="true" />
+                {track.duration && (
+                  <span className="shrink-0 text-[10px] text-[#2a1a0a]/60 tabular-nums">{track.duration}</span>
+                )}
+              </button>
+              {/* Progreso del fragmento */}
+              {isCurrent && (
+                <span className="absolute left-0 -bottom-px h-[2px] bg-[#d35400] transition-[width] duration-200 ease-linear" style={{ width: `${progress * 100}%` }} />
+              )}
+            </li>
+          );
+        })}
+      </ol>
+      {/* Remate con estrella, como en el diseño */}
+      <div className="flex items-center gap-3 mt-2 px-6" aria-hidden="true">
+        <span className="flex-1 h-px bg-[#7a3000]/40" />
+        <span className="text-[#7a3000] text-sm leading-none">★</span>
+        <span className="flex-1 h-px bg-[#7a3000]/40" />
+      </div>
+    </div>
+    </div>
+  );
+}
+
+// Botones para escuchar el disco completo en cada plataforma (sustituyen al botón "Escuchar" del diseño)
+function ListenLinks({ album, t }) {
+  const links = [
+    { href: album.links.sp, icon: "/images/icons/spotify.png", name: "Spotify" },
+    { href: album.links.ap, icon: "/images/icons/apple_music.svg", name: "Apple Music" },
+    { href: album.links.yt, icon: "/images/icons/youtube.png", name: "YouTube" },
+  ].filter((l) => l.href);
+  return (
+    <div className="flex flex-col items-center sm:items-start gap-1.5 font-mono">
+      <span className="text-[9px] font-bold uppercase tracking-[0.25em] text-[#2a1a0a]/60">{t.albums.listenOn}</span>
+      {/* Enlaces discretos con icono, en la misma tipografía retro que la tracklist */}
+      <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-4 gap-y-1">
+        {links.map((l) => (
+          <a
+            key={l.name}
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group/link inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#2a1a0a] hover:text-[#d35400] transition-colors"
+          >
+            <img src={l.icon} alt="" loading="lazy" decoding="async" className="w-4 h-4 object-contain grayscale-[35%] group-hover/link:grayscale-0 transition" />
+            <span className="border-b border-dotted border-[#2a1a0a]/40 group-hover/link:border-[#d35400]">{l.name}</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Albums() {
-  const [activeAlbum, setActiveAlbum] = useState(null);
-  const containerRef = useRef(null);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
 
-  // Auto-cerrar el menú desplegable del álbum al hacer scroll o al hacer clic fuera
+  // ── Reproductor de fragmentos: un único <audio> para toda la discografía ──
+  // Nada se descarga hasta que el visitante pulsa una canción.
+  const audioRef = useRef(null);
+  const [current, setCurrent] = useState(null); // { albumId, index }
+  const [playing, setPlaying] = useState(false);
+  const [progress, setProgress] = useState(0);
+  // Copia de "current" para el evento "ended" del audio (que se registra una sola vez)
+  const currentRef = useRef(null);
   useEffect(() => {
-    if (!activeAlbum) return;
+    currentRef.current = current;
+  }, [current]);
 
-    const handleScroll = () => {
-      setActiveAlbum(null);
-    };
+  const startTrack = (album, index) => {
+    const audio = audioRef.current;
+    const track = album.tracks[index];
+    if (!audio || !track?.previewUrl) return;
+    audio.src = track.previewUrl;
+    setCurrent({ albumId: album.id, index });
+    setProgress(0);
+    audio.play().catch(() => setPlaying(false));
+  };
 
-    const handleClickOutside = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setActiveAlbum(null);
+  const toggleTrack = (album, index) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (current?.albumId === album.id && current.index === index) {
+      if (audio.paused) audio.play().catch(() => setPlaying(false));
+      else audio.pause();
+    } else {
+      startTrack(album, index);
+    }
+  };
+
+  // Pulsar la portada: si el disco ya suena, pausa/continúa; si no, empieza por la primera canción con fragmento
+  const toggleAlbum = (album) => {
+    if (current?.albumId === album.id) {
+      toggleTrack(album, current.index);
+      return;
+    }
+    const first = album.tracks.findIndex((tr) => tr.previewUrl);
+    if (first > -1) startTrack(album, first);
+  };
+
+  useEffect(() => {
+    const audio = new Audio();
+    audio.preload = "none";
+    audioRef.current = audio;
+
+    const onPlay = () => setPlaying(true);
+    const onPause = () => setPlaying(false);
+    const onTime = () => setProgress(audio.duration ? audio.currentTime / audio.duration : 0);
+    // Al acabar un fragmento pasa al siguiente del mismo disco
+    const onEnded = () => {
+      const cur = currentRef.current;
+      const album = albums.find((a) => a.id === cur?.albumId);
+      const next = album?.tracks.findIndex((tr, i) => i > cur.index && tr.previewUrl);
+      if (album && next > -1) startTrack(album, next);
+      else {
+        setPlaying(false);
+        setCurrent(null);
       }
     };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    document.addEventListener("pointerdown", handleClickOutside);
-
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      document.removeEventListener("pointerdown", handleClickOutside);
+    const onError = () => {
+      setPlaying(false);
+      setCurrent(null);
     };
-  }, [activeAlbum]);
+
+    audio.addEventListener("play", onPlay);
+    audio.addEventListener("pause", onPause);
+    audio.addEventListener("timeupdate", onTime);
+    audio.addEventListener("ended", onEnded);
+    audio.addEventListener("error", onError);
+    return () => {
+      audio.pause();
+      audio.removeAttribute("src");
+      audio.removeEventListener("play", onPlay);
+      audio.removeEventListener("pause", onPause);
+      audio.removeEventListener("timeupdate", onTime);
+      audio.removeEventListener("ended", onEnded);
+      audio.removeEventListener("error", onError);
+    };
+  }, []);
 
   return (
     <section
       id="music"
-      ref={containerRef}
       className="min-h-screen w-full bg-parchment flex flex-col items-center justify-center overflow-hidden px-4 py-20 relative border-t border-amber-900/20"
     >
 
@@ -86,97 +217,80 @@ export default function Albums() {
         <div className="w-24 h-1.5 bg-[#d35400] mx-auto mt-6 rounded-full shadow-md" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-y-16 md:gap-x-24 lg:gap-x-40 max-w-5xl mx-auto">
-        
-        {albums.map((album, index) => {
-          const isLeftColumn = index % 2 === 0;
+      <div className="w-full max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 items-start gap-8 lg:gap-10 relative z-10">
+        {albums.map((album) => {
+          const isThisAlbum = current?.albumId === album.id;
+          const description = album.description?.[lang] || album.description?.es;
 
           return (
-            <div key={album.id} className="flex flex-col items-center relative">
-              
-              <div 
-                className="group relative w-44 h-44 md:w-56 md:h-56 cursor-pointer"
-                onClick={() => setActiveAlbum(activeAlbum === album.id ? null : album.id)}
-              >
-                
-                {/* VINILO */}
-                <div className="absolute inset-0 bg-[#1a1a1a] rounded-full shadow-xl transition-transform duration-700 group-hover:translate-x-10 md:group-hover:translate-x-20 flex items-center justify-center z-10">
-                  <div className="w-14 h-14 md:w-20 md:h-20 rounded-full border-[6px] md:border-[8px] border-[#222] flex items-center justify-center">
-                    <div className="w-5 h-5 md:w-6 md:h-6 bg-[#d35400] rounded-full"></div>
+            <article
+              key={album.id}
+              className="flex flex-col border border-[#2a1a0a]/25 rounded-sm p-4 sm:p-6"
+            >
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-2">
+                {/* PORTADA + VINILO. El margen derecho reserva el hueco donde se queda el vinilo al salir */}
+                <button
+                  type="button"
+                  onClick={() => toggleAlbum(album)}
+                  aria-label={`${isThisAlbum && playing ? t.albums.pause : t.albums.playAlbum} ${album.title}`}
+                  // En móvil la portada va centrada; al salir el vinilo, el conjunto se desplaza media salida a la izquierda para seguir centrado.
+                  // Desde sm el margen derecho reserva el hueco donde se queda el vinilo.
+                  className={`group relative shrink-0 w-40 h-40 sm:w-36 sm:h-36 md:w-40 md:h-40 sm:mr-14 cursor-pointer transition-transform duration-700 ${
+                    isThisAlbum ? "-translate-x-7 sm:translate-x-0" : ""
+                  }`}
+                >
+                  {/* VINILO: sale de la funda al pasar el ratón y se queda fuera girando mientras suena el disco */}
+                  <div
+                    className={`absolute inset-0 rounded-full shadow-xl transition-transform duration-700 group-hover:translate-x-14 z-10 ${
+                      isThisAlbum ? "translate-x-14" : ""
+                    }`}
+                  >
+                    <div
+                      className="w-full h-full rounded-full flex items-center justify-center animate-[spin_2.4s_linear_infinite]"
+                      style={{
+                        animationPlayState: isThisAlbum && playing ? "running" : "paused",
+                        background: "repeating-radial-gradient(circle at center, #1a1a1a 0 2px, #222 2px 4px)",
+                      }}
+                    >
+                      {/* Etiqueta central con la portada */}
+                      <div className="relative w-14 h-14 rounded-full border-[3px] border-[#d35400] overflow-hidden bg-[#d35400]">
+                        <img src={album.cover} alt="" loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                        <span className="absolute inset-0 m-auto w-2 h-2 rounded-full bg-[#1a1a1a]" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* PORTADA */}
+                  <div className="relative z-20 w-full h-full shadow-lg bg-slate-800">
+                    <img src={album.cover} alt={`${album.title} (${album.year}) – Ska Cubano`} loading="lazy" decoding="async" className="w-full h-full object-cover" />
+                    {/* Icono de play/pausa al pasar el ratón */}
+                    <span className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover:bg-black/25 transition-colors">
+                      <span className="w-12 h-12 rounded-full bg-[#d35400] text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow-lg">
+                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                          {isThisAlbum && playing ? <path d="M6 5h4v14H6zM14 5h4v14h-4z" /> : <path d="M8 5v14l11-7z" />}
+                        </svg>
+                      </span>
+                    </span>
+                  </div>
+                </button>
+
+                {/* TEXTO: tipo, título, año, descripción y enlaces */}
+                <div className="flex-1 min-w-0 flex flex-col gap-1.5 text-center sm:text-left">
+                  <h3 className="font-alfa text-2xl md:text-[1.7rem] uppercase text-[#2a1a0a] leading-tight">{album.title}</h3>
+                  <span className="font-alfa text-sm text-[#d35400]">{album.year}</span>
+                  <span className="font-mono text-[11px] text-[#2a1a0a]/75">
+                    {t.albums.types[album.type] || t.albums.types.studio}
+                    {album.tracks.length > 0 && ` · ${album.tracks.length} ${t.albums.songs}`}
+                  </span>
+                  {description && <p className="mt-1.5 font-mono text-[11px] sm:text-xs text-[#2a1a0a]/80 leading-relaxed">{description}</p>}
+                  <div className="mt-2">
+                    <ListenLinks album={album} t={t} />
                   </div>
                 </div>
-
-                {/* PORTADA */}
-                <div className="relative z-20 w-full h-full shadow-lg border-l border-white/10 bg-slate-800">
-                  <img src={album.cover} alt={album.title} className="w-full h-full object-cover rounded-sm" />
-                </div>
-
-                {/* BOCADILLO CON ANIMACIÓN */}
-                <AnimatePresence>
-                  {activeAlbum === album.id && (
-                    <motion.div
-                      // Definimos el estado inicial (invisible y pequeño)
-                      initial={{ opacity: 0, scale: 0.5, y: 20 }}
-                      // Estado al aparecer (visible y tamaño real)
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      // Estado al desaparecer
-                      exit={{ opacity: 0, scale: 0.5, y: 20 }}
-                      // Tipo de movimiento (un "pop" elástico)
-                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                      
-                      className={`
-                        absolute z-50 bg-white p-4 sm:p-5 md:p-6 rounded-[2rem] md:rounded-[2.5rem]
-                        shadow-[0_20px_50px_rgba(0,0,0,0.3)]
-                        flex gap-5 sm:gap-6 md:gap-8 items-center border-4 border-[#d35400]/10
-
-                        /* MÓVIL Y TABLET (HASTA LG: 1024px) */
-                        top-full mt-4 left-1/2 -translate-x-1/2
-
-                        /* ESCRITORIO (LG EN ADELANTE) */
-                        lg:top-1/2 lg:-translate-y-1/2 lg:inset-auto lg:translate-x-0
-                        ${isLeftColumn ? "lg:right-full lg:mr-12" : "lg:left-full lg:ml-12"}
-                      `}
-                    >
-                     {/* FLECHA (FIX RESPONSIVE TOTAL) */}
-                    <div className={`
-                    absolute w-6 h-6 bg-white rotate-45 border-[#d35400]/10 z-0
-                    
-                    /* 1. MÓVIL Y TABLET (Por defecto hasta lg) */
-                    -top-2 left-1/2 -translate-x-1/2 border-t-4 border-l-4
-
-                    /* 2. ESCRITORIO (LG de 1024px en adelante) */
-                    lg:inset-auto lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0
-                    
-                    ${isLeftColumn 
-                        ? "lg:-right-3 lg:border-t-4 lg:border-r-4 lg:border-b-0 lg:border-l-0" 
-                        : "lg:-left-3 lg:border-b-4 lg:border-l-4 lg:border-t-0 lg:border-r-0"
-                    }
-                    `} />
-
-                      <div className="relative z-10 flex gap-6 md:gap-8">
-                        <a href={album.links.sp} target="_blank" className="w-12 h-12 md:w-14 md:h-14 block hover:scale-110 transition-transform">
-                          <img src="/images/icons/spotify.png" alt="Spotify" className="w-full h-full object-contain" />
-                        </a>
-                        <a href={album.links.yt} target="_blank" className="w-12 h-12 md:w-14 md:h-14 block hover:scale-110 transition-transform">
-                          <img src="/images/icons/youtube.png" alt="YouTube" className="w-full h-full object-contain" />
-                        </a>
-                        <a href={album.links.ap} target="_blank" className="w-12 h-12 md:w-14 md:h-14 block hover:scale-110 transition-transform">
-                          <img src="/images/icons/apple_music.svg" alt="Apple Music" className="w-full h-full object-contain" />
-                        </a>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
               </div>
 
-              {/* TEXTO */}
-              <div className="mt-4 text-center">
-                <h3 className="text-sm md:text-base font-bold text-slate-900 uppercase tracking-widest leading-tight">
-                  {album.title}
-                </h3>
-                <p className="text-[#d35400] text-xs font-mono">{album.year}</p>
-              </div>
-            </div>
+              <Tracklist album={album} current={current} playing={playing} progress={progress} onToggle={toggleTrack} t={t} />
+            </article>
           );
         })}
       </div>

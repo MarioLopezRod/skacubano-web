@@ -8,11 +8,11 @@ import BowloramaText from "./BowloramaText";
 
 /* ── Photo data ─────────────────────────────────────────────────────── */
 const PHOTOS = [
-  { src: "/images/photos/beny_natty_santiago.jpg", rotate: -4, top: "2%", left: "0%", z: 1, w: 320, label: "Santiago de Cuba 2001" },
+  { src: "/images/photos/beny_natty_santiago-800.jpg", rotate: -4, top: "2%", left: "0%", z: 1, w: 320, label: "Santiago de Cuba 2001" },
   { src: "/images/photos/fruitguitar.jpg", rotate: 3, top: "0%", left: "22%", z: 2, w: 280, label: "Fruit Guitar Session" },
   { src: "/images/photos/bio_portrait_benny.jpg", rotate: -2, top: "5%", right: "19%", z: 1, w: 260, label: "Beny Billy" },
   { src: "/images/photos/bio_portrait_natty.jpg", rotate: 5, top: "1%", right: "0%", z: 2, w: 300, label: "Natty Bo" },
-  { src: "/images/photos/ajiaco_cover.jpg", rotate: -3, bottom: "2%", left: "1%", z: 2, w: 290, label: "Ajiaco! Original Artwork" },
+  { src: "/images/photos/ajiaco_cover-800.jpg", rotate: -3, bottom: "2%", left: "1%", z: 2, w: 290, label: "Ajiaco! Original Artwork" },
   { src: "/images/hero/SkaImagen11.jpg", rotate: 4, bottom: "0%", left: "20%", z: 1, w: 270, label: "London Rehearsals" },
   { src: "/images/hero/SkaImagen14.jpg", rotate: -5, bottom: "3%", right: "18%", z: 2, w: 285, label: "Mambo Ska Tour" },
   { src: "/images/hero/SkaImagen16.jpg", rotate: 2, bottom: "1%", right: "0%", z: 1, w: 305, label: "World Music Tour" },
@@ -71,6 +71,8 @@ function AnalogPhoto({ src, rotate, top, left, right, bottom, z, w, label, delay
           <img
             src={src}
             alt={label}
+            loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover"
             style={{ filter: "sepia(40%) contrast(1.1) brightness(0.92)" }}
           />

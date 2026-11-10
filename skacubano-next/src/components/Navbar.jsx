@@ -13,7 +13,8 @@ const handleSmoothScroll = (e, href, callback = null) => {
       top: 0,
       behavior: "smooth",
     });
-    window.history.pushState(null, "", "/");
+    // Vuelve al inicio sin salir de la versión de idioma actual (/ o /es)
+    window.history.pushState(null, "", window.location.pathname);
   } else if (href.includes("#")) {
     const targetId = href.replace(/.*\#/, "");
     const elem = document.getElementById(targetId);
