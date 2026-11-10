@@ -1,0 +1,17 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "npm run build:vercel",
+  "outputDirectory": "out",
+  "cleanUrls": true,
+  "functions": {
+    "api/index.php": {
+      "runtime": "vercel-php@0.9.0",
+      "excludeFiles": "{node_modules/**,.next/**,out/**,src/**,public/images/**,public/videos/**,public/uploads/**,public/data/**}"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/index.php?__path=:path*" },
+    { "source": "/privado/:slug", "destination": "/privado" }
+  ]
+}
