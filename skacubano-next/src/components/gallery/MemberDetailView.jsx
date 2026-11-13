@@ -11,7 +11,7 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
     .filter((p) => p.integranteId === member.id)
     .sort((a, b) => (a.orden || 0) - (b.orden || 0));
 
-  const mainPhoto = member.fotoPrincipalUrl || (memberPhotos[0]?.url) || "/images/photos/bio_portrait_natty.jpg";
+  const mainPhoto = member.fotoPrincipalUrl || (memberPhotos[0]?.url) || "/images/placeholder-integrante.svg";
 
   return (
     <motion.div

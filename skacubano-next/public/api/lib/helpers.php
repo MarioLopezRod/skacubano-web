@@ -114,9 +114,23 @@ function save_json_store($name, $data)
     return rename($tmp, $path);
 }
 
+// Foto que antes se asignaba por defecto a los integrantes nuevos (es de Natty Bo)
+const OLD_DEFAULT_MEMBER_PHOTO = '/images/photos/bio_portrait_natty.jpg';
+
 function get_gallery_data()
 {
-    return load_json_store('galleryData.json', ['integrantes' => [], 'fotos' => []]);
+    $data = load_json_store('galleryData.json', ['integrantes' => [], 'fotos' => []]);
+    if (!isset($data['integrantes']) || !is_array($data['integrantes'])) $data['integrantes'] = [];
+    if (!isset($data['fotos']) || !is_array($data['fotos'])) $data['fotos'] = [];
+    // Los integrantes creados con la foto por defecto antigua pasan a "sin foto" (la web usa entonces
+    // su primera foto o una silueta), salvo el propio Natty Bo
+    foreach ($data['integrantes'] as &$m) {
+        if (isset($m['fotoPrincipalUrl']) && $m['fotoPrincipalUrl'] === OLD_DEFAULT_MEMBER_PHOTO && $m['id'] !== 'natty-bo') {
+            $m['fotoPrincipalUrl'] = '';
+        }
+    }
+    unset($m);
+    return $data;
 }
 
 function save_gallery_data($data)
@@ -174,13 +188,10 @@ function allowed_extension($filename, $allowPdf)
     return in_array($ext, $allowed, true);
 }
 
+// Solo se aceptan ficheros recibidos en una subida real (POST); nunca rutas arbitrarias del disco
 function move_upload($file, $destPath)
 {
-    if (is_uploaded_file($file['tmp_name'])) {
-        return move_uploaded_file($file['tmp_name'], $destPath);
-    }
-    // Ficheros procesados con request_parse_body() en peticiones PUT
-    return rename($file['tmp_name'], $destPath);
+    return is_uploaded_file($file['tmp_name']) && move_uploaded_file($file['tmp_name'], $destPath);
 }
 
 function ensure_dir($dir)

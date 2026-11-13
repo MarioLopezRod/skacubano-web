@@ -17,6 +17,9 @@ const CARRUSEL_ID = 'carrusel';
 // Segundos durante los que vale la clave introducida en /privado/<slug> sin volver a pedirla (12 horas)
 const PRIVATE_ACCESS_TTL = 12 * 60 * 60;
 
+// Valores que usan el panel y la API con un significado especial: ningún integrante ni sección puede llamarse así
+const RESERVED_GALLERY_IDS = ['banda', 'carrusel', 'todos', 'integrantes', 'member', 'section', 'photo', 'reorder'];
+
 require __DIR__ . '/lib/helpers.php';
 require __DIR__ . '/lib/auth.php';
 
@@ -31,22 +34,16 @@ $path = preg_replace('#^.*?/api/#', '', rawurldecode($path));
 $path = trim($path, '/');
 $segments = $path === '' ? [] : explode('/', $path);
 
-// En PHP los PUT multipart no rellenan $_POST/$_FILES. En PHP 8.4 se procesan con request_parse_body().
-$putFiles = [];
-if ($method === 'PUT' && isset($_SERVER['CONTENT_TYPE']) && stripos($_SERVER['CONTENT_TYPE'], 'multipart/form-data') === 0) {
-    if (function_exists('request_parse_body')) {
-        list($_POST, $putFiles) = request_parse_body();
-    }
-}
+// Las peticiones con ficheros van siempre por POST: PHP no rellena $_POST/$_FILES en los PUT con ficheros.
 
 try {
-    route($method, $segments, $putFiles);
+    route($method, $segments);
 } catch (Throwable $e) {
     error_log('API error: ' . $e->getMessage());
     json_response(['error' => 'Error interno del servidor'], 500);
 }
 
-function route($method, $s, $putFiles)
+function route($method, $s)
 {
     $n = count($s);
     $first = $n > 0 ? $s[0] : '';
@@ -84,7 +81,7 @@ function route($method, $s, $putFiles)
         if ($n === 1 && $method === 'GET') return private_links_list();
         if ($n === 1 && $method === 'POST') return private_link_create();
         if ($n === 2 && $s[1] === 'verify' && $method === 'POST') return private_link_verify();
-        if ($n === 2 && ($method === 'PUT' || $method === 'POST')) return private_link_update($s[1], $method === 'PUT' ? $putFiles : $_FILES);
+        if ($n === 2 && $method === 'POST') return private_link_update($s[1]);
         if ($n === 2 && $method === 'DELETE') return private_link_delete($s[1]);
         if ($n === 4 && $s[2] === 'files' && $method === 'GET') return private_file_serve($s[1], $s[3]);
     }
@@ -180,6 +177,12 @@ function gallery_upload()
         $enCarrusel = true;
     }
 
+    $data = get_gallery_data();
+    // La primera foto de un integrante que todavía no tiene foto principal pasa a serlo
+    if ($integranteId && !$esPrincipal && member_exists($data, $integranteId) && !member_has_main_photo($data, $integranteId)) {
+        $esPrincipal = true;
+    }
+
     $files = uploaded_files('file');
     $file = isset($files[0]) ? $files[0] : null;
     if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
@@ -201,7 +204,6 @@ function gallery_upload()
     }
 
     $filePublicUrl = '/uploads/gallery/' . $fileName;
-    $data = get_gallery_data();
 
     $maxOrder = 0;
     foreach ($data['fotos'] as $f) {
@@ -376,6 +378,47 @@ function photo_delete($id)
 
 /* ── Galería: integrantes ──────────────────────────────────────────── */
 
+// Devuelve $base, o $base-2, $base-3... si ya lo usa otro integrante, otra sección o es un valor reservado.
+// Integrantes y secciones comparten el mismo selector de destino al subir fotos, por eso no pueden repetirse.
+function unique_gallery_id($data, $base)
+{
+    $taken = RESERVED_GALLERY_IDS;
+    foreach ($data['integrantes'] as $m) {
+        $taken[] = $m['id'];
+    }
+    if (isset($data['secciones'])) {
+        foreach ($data['secciones'] as $sec) {
+            $taken[] = $sec['id'];
+        }
+    }
+    $id = $base;
+    $i = 2;
+    while (in_array($id, $taken, true)) {
+        $id = $base . '-' . $i++;
+    }
+    return $id;
+}
+
+function member_has_main_photo($data, $memberId)
+{
+    foreach ($data['integrantes'] as $m) {
+        if ($m['id'] === $memberId) {
+            return !empty($m['fotoPrincipalUrl']);
+        }
+    }
+    return false;
+}
+
+function member_exists($data, $memberId)
+{
+    foreach ($data['integrantes'] as $m) {
+        if ($m['id'] === $memberId) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function member_create()
 {
     require_admin();
@@ -388,8 +431,9 @@ function member_create()
     $data = get_gallery_data();
     $slug = slugify($nombre);
     if ($slug === '') {
-        $slug = 'member-' . now_ms();
+        $slug = 'member';
     }
+    $slug = unique_gallery_id($data, $slug);
 
     $newMember = [
         'id' => $slug,
@@ -397,12 +441,10 @@ function member_create()
         'slug' => $slug,
         'rol' => !empty($body['rol']) ? $body['rol'] : 'Integrante',
         'bio' => !empty($body['bio']) ? $body['bio'] : '',
-        'fotoPrincipalUrl' => !empty($body['fotoPrincipalUrl']) ? $body['fotoPrincipalUrl'] : '/images/photos/bio_portrait_natty.jpg',
+        // Sin foto: la web muestra su primera foto subida o una silueta. La primera foto que se suba será la principal.
+        'fotoPrincipalUrl' => !empty($body['fotoPrincipalUrl']) ? $body['fotoPrincipalUrl'] : '',
     ];
 
-    if (!isset($data['integrantes'])) {
-        $data['integrantes'] = [];
-    }
     $data['integrantes'][] = $newMember;
 
     save_gallery_data($data);
@@ -470,13 +512,15 @@ function section_create()
 
     $slug = slugify($nombre);
     if ($slug === '') {
-        $slug = 'section-' . now_ms();
+        $slug = 'section';
     }
+    // Se compara por nombre (no por id): el id puede llevar sufijo si coincidía con un integrante
     foreach ($data['secciones'] as $sec) {
-        if ($sec['id'] === $slug) {
+        if (slugify(isset($sec['nombre']) ? $sec['nombre'] : '') === slugify($nombre)) {
             json_response(['error' => 'Ya existe una sección con ese nombre'], 400);
         }
     }
+    $slug = unique_gallery_id($data, $slug);
 
     $newSection = ['id' => $slug, 'nombre' => $body['nombre'], 'slug' => $slug];
     $data['secciones'][] = $newSection;
@@ -885,7 +929,7 @@ function private_link_create()
     json_response(['success' => true, 'link' => private_link_out($newLink), 'data' => private_links_out($data)]);
 }
 
-function private_link_update($id, $fileSource)
+function private_link_update($id)
 {
     require_admin();
     $data = load_private_links();
@@ -923,7 +967,7 @@ function private_link_update($id, $fileSource)
         foreach ($current as $removed) {
             delete_private_file($removed);
         }
-        $fotos = array_merge($fotos, save_private_files(uploaded_files('files', $fileSource)));
+        $fotos = array_merge($fotos, save_private_files(uploaded_files('files')));
 
         if (!empty($_POST['titulo'])) {
             $link['titulo'] = $_POST['titulo'];

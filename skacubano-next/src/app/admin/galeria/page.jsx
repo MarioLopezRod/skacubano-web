@@ -150,8 +150,12 @@ export default function AdminGalleryPage() {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (newPassword.length < 10) {
-      setPasswordStatus("❌ La nueva contraseña debe tener al menos 10 caracteres");
+    if (newPassword !== newPassword.trim()) {
+      setPasswordStatus("❌ La nueva contraseña no puede empezar ni acabar con espacios");
+      return;
+    }
+    if (newPassword.replace(/\s+/g, "").length < 10) {
+      setPasswordStatus("❌ La nueva contraseña debe tener al menos 10 caracteres (sin contar espacios)");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -1205,7 +1209,7 @@ export default function AdminGalleryPage() {
                   <div className="flex items-start gap-4">
                     <div className="w-20 h-24 rounded-xl overflow-hidden border-2 border-slate-700 bg-black shrink-0 relative">
                       <img
-                        src={m.fotoPrincipalUrl || "/images/photos/bio_portrait_natty.jpg"}
+                        src={m.fotoPrincipalUrl || "/images/placeholder-integrante.svg"}
                         alt={m.nombre}
                         className="w-full h-full object-cover"
                       />

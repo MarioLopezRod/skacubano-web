@@ -9,7 +9,7 @@ export default function MembersGrid({ integrantes = [], fotos = [], onSelectMemb
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
       {integrantes.map((member, index) => {
         const memberPhotos = fotos.filter((f) => f.integranteId === member.id);
-        const profileImg = member.fotoPrincipalUrl || (memberPhotos[0]?.url) || "/images/photos/bio_portrait_natty.jpg";
+        const profileImg = member.fotoPrincipalUrl || (memberPhotos[0]?.url) || "/images/placeholder-integrante.svg";
 
         return (
           <motion.div

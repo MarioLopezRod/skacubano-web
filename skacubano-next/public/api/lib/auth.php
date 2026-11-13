@@ -112,8 +112,13 @@ function validate_new_admin_password($password)
     if (strlen($password) > MAX_ADMIN_PASSWORD_BYTES) {
         return 'La contraseña es demasiado larga';
     }
-    if (mb_strlen($password, 'UTF-8') < MIN_ADMIN_PASSWORD_LENGTH) {
-        return 'La nueva contraseña debe tener al menos ' . MIN_ADMIN_PASSWORD_LENGTH . ' caracteres';
+    // Los espacios al principio o al final suelen ser un error al copiar y pegar: no se aceptan
+    if ($password !== trim($password)) {
+        return 'La nueva contraseña no puede empezar ni acabar con espacios';
+    }
+    // Los espacios no cuentan para la longitud mínima (una contraseña de solo espacios no vale)
+    if (mb_strlen(preg_replace('/\s+/u', '', $password), 'UTF-8') < MIN_ADMIN_PASSWORD_LENGTH) {
+        return 'La nueva contraseña debe tener al menos ' . MIN_ADMIN_PASSWORD_LENGTH . ' caracteres (sin contar espacios)';
     }
     if ($password === DEFAULT_ADMIN_PASSWORD) {
         return 'La nueva contraseña no puede ser la contraseña inicial';
