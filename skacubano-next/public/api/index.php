@@ -197,6 +197,24 @@ function gallery_upload()
     }
 
     $filePublicUrl = '/uploads/gallery/' . $fileName;
+
+    // Versiones ligeras para la web pública (las genera el navegador del admin al elegir la foto).
+    // Si no llegan, la web usa la foto original.
+    $baseName = $timestamp . '_' . preg_replace('/\.[^.]*$/', '', $originalName);
+    $variantUrls = [];
+    foreach (['thumb' => 'w400', 'large' => 'w1600'] as $field => $suffix) {
+        $variants = uploaded_files($field);
+        $variant = isset($variants[0]) ? $variants[0] : null;
+        if (!$variant || $variant['error'] !== UPLOAD_ERR_OK || !allowed_extension($variant['name'], false)) {
+            continue;
+        }
+        $ext = strtolower(pathinfo($variant['name'], PATHINFO_EXTENSION));
+        $variantName = $baseName . '.' . $suffix . '.' . $ext;
+        if (move_upload($variant, $uploadsDir . '/' . $variantName)) {
+            $variantUrls[$field] = '/uploads/gallery/' . $variantName;
+        }
+    }
+
     $data = get_gallery_data();
 
     $maxOrder = 0;
@@ -219,6 +237,12 @@ function gallery_upload()
         'enCarrusel' => $enCarrusel,
         'soloCarrusel' => $soloCarrusel,
     ];
+    if (isset($variantUrls['thumb'])) {
+        $newPhoto['thumbUrl'] = $variantUrls['thumb'];
+    }
+    if (isset($variantUrls['large'])) {
+        $newPhoto['largeUrl'] = $variantUrls['large'];
+    }
 
     if ($esPrincipal && $integranteId) {
         set_member_main_photo($data, $integranteId, $filePublicUrl);
@@ -312,8 +336,13 @@ function photo_update($id)
     $photo['fecha'] = array_key_exists('fecha', $body) ? $body['fecha'] : (isset($current['fecha']) ? $current['fecha'] : '');
     $photo['integranteId'] = $targetMemberId;
     $photo['esPrincipal'] = array_key_exists('esPrincipal', $body) ? (bool) $body['esPrincipal'] : !empty($current['esPrincipal']);
-    // Fotos que se muestran en el carrusel de la portada (hero)
-    $photo['enCarrusel'] = $soloCarrusel || (array_key_exists('enCarrusel', $body) ? (bool) $body['enCarrusel'] : !empty($current['enCarrusel']));
+    // Fotos que se muestran en el carrusel de la portada (hero). Una foto "solo carrusel" también se puede
+    // ocultar (enCarrusel = false) sin borrarla; al pasar una foto a "solo carrusel" se muestra.
+    if ($soloCarrusel && empty($current['soloCarrusel'])) {
+        $photo['enCarrusel'] = true;
+    } else {
+        $photo['enCarrusel'] = array_key_exists('enCarrusel', $body) ? (bool) $body['enCarrusel'] : !empty($current['enCarrusel']);
+    }
     $photo['soloCarrusel'] = $soloCarrusel;
     $data['fotos'][$index] = $photo;
 
@@ -337,11 +366,15 @@ function photo_delete($id)
         json_response(['error' => 'Photo not found'], 404);
     }
 
-    // Solo se borran del disco las fotos subidas desde el panel (las de /images son del repositorio)
-    if (strpos($photo['url'], '/uploads/') === 0 && strpos($photo['url'], '..') === false) {
-        $filePath = PUBLIC_DIR . $photo['url'];
-        if (is_file($filePath)) {
-            @unlink($filePath);
+    // Solo se borran del disco las fotos subidas desde el panel (las de /images son del repositorio),
+    // junto con sus versiones ligeras
+    foreach (['url', 'thumbUrl', 'largeUrl'] as $field) {
+        $fileUrl = isset($photo[$field]) ? (string) $photo[$field] : '';
+        if (strpos($fileUrl, '/uploads/') === 0 && strpos($fileUrl, '..') === false) {
+            $filePath = PUBLIC_DIR . $fileUrl;
+            if (is_file($filePath)) {
+                @unlink($filePath);
+            }
         }
     }
 
@@ -392,7 +425,9 @@ function member_create()
         'nombre' => $body['nombre'],
         'slug' => $slug,
         'rol' => !empty($body['rol']) ? $body['rol'] : 'Integrante',
+        'rolEn' => !empty($body['rolEn']) ? $body['rolEn'] : '',
         'bio' => !empty($body['bio']) ? $body['bio'] : '',
+        'bioEn' => !empty($body['bioEn']) ? $body['bioEn'] : '',
         'fotoPrincipalUrl' => !empty($body['fotoPrincipalUrl']) ? $body['fotoPrincipalUrl'] : '/images/photos/bio_portrait_natty.jpg',
     ];
 
@@ -413,7 +448,7 @@ function member_update($id)
 
     foreach ($data['integrantes'] as $i => $m) {
         if ($m['id'] === $id) {
-            foreach (['nombre', 'rol', 'bio', 'fotoPrincipalUrl'] as $field) {
+            foreach (['nombre', 'rol', 'rolEn', 'bio', 'bioEn', 'fotoPrincipalUrl'] as $field) {
                 if (array_key_exists($field, $body)) {
                     $m[$field] = $body[$field];
                 }

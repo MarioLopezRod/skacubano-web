@@ -3,25 +3,28 @@
 import { useState, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLanguage } from "@/context/LanguageContext";
+import { useLanguage, localized } from "@/context/LanguageContext";
+import { optimizedSrc, byOrder } from "@/lib/images";
 
 export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const filmstripRef = useRef(null);
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
+  const g = t.gallery;
 
   if (!photos || photos.length === 0) {
     return (
       <div className="text-center py-16 px-4 bg-black/60 rounded-2xl border border-dashed border-yellow-400/30">
         <p className="text-yellow-400/80 font-mono text-sm uppercase tracking-wider">
-          No hay fotografías en la galería general de la banda.
+          {g.noBandPhotos}
         </p>
       </div>
     );
   }
 
-  const sortedPhotos = [...photos].sort((a, b) => (a.orden || 0) - (b.orden || 0));
+  const sortedPhotos = byOrder(photos);
   const currentPhoto = sortedPhotos[selectedIndex] || sortedPhotos[0];
+  const currentCaption = localized(currentPhoto, "descripcion", lang);
 
   const handlePrev = (e) => {
     e.stopPropagation();
@@ -48,8 +51,18 @@ export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
         
         {/* Contenedor de la foto principal destacada */}
         <div 
+          role="button"
+          tabIndex={0}
+          aria-label={currentCaption || g.photoAlt}
           onClick={() => onSelectPhoto(currentPhoto)}
-          className="relative w-full h-[340px] sm:h-[480px] md:h-[540px] rounded-xl overflow-hidden bg-black/90 cursor-pointer group"
+          onKeyDown={(e) => {
+            if (e.target !== e.currentTarget) return;
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              onSelectPhoto(currentPhoto);
+            }
+          }}
+          className="relative w-full h-[340px] sm:h-[480px] md:h-[540px] rounded-xl overflow-hidden bg-black/90 cursor-pointer group focus-visible:outline-3 focus-visible:outline-yellow-400"
         >
           <AnimatePresence mode="wait">
             <motion.div
@@ -62,7 +75,7 @@ export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
             >
               {/* Fondo difuminado con la misma foto, para que las verticales se vean enteras sin huecos negros */}
               <Image
-                src={currentPhoto.url}
+                src={optimizedSrc(currentPhoto, "thumb")}
                 alt=""
                 aria-hidden="true"
                 fill
@@ -70,8 +83,8 @@ export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
                 className="object-cover scale-110 blur-2xl opacity-60"
               />
               <Image
-                src={currentPhoto.url}
-                alt={currentPhoto.descripcion || "Foto Ska Cubano"}
+                src={optimizedSrc(currentPhoto, "large")}
+                alt={currentCaption || g.photoAlt}
                 fill
                 priority
                 sizes="100vw"
@@ -83,27 +96,31 @@ export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
 
           {/* Flechas Navegación Foto Principal */}
           <button
+            type="button"
             onClick={handlePrev}
-            aria-label="Fotografía anterior"
+            onKeyDown={(e) => e.stopPropagation()}
+            aria-label={g.prevPhoto}
             className="absolute left-3 sm:left-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/75 border border-yellow-400/50 text-yellow-400 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all duration-200 shadow-2xl hover:scale-110"
           >
             <span className="text-xl sm:text-2xl font-bold font-mono">‹</span>
           </button>
 
           <button
+            type="button"
             onClick={handleNext}
-            aria-label="Fotografía siguiente"
+            onKeyDown={(e) => e.stopPropagation()}
+            aria-label={g.nextPhoto}
             className="absolute right-3 sm:right-5 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-black/75 border border-yellow-400/50 text-yellow-400 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all duration-200 shadow-2xl hover:scale-110"
           >
             <span className="text-xl sm:text-2xl font-bold font-mono">›</span>
           </button>
 
           {/* Pie de foto */}
-          {((lang === "en" ? currentPhoto.descripcionEn : currentPhoto.descripcion) || currentPhoto.fecha) && (
+          {(currentCaption || currentPhoto.fecha) && (
             <div className="absolute bottom-4 left-4 right-4 z-20 text-left">
-              {(lang === "en" ? currentPhoto.descripcionEn : currentPhoto.descripcion) && (
+              {currentCaption && (
                 <p className="text-sm sm:text-lg font-serif italic text-amber-100 drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] line-clamp-2">
-                  {lang === "en" && currentPhoto.descripcionEn ? currentPhoto.descripcionEn : currentPhoto.descripcion}
+                  {currentCaption}
                 </p>
               )}
               {currentPhoto.fecha && (
@@ -122,16 +139,20 @@ export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
           {/* Botones de navegación horizontal */}
           <div className="flex items-center gap-2">
             <button
+              type="button"
               onClick={() => scrollFilmstrip("left")}
+              aria-label={g.scrollLeft}
               className="w-8 h-8 rounded-full bg-black/80 border border-yellow-400/40 text-yellow-400 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all text-sm font-mono font-bold shadow"
-              title="Desplazar a la izquierda"
+              title={g.scrollLeft}
             >
               ‹
             </button>
             <button
+              type="button"
               onClick={() => scrollFilmstrip("right")}
+              aria-label={g.scrollRight}
               className="w-8 h-8 rounded-full bg-black/80 border border-yellow-400/40 text-yellow-400 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all text-sm font-mono font-bold shadow"
-              title="Desplazar a la derecha"
+              title={g.scrollRight}
             >
               ›
             </button>
@@ -148,20 +169,23 @@ export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
             const isSelected = idx === selectedIndex;
 
             return (
-              <motion.div
+              <motion.button
+                type="button"
                 key={photo.id}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setSelectedIndex(idx)}
-                className={`relative flex-shrink-0 w-36 sm:w-44 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer transition-all duration-300 snap-start bg-black/80 ${
+                aria-pressed={isSelected}
+                aria-label={localized(photo, "descripcion", lang) || `${g.photoAlt} ${idx + 1}`}
+                className={`relative p-0 focus-visible:outline-3 focus-visible:outline-yellow-400 flex-shrink-0 w-36 sm:w-44 aspect-[4/3] rounded-xl overflow-hidden cursor-pointer transition-all duration-300 snap-start bg-black/80 ${
                   isSelected
                     ? "border-3 border-yellow-400 shadow-[0_0_20px_rgba(250,204,21,0.6)] ring-2 ring-yellow-400/50 scale-105 z-10"
                     : "border border-yellow-500/30 opacity-75 hover:opacity-100 hover:border-yellow-400/80"
                 }`}
               >
                 <Image
-                  src={photo.url}
-                  alt={photo.descripcion || `Foto ${idx + 1}`}
+                  src={optimizedSrc(photo, "thumb")}
+                  alt=""
                   fill
                   sizes="(max-width: 640px) 144px, 176px"
                   className="object-cover"
@@ -178,10 +202,10 @@ export default function BandGalleryGrid({ photos = [], onSelectPhoto }) {
                 {/* Insignia de Fecha / Año en cada foto */}
                 <div className="absolute bottom-1.5 left-1.5 right-1.5 flex items-center justify-between text-[9px] font-mono font-bold text-amber-200">
                   <span className="bg-black/75 px-1.5 py-0.5 rounded border border-yellow-400/30 text-yellow-300">
-                    {photo.fecha || `Nº ${idx + 1}`}
+                    {photo.fecha || `${g.photoNumber} ${idx + 1}`}
                   </span>
                 </div>
-              </motion.div>
+              </motion.button>
             );
           })}
         </div>

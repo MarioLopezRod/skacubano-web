@@ -14,6 +14,8 @@ export const translations = {
       gallery: "Gallery",
       history: "History",
       contact: "Contact",
+      home: "Back to home",
+      toggleMenu: "Open or close the menu",
     },
     gallery: {
       badge: "★ Archive & Memories ★",
@@ -27,7 +29,39 @@ export const translations = {
       additionalPhotos: "Additional Photos",
       noPhotos: "No photos available in this category.",
       backToTop: "Back to Top",
-      adminBtn: "Admin Panel"
+      adminBtn: "Admin Panel",
+      loading: "Loading the Ska Cubano vintage gallery...",
+      noBandPhotos: "There are no photos in the band gallery yet.",
+      scrollLeft: "Scroll left",
+      scrollRight: "Scroll right",
+      prevPhoto: "Previous photo",
+      nextPhoto: "Next photo",
+      photoAlt: "Ska Cubano photo",
+      photoNumber: "No.",
+      backToMembers: "← Back to Band Members",
+      profilePhoto: "Profile Photo",
+      memberPhotosTitle: "PHOTO GALLERY OF",
+      noMemberPhotos: "No additional photos have been added yet for",
+      defaultBio: "A key member of Ska Cubano.",
+      defaultBioDetail: "A standout member of the international Ska Cubano ensemble.",
+      viewProfile: "View profile of",
+    },
+    // Visor de fotos (lightbox)
+    lightbox: {
+      dialogLabel: "Photo viewer",
+      close: "Close (Esc)",
+      prev: "Previous (Left arrow)",
+      next: "Next (Right arrow)",
+      archive: "SKA CUBANO ARCHIVE",
+      mainPhoto: "★ MAIN PHOTO",
+    },
+    // Página 404
+    notFound: {
+      badge: "★ Error 404 ★",
+      title: "PAGE NOT FOUND",
+      text: "This song isn't on the setlist. The page you're looking for doesn't exist or has been moved.",
+      homeBtn: "Back to the home page",
+      galleryBtn: "See the gallery",
     },
     // Hero
     hero: {
@@ -50,41 +84,47 @@ export const translations = {
       videoDesc: "Discover the origin, energy, and fusion of Jamaican Ska with the authentic flavor of Cuban Son in this official presentation video.",
       quote: `"Although the band is not active today, the magical fusion of Jamaican Ska and Cuban Son continues to resonate in their recordings and in the memory of thousands of fans worldwide."`,
       tag: "★ ORIGINAL SKA & SON ★",
+      videoFallback: "Your browser does not support HTML5 video.",
       events: [
         {
           year: "2001",
           title: "SANTIAGO DE CUBA",
           subtitle: "The idea of an alternative history",
           text: "Investment manager Peter A. Scott decides to recreate an 'alternative history in which Cuban ska had emerged naturally'. He travels to Santiago de Cuba with the charismatic singer and DJ Natty Bo (Nathan Lerner) to rehearse and record their debut album with local talents such as singer Beny Billy (Juan Manuel Villy Carbonell).",
-          stamp: "CUBA • 2001"
+          stamp: "CUBA • 2001",
+          caption: "Santiago de Cuba 2001 • First rehearsals"
         },
         {
           year: "2004",
           title: "DEBUT ALBUM & BIG BAND",
           subtitle: "Release of 'Ska Cubano' & London Connection",
           text: "In 2004, the band releases their self-titled debut album, 'Ska Cubano'. Later that year, the line-up consolidates in London with top-tier Caribbean and international musicians, including Rey Crespo and Ernesto Estruch (Havana), Dr. Sleepy (Montserrat), Eddie 'Tan Tan' Thornton (Jamaica), Miss Megoo (Japan) and Trevor Edwards (London), with Beny Billy constantly traveling from Cuba for tours and recordings.",
-          stamp: "DEBUT ALBUM • 2004"
+          stamp: "DEBUT ALBUM • 2004",
+          caption: "2004 • Debut album 'Ska Cubano' & Big Band"
         },
         {
           year: "2005",
           title: "¡AY CARAMBA!",
           subtitle: "BBC World Music Award Nomination",
           text: "They release their acclaimed second album, '¡Ay Caramba!', which is nominated for the prestigious BBC World Music Award in the 'Crossover' category. The music press describes it as 'imaginative, full of melody, wit and a joyful fusion of irresistible rhythms'. In 2006, Venezuelan singer Carlos Peña joins as co-lead vocalist.",
-          stamp: "BBC AWARD • 2005"
+          stamp: "BBC AWARD • 2005",
+          caption: "¡Ay Caramba! • BBC World Music Award"
         },
         {
           year: "2010",
           title: "MAMBO SKA",
           subtitle: "High-octane sound",
           text: "They release 'Mambo Ska', described by the prestigious magazine All About Jazz as 'a loud, messy, irresistible explosion of high-octane music'. Their popular song 'Soy Campesino' becomes a Christmas advertising phenomenon in the UK for the Comet chain.",
-          stamp: "MAMBO • 2010"
+          stamp: "MAMBO • 2010",
+          caption: "Mambo Ska 2010 • High-octane sound"
         },
         {
           year: "LEGACY",
           title: "GLOBAL TOURS",
           subtitle: "Conquered over 30 countries",
           text: "With one of the most energetic and festive live shows in the world, Ska Cubano performs on major international stages and festivals such as Glastonbury, WOMAD and Big Day Out, taking their infectious fusion to every corner of the planet.",
-          stamp: "WORLD TOUR"
+          stamp: "WORLD TOUR",
+          caption: "World Tour • Glastonbury & WOMAD"
         }
       ]
     },
@@ -129,6 +169,9 @@ export const translations = {
         sending: "Sending...",
         sendBtn: "— Send Message —",
         success: "✓ Message received — we'll be in touch soon!",
+        errorSend: "There was a problem sending your message. Please try again.",
+        errorNetwork: "Connection error. Please check your internet connection.",
+        dateLocale: "en-GB",
         followUs: "Follow Us"
       }
     },
@@ -149,10 +192,12 @@ export const translations = {
       gallery: "Galería",
       history: "Historia",
       contact: "Contacto",
+      home: "Volver al inicio",
+      toggleMenu: "Abrir o cerrar el menú",
     },
     gallery: {
       badge: "★ Archivo y Recuerdos ★",
-      title: "GALERIA DE FOTOS",
+      title: "GALERÍA DE FOTOS",
       subtitle: "Revive los conciertos legendarios, momentos de camerino y perfiles individuales de la orquesta Ska Cubano.",
       tabBand: "Galería General",
       tabMembers: "Integrantes",
@@ -162,7 +207,39 @@ export const translations = {
       additionalPhotos: "Fotos Adicionales",
       noPhotos: "No hay fotos disponibles en esta categoría.",
       backToTop: "Volver Arriba",
-      adminBtn: "Panel Admin"
+      adminBtn: "Panel Admin",
+      loading: "Cargando galería vintage Ska Cubano...",
+      noBandPhotos: "No hay fotografías en la galería general de la banda.",
+      scrollLeft: "Desplazar a la izquierda",
+      scrollRight: "Desplazar a la derecha",
+      prevPhoto: "Fotografía anterior",
+      nextPhoto: "Fotografía siguiente",
+      photoAlt: "Foto de Ska Cubano",
+      photoNumber: "Nº",
+      backToMembers: "← Volver a Integrantes",
+      profilePhoto: "Foto de Perfil",
+      memberPhotosTitle: "GALERÍA DE FOTOS DE",
+      noMemberPhotos: "Aún no se han añadido fotos adicionales para",
+      defaultBio: "Integrante fundamental de Ska Cubano.",
+      defaultBioDetail: "Integrante destacado del ensamble internacional Ska Cubano.",
+      viewProfile: "Ver el perfil de",
+    },
+    // Visor de fotos (lightbox)
+    lightbox: {
+      dialogLabel: "Visor de fotos",
+      close: "Cerrar (Esc)",
+      prev: "Anterior (Flecha izquierda)",
+      next: "Siguiente (Flecha derecha)",
+      archive: "ARCHIVO SKA CUBANO",
+      mainPhoto: "★ FOTO PRINCIPAL",
+    },
+    // Página 404
+    notFound: {
+      badge: "★ Error 404 ★",
+      title: "PÁGINA NO ENCONTRADA",
+      text: "Esta canción no está en el repertorio. La página que buscas no existe o se ha movido.",
+      homeBtn: "Volver a la portada",
+      galleryBtn: "Ver la galería",
     },
     // Hero
     hero: {
@@ -185,48 +262,54 @@ export const translations = {
       videoDesc: "Descubre el origen, la energía y la fusión del Ska jamaicano con el auténtico sabor del Son cubano en este vídeo de presentación oficial.",
       quote: `"Aunque la banda hoy no está en activo, la fusión mágica del Ska jamaicano y el Son cubano sigue resonando en sus grabaciones y en la memoria de miles de fans en todo el mundo."`,
       tag: "★ ORIGINAL SKA & SON ★",
+      videoFallback: "Tu navegador no soporta el reproductor de vídeo HTML5.",
       events: [
         {
           year: "2001",
           title: "SANTIAGO DE CUBA",
           subtitle: "La idea de una historia alternativa",
           text: "El gestor de inversiones Peter A. Scott decide recrear una 'historia alternativa en la que el ska cubano hubiera surgido de forma natural'. Viaja a Santiago de Cuba con el carismático cantante y DJ Natty Bo (Nathan Lerner) para ensayar y grabar su álbum debut con talentos locales como el cantante Beny Billy (Juan Manuel Villy Carbonell).",
-          stamp: "CUBA • 2001"
+          stamp: "CUBA • 2001",
+          caption: "Santiago de Cuba 2001 • Primeros ensayos"
         },
         {
           year: "2004",
           title: "ÁLBUM DEBUT Y LA BIG BAND",
           subtitle: "Lanzamiento de 'Ska Cubano' y Conexión Londres-Caribe",
           text: "En 2004 ve la luz su primer álbum homónimo, 'Ska Cubano'. Ese mismo año la banda se consolida en Londres reuniendo a músicos caribeños e internacionales de primer nivel, incluyendo a Rey Crespo y Ernesto Estruch (La Habana), Dr. Sleepy (Montserrat), Eddie 'Tan Tan' Thornton (Jamaica), Miss Megoo (Japón) y Trevor Edwards (Londres), con Beny Billy viajando constantemente desde Cuba para giras y grabaciones.",
-          stamp: "ÁLBUM DEBUT • 2004"
+          stamp: "ÁLBUM DEBUT • 2004",
+          caption: "2004 • Primer álbum 'Ska Cubano' & Big Band"
         },
         {
           year: "2005",
           title: "¡AY CARAMBA!",
           subtitle: "Nominación a los Premios BBC",
           text: "Lanzan su aclamado segundo álbum, '¡Ay Caramba!', que es nominado a los prestigiosos premios BBC World Music Award en la categoría 'Crossover'. La prensa musical lo describe como 'imaginativo, lleno de melodía, ingenio y una fusión alegre de ritmos irresistibles'. En 2006, el cantante venezolano Carlos Peña se une como co-líder vocal.",
-          stamp: "PREMIO BBC • 2005"
+          stamp: "PREMIO BBC • 2005",
+          caption: "¡Ay Caramba! • Premio BBC World Music"
         },
         {
           year: "2010",
           title: "MAMBO SKA",
           subtitle: "Sonido de alto octanaje",
           text: "Se publica 'Mambo Ska', calificado por la prestigiosa revista All About Jazz como 'una explosión ruidosa, desordenada e irresistible de música de alto octanaje'. Su popular tema 'Soy Campesino' se convierte en un fenómeno publicitario navideño en el Reino Unido para la cadena Comet.",
-          stamp: "MAMBO • 2010"
+          stamp: "MAMBO • 2010",
+          caption: "Mambo Ska 2010 • Sonido de alto octanaje"
         },
         {
           year: "LEGADO",
           title: "GIRAS GLOBALES",
           subtitle: "Más de 30 países conquistados",
           text: "Con uno de los directos más enérgicos y fiesteros del mundo, Ska Cubano se presenta en los principales escenarios y festivales internacionales de prestigio como Glastonbury, WOMAD y Big Day Out, llevando su fusión contagiosa a rincones de todo el planeta.",
-          stamp: "GIRA MUNDIAL"
+          stamp: "GIRA MUNDIAL",
+          caption: "World Tour • Glastonbury & WOMAD"
         }
       ]
     },
     // Albums
     albums: {
       badge: "— Selección Musical —",
-      title: "DISCOGRAFIA",
+      title: "DISCOGRAFÍA",
       tracklist: "Tracklist",
       play: "Reproducir",
       pause: "Pausar",
@@ -264,6 +347,9 @@ export const translations = {
         sending: "Enviando...",
         sendBtn: "— Enviar Mensaje —",
         success: "✓ ¡Mensaje recibido! Nos pondremos en contacto pronto.",
+        errorSend: "Hubo un problema al enviar el mensaje. Inténtalo de nuevo.",
+        errorNetwork: "Error de conexión. Revisa tu internet.",
+        dateLocale: "es-ES",
         followUs: "Síguenos"
       }
     },
@@ -281,6 +367,16 @@ export const translations = {
 // La portada existe en dos direcciones: "/" (inglés) y "/es" (español), cada una con su HTML ya traducido
 const isSpanishHome = (path) => path === "/es" || path === "/es/";
 const isHome = (path) => path === "/" || isSpanishHome(path);
+// El panel de admin y los enlaces privados solo existen en español
+const isSpanishOnly = (path) => /^\/(admin|privado)(\/|$)/.test(path);
+
+// Texto de un dato (foto, integrante...) en el idioma activo: en inglés usa el campo "<campo>En"
+// y, mientras no esté traducido, vuelve al texto en español en vez de dejarlo vacío.
+export function localized(item, field, lang) {
+  if (!item) return "";
+  if (lang === "en" && item[`${field}En`]) return item[`${field}En`];
+  return item[field] || "";
+}
 
 export function LanguageProvider({ children }) {
   const pathname = usePathname() || "/";
@@ -297,8 +393,8 @@ export function LanguageProvider({ children }) {
 
   // Idioma del documento (lectores de pantalla, traductor del navegador y buscadores)
   useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
+    document.documentElement.lang = isSpanishOnly(pathname) ? "es" : lang;
+  }, [lang, pathname]);
 
   const toggleLanguage = () => {
     const next = lang === "en" ? "es" : "en";

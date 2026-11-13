@@ -3,8 +3,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { compressImage } from "@/components/gallery/ImageCompressor";
+import { compressImage, createImageVariants } from "@/components/gallery/ImageCompressor";
 import ShowsAdmin from "@/components/admin/ShowsAdmin";
+import { optimizedSrc, memberPhoto } from "@/lib/images";
 
 export default function AdminGalleryPage() {
   const router = useRouter();
@@ -20,6 +21,8 @@ export default function AdminGalleryPage() {
 
   // Upload Photo State
   const [uploadFile, setUploadFile] = useState(null);
+  // Versiones ligeras (400 px y 1600 px) que se suben junto a la foto para la web pública
+  const [uploadVariants, setUploadVariants] = useState(null);
   const [uploadPreview, setUploadPreview] = useState("");
   const [uploadDescripcion, setUploadDescripcion] = useState("");
   const [uploadDescripcionEn, setUploadDescripcionEn] = useState("");
@@ -46,6 +49,8 @@ export default function AdminGalleryPage() {
   const [memberFormNombre, setMemberFormNombre] = useState("");
   const [memberFormRol, setMemberFormRol] = useState("");
   const [memberFormBio, setMemberFormBio] = useState("");
+  const [memberFormRolEn, setMemberFormRolEn] = useState("");
+  const [memberFormBioEn, setMemberFormBioEn] = useState("");
   const [memberFormFoto, setMemberFormFoto] = useState("");
   const [savingMember, setSavingMember] = useState(false);
 
@@ -195,10 +200,13 @@ export default function AdminGalleryPage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setUploadVariants(null);
     try {
       setUploadStatus("Optimizando imagen...");
-      const compressed = await compressImage(file);
+      // Las versiones se sacan de la foto original, no de la ya comprimida, para no perder calidad dos veces
+      const [compressed, variants] = await Promise.all([compressImage(file), createImageVariants(file)]);
       setUploadFile(compressed);
+      setUploadVariants(variants);
       setUploadPreview(URL.createObjectURL(compressed));
       setUploadStatus("");
     } catch (err) {
@@ -218,6 +226,10 @@ export default function AdminGalleryPage() {
     try {
       const formData = new FormData();
       formData.append("file", uploadFile);
+      if (uploadVariants) {
+        formData.append("thumb", uploadVariants.thumb);
+        formData.append("large", uploadVariants.large);
+      }
       formData.append("descripcion", uploadDescripcion);
       formData.append("descripcionEn", uploadDescripcionEn);
       formData.append("fecha", uploadFecha);
@@ -234,6 +246,7 @@ export default function AdminGalleryPage() {
       if (res.ok && json.success) {
         fetchData();
         setUploadFile(null);
+        setUploadVariants(null);
         setUploadPreview("");
         setUploadDescripcion("");
         setUploadDescripcionEn("");
@@ -371,6 +384,8 @@ export default function AdminGalleryPage() {
     setMemberFormNombre("");
     setMemberFormRol("");
     setMemberFormBio("");
+    setMemberFormRolEn("");
+    setMemberFormBioEn("");
     setMemberFormFoto("");
     setShowCreateMemberModal(true);
   };
@@ -387,7 +402,9 @@ export default function AdminGalleryPage() {
         body: JSON.stringify({
           nombre: memberFormNombre,
           rol: memberFormRol,
+          rolEn: memberFormRolEn,
           bio: memberFormBio,
+          bioEn: memberFormBioEn,
           fotoPrincipalUrl: memberFormFoto,
         }),
       });
@@ -410,6 +427,8 @@ export default function AdminGalleryPage() {
     setMemberFormNombre(member.nombre || "");
     setMemberFormRol(member.rol || "");
     setMemberFormBio(member.bio || "");
+    setMemberFormRolEn(member.rolEn || "");
+    setMemberFormBioEn(member.bioEn || "");
     setMemberFormFoto(member.fotoPrincipalUrl || "");
   };
 
@@ -425,7 +444,9 @@ export default function AdminGalleryPage() {
         body: JSON.stringify({
           nombre: memberFormNombre,
           rol: memberFormRol,
+          rolEn: memberFormRolEn,
           bio: memberFormBio,
+          bioEn: memberFormBioEn,
           fotoPrincipalUrl: memberFormFoto,
         }),
       });
@@ -649,7 +670,8 @@ export default function AdminGalleryPage() {
     if (filterMember === "banda") {
       list = list.filter((f) => !f.integranteId && !f.soloCarrusel);
     } else if (filterMember === "carrusel") {
-      list = list.filter((f) => f.enCarrusel);
+      // También las "solo carrusel" ocultas, para poder volver a mostrarlas
+      list = list.filter((f) => f.enCarrusel || f.soloCarrusel);
     } else if (filterMember !== "todos") {
       list = list.filter((f) => f.integranteId === filterMember || f.seccionId === filterMember);
     }
@@ -671,6 +693,7 @@ export default function AdminGalleryPage() {
 
   const filteredPhotos = getFilteredPhotos();
   const bandPhotosCount = data.fotos.filter((f) => !f.integranteId && !f.soloCarrusel).length;
+  const carouselCount = data.fotos.filter((f) => f.enCarrusel).length;
   const seccionesList = data.secciones || [{ id: "banda", nombre: "Galería General de la Banda", slug: "banda" }];
 
   return (
@@ -1011,7 +1034,7 @@ export default function AdminGalleryPage() {
                         : "bg-slate-900 text-white border-2 border-slate-700 hover:border-yellow-400"
                       }`}
                   >
-                    🎞️ Carrusel Portada ({data.fotos.filter((f) => f.enCarrusel).length})
+                    🎞️ Carrusel Portada ({carouselCount})
                   </button>
 
                   {data.integrantes.map((m) => {
@@ -1056,6 +1079,19 @@ export default function AdminGalleryPage() {
                 </button>
               </div>
 
+              {filterMember === "carrusel" && (
+                <div className={`mb-6 px-5 py-4 rounded-xl border-2 text-sm font-bold leading-relaxed ${carouselCount === 0
+                    ? "bg-red-950/60 border-red-500/60 text-red-100"
+                    : "bg-orange-950/40 border-orange-500/50 text-orange-100"
+                  }`}>
+                  {carouselCount === 0 ? (
+                    <>⚠️ No hay ninguna foto visible en el carrusel. Mientras sea así, la portada muestra las 17 fotos originales del carrusel (SkaImagen1…17) para no quedarse vacía.</>
+                  ) : (
+                    <>🎞️ La portada muestra las <span className="text-orange-300">{carouselCount}</span> fotos marcadas con «Carrusel», en este orden (cámbialo con ◄ ►). Pulsa 🎞️ en una foto para quitarla o volver a mostrarla; las fotos «Solo carrusel» ocultas se quedan aquí para recuperarlas cuando quieras.</>
+                  )}
+                </div>
+              )}
+
               {filteredPhotos.length === 0 ? (
                 <div className="text-center py-14 px-4 bg-slate-900 rounded-xl border-2 border-dashed border-slate-700">
                   <p className="text-amber-300 font-extrabold text-sm uppercase">
@@ -1075,7 +1111,12 @@ export default function AdminGalleryPage() {
                       >
                         <div>
                           <div className="relative aspect-[4/3] w-full bg-black overflow-hidden">
-                            <img src={photo.url} alt="Miniatura" className="w-full h-full object-cover" />
+                            <img
+                              src={optimizedSrc(photo, "thumb")}
+                              alt="Miniatura"
+                              loading="lazy"
+                              className={`w-full h-full object-cover ${photo.soloCarrusel && !photo.enCarrusel ? "opacity-40 grayscale" : ""}`}
+                            />
 
                             <div className="absolute top-2.5 left-2.5 px-2.5 py-1 rounded-lg bg-slate-950/95 border border-slate-600 text-xs font-extrabold text-yellow-300 shadow">
                               {photo.soloCarrusel ? "🎞️ Solo Carrusel" : memberAssigned ? `👤 ${memberAssigned.nombre}` : sectionAssigned ? `📁 ${sectionAssigned.nombre}` : "📌 Galería Banda"}
@@ -1087,9 +1128,13 @@ export default function AdminGalleryPage() {
                               </div>
                             )}
 
-                            {photo.enCarrusel && (
+                            {photo.enCarrusel ? (
                               <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-orange-500 text-black text-xs font-extrabold uppercase shadow">
                                 🎞️ Carrusel
+                              </div>
+                            ) : photo.soloCarrusel && (
+                              <div className="absolute bottom-2.5 right-2.5 px-2.5 py-1 rounded-lg bg-slate-700 text-white text-xs font-extrabold uppercase shadow">
+                                Oculta
                               </div>
                             )}
 
@@ -1114,7 +1159,7 @@ export default function AdminGalleryPage() {
                           </div>
                         </div>
 
-                        <div className="p-3 bg-slate-950 border-t-2 border-slate-800 flex items-center justify-between gap-1.5">
+                        <div className="p-3 bg-slate-950 border-t-2 border-slate-800 flex flex-wrap items-center justify-between gap-1.5">
                           <div className="flex items-center gap-1">
                             <button
                               onClick={() => handleMovePhoto(photo.id, -1)}
@@ -1142,19 +1187,19 @@ export default function AdminGalleryPage() {
                               ✏️ Editar
                             </button>
 
-                            {/* Las fotos "solo carrusel" no se pueden sacar del carrusel: se cambian de destino desde Editar */}
-                            {!photo.soloCarrusel && (
-                              <button
-                                onClick={() => handleToggleCarrusel(photo)}
-                                className={`px-2.5 py-1.5 rounded-lg border font-extrabold text-xs uppercase transition-colors cursor-pointer ${photo.enCarrusel
-                                    ? "bg-orange-500 border-orange-400 text-black hover:bg-orange-400"
-                                    : "bg-slate-800 border-slate-600 text-slate-300 hover:border-orange-400 hover:text-orange-300"
-                                  }`}
-                                title={photo.enCarrusel ? "Quitar del carrusel de la portada" : "Mostrar también en el carrusel de la portada"}
-                              >
-                                🎞️
-                              </button>
-                            )}
+                            {/* Las fotos "solo carrusel" ocultas no salen en ningún sitio, pero se conservan aquí */}
+                            <button
+                              onClick={() => handleToggleCarrusel(photo)}
+                              className={`px-2.5 py-1.5 rounded-lg border font-extrabold text-xs uppercase transition-colors cursor-pointer ${photo.enCarrusel
+                                  ? "bg-orange-500 border-orange-400 text-black hover:bg-orange-400"
+                                  : "bg-slate-800 border-slate-600 text-slate-300 hover:border-orange-400 hover:text-orange-300"
+                                }`}
+                              title={photo.enCarrusel
+                                ? "Quitar del carrusel de la portada"
+                                : photo.soloCarrusel ? "Volver a mostrar en el carrusel de la portada" : "Mostrar también en el carrusel de la portada"}
+                            >
+                              🎞️
+                            </button>
 
                             <button
                               onClick={() => handleDeletePhoto(photo.id)}
@@ -1205,7 +1250,7 @@ export default function AdminGalleryPage() {
                   <div className="flex items-start gap-4">
                     <div className="w-20 h-24 rounded-xl overflow-hidden border-2 border-slate-700 bg-black shrink-0 relative">
                       <img
-                        src={m.fotoPrincipalUrl || "/images/photos/bio_portrait_natty.jpg"}
+                        src={optimizedSrc(memberPhoto(m, data.fotos), "thumb")}
                         alt={m.nombre}
                         className="w-full h-full object-cover"
                       />
@@ -1378,12 +1423,12 @@ export default function AdminGalleryPage() {
 
                 <div>
                   <label className="block text-sm font-extrabold text-yellow-400 uppercase mb-2">
-                    4. Fotos de Escenario, Diagramas, Rider o Dossier (Varias selecciones permitidas):
+                    4. Fotos de Escenario, Diagramas, Rider o Dossier en PDF (Varias selecciones permitidas):
                   </label>
                   <input
                     type="file"
                     multiple
-                    accept="image/*"
+                    accept="image/*,.pdf"
                     onChange={(e) => {
                       const newFiles = Array.from(e.target.files || []);
                       if (newFiles.length > 0) {
@@ -1397,7 +1442,7 @@ export default function AdminGalleryPage() {
                     <div className="mt-3 space-y-2">
                       <div className="flex items-center justify-between">
                         <p className="text-xs font-extrabold text-yellow-300">
-                          ✓ {privateFiles.length} imagen(es) acumulada(s) para este enlace:
+                          ✓ {privateFiles.length} archivo(s) acumulado(s) para este enlace:
                         </p>
                         <button
                           type="button"
@@ -1410,7 +1455,7 @@ export default function AdminGalleryPage() {
                       <div className="flex flex-wrap gap-2 max-h-36 overflow-y-auto p-2.5 bg-slate-950 rounded-xl border border-slate-800">
                         {privateFiles.map((file, idx) => (
                           <div key={idx} className="flex items-center gap-2 bg-slate-900 border border-slate-700 text-xs px-3 py-1.5 rounded-lg shadow-sm">
-                            <span className="truncate max-w-[160px] text-slate-200 font-medium">📷 {file.name}</span>
+                            <span className="truncate max-w-[160px] text-slate-200 font-medium">{file.name.toLowerCase().endsWith(".pdf") ? "📄" : "📷"} {file.name}</span>
                             <button
                               type="button"
                               onClick={() => setPrivateFiles((prev) => prev.filter((_, i) => i !== idx))}
@@ -1471,7 +1516,7 @@ export default function AdminGalleryPage() {
                               {link.titulo}
                             </h4>
                             <span className="px-2.5 py-0.5 rounded-lg bg-slate-950 border border-slate-700 text-xs font-bold text-slate-300">
-                              📷 {link.fotos?.length || 0} Fotos
+                              📎 {link.fotos?.length || 0} {link.fotos?.length === 1 ? "Archivo" : "Archivos"}
                             </span>
                           </div>
 
@@ -1493,7 +1538,7 @@ export default function AdminGalleryPage() {
                             </div>
 
                             <span className="text-slate-400">
-                              Creado: {new Date(link.creadoEn).toLocaleDateString()}
+                              Creado: {new Date(link.creadoEn).toLocaleDateString("es-ES")}
                             </span>
                           </div>
 
@@ -1565,7 +1610,7 @@ export default function AdminGalleryPage() {
       {/* ── MODALES EXISTENTES ── */}
       {showCreateMemberModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-          <div className="w-full max-w-lg p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b-2 border-slate-800 pb-3">
               <h3 className="font-extrabold text-lg text-yellow-400 uppercase">
                 ➕ Crear Nuevo Integrante
@@ -1616,6 +1661,35 @@ export default function AdminGalleryPage() {
                 />
               </div>
 
+              {/* Textos en inglés (si se dejan vacíos, la web en inglés muestra los de español) */}
+              <div className="space-y-4 p-4 rounded-xl border-2 border-slate-700 bg-slate-950/50">
+                <p className="text-xs font-extrabold text-slate-300 uppercase">🇬🇧 Versión en inglés (opcional)</p>
+                <div>
+                  <label className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                    Rol / Instrumento (EN):
+                  </label>
+                  <input
+                    type="text"
+                    value={memberFormRolEn}
+                    onChange={(e) => setMemberFormRolEn(e.target.value)}
+                    placeholder="E.g. Baritone Saxophone"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-bold focus:outline-none focus:border-yellow-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                    Biografía (EN):
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={memberFormBioEn}
+                    onChange={(e) => setMemberFormBioEn(e.target.value)}
+                    placeholder="Short bio of the musician..."
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-semibold leading-relaxed focus:outline-none focus:border-yellow-400"
+                  />
+                </div>
+              </div>
+
               <div className="flex items-center justify-end gap-3 pt-3 border-t-2 border-slate-800">
                 <button
                   type="button"
@@ -1639,7 +1713,7 @@ export default function AdminGalleryPage() {
 
       {editingMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-          <div className="w-full max-w-lg p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b-2 border-slate-800 pb-3">
               <h3 className="font-extrabold text-lg text-yellow-400 uppercase">
                 ✏️ Editar Músico: {editingMember.nombre}
@@ -1684,6 +1758,35 @@ export default function AdminGalleryPage() {
                   onChange={(e) => setMemberFormBio(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-semibold leading-relaxed focus:outline-none focus:border-yellow-400"
                 />
+              </div>
+
+              {/* Textos en inglés (si se dejan vacíos, la web en inglés muestra los de español) */}
+              <div className="space-y-4 p-4 rounded-xl border-2 border-slate-700 bg-slate-950/50">
+                <p className="text-xs font-extrabold text-slate-300 uppercase">🇬🇧 Versión en inglés (opcional)</p>
+                <div>
+                  <label className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                    Rol / Instrumento (EN):
+                  </label>
+                  <input
+                    type="text"
+                    value={memberFormRolEn}
+                    onChange={(e) => setMemberFormRolEn(e.target.value)}
+                    placeholder="E.g. Baritone Saxophone"
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-bold focus:outline-none focus:border-yellow-400"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                    Biografía (EN):
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={memberFormBioEn}
+                    onChange={(e) => setMemberFormBioEn(e.target.value)}
+                    placeholder="Short bio of the musician..."
+                    className="w-full px-4 py-3 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-semibold leading-relaxed focus:outline-none focus:border-yellow-400"
+                  />
+                </div>
               </div>
 
               <div className="flex items-center justify-end gap-3 pt-3 border-t-2 border-slate-800">
@@ -1903,7 +2006,7 @@ export default function AdminGalleryPage() {
 
       {editingPhoto && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-          <div className="w-full max-w-lg p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
+          <div className="w-full max-w-lg max-h-[90vh] overflow-y-auto p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b-2 border-slate-800 pb-3">
               <h3 className="font-extrabold text-lg text-yellow-400 uppercase">
                 ✏️ Editar Fotografía
@@ -1917,7 +2020,7 @@ export default function AdminGalleryPage() {
 
               <div className="flex items-center gap-4 bg-slate-950 p-3 rounded-xl border border-slate-800">
                 <div className="w-20 h-16 rounded-lg overflow-hidden bg-black shrink-0">
-                  <img src={editingPhoto.url} alt="Foto" className="w-full h-full object-cover" />
+                  <img src={optimizedSrc(editingPhoto, "large")} alt="Foto" className="w-full h-full object-cover" />
                 </div>
                 <div className="text-xs text-slate-200 font-bold">
                   <p>ID: {editingPhoto.id}</p>
@@ -2008,7 +2111,8 @@ export default function AdminGalleryPage() {
                 </div>
               )}
 
-              {editIntegranteId !== "carrusel" && (
+              {/* Una foto que pasa a "solo carrusel" se muestra siempre; si ya lo era, se puede ocultar sin borrarla */}
+              {!(editIntegranteId === "carrusel" && !editingPhoto?.soloCarrusel) && (
                 <div className="flex items-center gap-2.5 pt-1">
                   <input
                     type="checkbox"
@@ -2018,7 +2122,9 @@ export default function AdminGalleryPage() {
                     className="w-5 h-5 accent-orange-500 cursor-pointer"
                   />
                   <label htmlFor="editCheckCarrusel" className="text-sm text-orange-300 font-extrabold cursor-pointer">
-                    🎞️ Mostrar también en el carrusel de la portada
+                    {editIntegranteId === "carrusel"
+                      ? "🎞️ Visible en el carrusel de la portada (si la desmarcas, se oculta pero no se borra)"
+                      : "🎞️ Mostrar también en el carrusel de la portada"}
                   </label>
                 </div>
               )}

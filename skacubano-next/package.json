@@ -3,11 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/optimize-images.mjs",
     "dev": "next dev",
     "dev:php": "php -S localhost:8000 -t public public/api/dev-router.php",
+    "prebuild": "node scripts/optimize-images.mjs",
     "build": "next build",
-    "build:vercel": "next build && node scripts/vercel-postbuild.mjs",
+    "build:vercel": "node scripts/optimize-images.mjs && next build && node scripts/vercel-postbuild.mjs",
     "lint": "eslint",
+    "images": "node scripts/optimize-images.mjs",
     "tracklists": "node scripts/fetch-tracklists.mjs"
   },
   "dependencies": {
@@ -24,6 +27,7 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.2",
+    "sharp": "^0.34.5",
     "tailwindcss": "^4.2.2"
   }
 }

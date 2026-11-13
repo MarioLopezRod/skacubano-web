@@ -1,6 +1,6 @@
 // Esta sección no debe aparecer en buscadores
 export const metadata = {
-  title: "Private area",
+  title: "Área privada",
   robots: { index: false, follow: false, nocache: true, googleBot: { index: false, follow: false } },
 };
 
