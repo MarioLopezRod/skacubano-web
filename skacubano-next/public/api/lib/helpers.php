@@ -130,7 +130,40 @@ function get_gallery_data()
         }
     }
     unset($m);
+
+    // Antes, las fotos subidas a una sección guardaban la sección en 'integranteId' (y no salían en la web).
+    // Se pasan a 'seccionId'. Las que apuntan a un integrante o sección que ya no existe van a la galería general.
+    $memberIds = array_column($data['integrantes'], 'id');
+    $sectionIds = isset($data['secciones']) && is_array($data['secciones']) ? array_column($data['secciones'], 'id') : [];
+    foreach ($data['fotos'] as &$f) {
+        $iid = isset($f['integranteId']) ? $f['integranteId'] : null;
+        if ($iid !== null && !in_array($iid, $memberIds, true)) {
+            $f['integranteId'] = null;
+            $f['esPrincipal'] = false;
+            if (in_array($iid, $sectionIds, true) && $iid !== 'banda') {
+                $f['seccionId'] = $iid;
+            }
+        }
+        $sid = isset($f['seccionId']) ? $f['seccionId'] : null;
+        if ($sid !== null && (!in_array($sid, $sectionIds, true) || $sid === 'banda')) {
+            $f['seccionId'] = null;
+        }
+    }
+    unset($f);
     return $data;
+}
+
+function is_section_id($data, $id)
+{
+    if ($id === null || $id === 'banda' || !isset($data['secciones'])) {
+        return false;
+    }
+    foreach ($data['secciones'] as $sec) {
+        if ($sec['id'] === $id) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function save_gallery_data($data)

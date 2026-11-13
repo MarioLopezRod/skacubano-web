@@ -303,7 +303,7 @@ export default function AdminGalleryPage() {
     setEditDescripcion(photo.descripcion || "");
     setEditDescripcionEn(photo.descripcionEn || "");
     setEditFecha(photo.fecha || "");
-    setEditIntegranteId(photo.soloCarrusel ? "carrusel" : photo.integranteId || "banda");
+    setEditIntegranteId(photo.soloCarrusel ? "carrusel" : photo.integranteId || photo.seccionId || "banda");
     setEditEsPrincipal(!!photo.esPrincipal);
     setEditEnCarrusel(!!photo.enCarrusel);
   };
@@ -673,7 +673,7 @@ export default function AdminGalleryPage() {
   const getFilteredPhotos = () => {
     let list = data.fotos;
     if (filterMember === "banda") {
-      list = list.filter((f) => !f.integranteId && !f.soloCarrusel);
+      list = list.filter((f) => !f.integranteId && !f.seccionId && !f.soloCarrusel);
     } else if (filterMember === "carrusel") {
       list = list.filter((f) => f.enCarrusel);
     } else if (filterMember !== "todos") {
@@ -696,7 +696,7 @@ export default function AdminGalleryPage() {
   if (!authenticated) return null;
 
   const filteredPhotos = getFilteredPhotos();
-  const bandPhotosCount = data.fotos.filter((f) => !f.integranteId && !f.soloCarrusel).length;
+  const bandPhotosCount = data.fotos.filter((f) => !f.integranteId && !f.seccionId && !f.soloCarrusel).length;
   const seccionesList = data.secciones || [{ id: "banda", nombre: "Galería General de la Banda", slug: "banda" }];
 
   return (
@@ -1295,7 +1295,7 @@ export default function AdminGalleryPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {seccionesList.map((sec) => {
                 const isDefaultBanda = sec.id === "banda";
-                const secPhotosCount = data.fotos.filter((f) => f.seccionId === sec.id || (!f.integranteId && !f.soloCarrusel && isDefaultBanda)).length;
+                const secPhotosCount = data.fotos.filter((f) => f.seccionId === sec.id || (!f.integranteId && !f.seccionId && !f.soloCarrusel && isDefaultBanda)).length;
 
                 return (
                   <div

@@ -179,6 +179,13 @@ function gallery_upload()
     }
 
     $data = get_gallery_data();
+    // Destino "sección personalizada": la sección va en 'seccionId', no en 'integranteId'
+    $seccionId = null;
+    if (is_section_id($data, $integranteId)) {
+        $seccionId = $integranteId;
+        $integranteId = null;
+        $esPrincipal = false;
+    }
     // La primera foto de un integrante que todavía no tiene foto principal pasa a serlo
     if ($integranteId && !$esPrincipal && member_exists($data, $integranteId) && !member_has_main_photo($data, $integranteId)) {
         $esPrincipal = true;
@@ -187,10 +194,12 @@ function gallery_upload()
     $timestamp = now_ms();
     $filePublicUrl = save_gallery_upload();
 
+    // El orden se cuenta dentro del mismo grupo (integrante, sección o galería general)
     $maxOrder = 0;
     foreach ($data['fotos'] as $f) {
         $fid = isset($f['integranteId']) ? $f['integranteId'] : null;
-        if ($fid === $integranteId) {
+        $sid = isset($f['seccionId']) ? $f['seccionId'] : null;
+        if ($fid === $integranteId && $sid === $seccionId) {
             $maxOrder = max($maxOrder, isset($f['orden']) ? (int) $f['orden'] : 0);
         }
     }
@@ -202,6 +211,7 @@ function gallery_upload()
         'descripcionEn' => $descripcionEn,
         'fecha' => $fecha,
         'integranteId' => $integranteId,
+        'seccionId' => $seccionId,
         'orden' => $maxOrder + 1,
         'esPrincipal' => $esPrincipal,
         'enCarrusel' => $enCarrusel,
@@ -353,10 +363,17 @@ function photo_update($id)
     $current = $data['fotos'][$index];
     $currentMember = isset($current['integranteId']) ? $current['integranteId'] : null;
     $soloCarrusel = !empty($current['soloCarrusel']);
+    $targetSectionId = isset($current['seccionId']) ? $current['seccionId'] : null;
     if (array_key_exists('integranteId', $body)) {
         $soloCarrusel = $body['integranteId'] === CARRUSEL_ID;
         $targetMemberId = ($body['integranteId'] === 'banda' || $body['integranteId'] === '' || $soloCarrusel) ? null : $body['integranteId'];
-        if ($soloCarrusel) {
+        $targetSectionId = null;
+        // Destino "sección personalizada": va en 'seccionId'
+        if (is_section_id($data, $targetMemberId)) {
+            $targetSectionId = $targetMemberId;
+            $targetMemberId = null;
+        }
+        if ($soloCarrusel || $targetSectionId !== null) {
             $body['esPrincipal'] = false;
         }
     } else {
@@ -372,6 +389,7 @@ function photo_update($id)
     $photo['descripcionEn'] = array_key_exists('descripcionEn', $body) ? $body['descripcionEn'] : (isset($current['descripcionEn']) ? $current['descripcionEn'] : '');
     $photo['fecha'] = array_key_exists('fecha', $body) ? $body['fecha'] : (isset($current['fecha']) ? $current['fecha'] : '');
     $photo['integranteId'] = $targetMemberId;
+    $photo['seccionId'] = $targetSectionId;
     $photo['esPrincipal'] = array_key_exists('esPrincipal', $body) ? (bool) $body['esPrincipal'] : !empty($current['esPrincipal']);
     // Fotos que se muestran en el carrusel de la portada (hero)
     $photo['enCarrusel'] = $soloCarrusel || (array_key_exists('enCarrusel', $body) ? (bool) $body['enCarrusel'] : !empty($current['enCarrusel']));
