@@ -3,14 +3,16 @@
 import { motion } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
 import BowloramaText from "./BowloramaText";
+import { optimizedSrc } from "../lib/images";
 
-// Fotos históricas asignadas a cada hito para completar el espacio opuesto
+// Fotos históricas asignadas a cada hito para completar el espacio opuesto.
+// El pie de cada foto está en LanguageContext.jsx (history.events[i].caption), en los dos idiomas.
 const eventPhotos = [
-  { photo: "/images/photos/galery/banda/banda_2001.jpg", caption: "Santiago de Cuba 2001 • Primeros ensayos" },
-  { photo: "/images/hero/SkaImagen11.jpg", caption: "2004 • Primer álbum 'Ska Cubano' & Big Band" },
-  { photo: "/images/albums/caramba.jpg", caption: "¡Ay Caramba! • Premio BBC World Music" },
-  { photo: "/images/albums/mamboska.jpg", caption: "Mambo Ska 2010 • Sonido de alto octanaje" },
-  { photo: "/images/hero/SkaImagen16.jpg", caption: "World Tour • Glastonbury & WOMAD" },
+  "/images/photos/galery/banda/banda_2001.jpg",
+  "/images/hero/SkaImagen11.jpg",
+  "/images/albums/caramba.jpg",
+  "/images/albums/mamboska.jpg",
+  "/images/hero/SkaImagen16.jpg",
 ];
 
 export default function History() {
@@ -76,11 +78,11 @@ export default function History() {
               <video 
                 controls 
                 preload="metadata" 
-                poster="/images/hero/SkaImagen11.jpg"
+                poster={optimizedSrc("/images/hero/SkaImagen11.jpg", "large")}
                 className="w-full h-full object-contain"
               >
                 <source src="/videos/ska-cubano-promo.mp4" type="video/mp4" />
-                Tu navegador no soporta el reproductor de vídeo HTML5.
+                {t.history.videoFallback}
               </video>
             </div>
 
@@ -102,7 +104,7 @@ export default function History() {
           <div className="space-y-8 md:space-y-10 relative z-10">
             {t.history.events.map((event, index) => {
               const isLeft = index % 2 === 0;
-              const photoData = eventPhotos[index] || eventPhotos[0];
+              const photo = eventPhotos[index] || eventPhotos[0];
 
               return (
                 <div
@@ -174,15 +176,15 @@ export default function History() {
 
                       <div className="relative aspect-[16/10] w-full overflow-hidden rounded-xs bg-black">
                         <img
-                          src={photoData.photo}
-                          alt={photoData.caption}
+                          src={optimizedSrc(photo, "large")}
+                          alt={event.caption}
                           loading="lazy"
                           decoding="async"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
                         <span className="absolute bottom-2 left-2.5 text-[10px] font-mono font-bold text-yellow-300 drop-shadow">
-                          ★ {photoData.caption}
+                          ★ {event.caption}
                         </span>
                       </div>
                     </motion.div>

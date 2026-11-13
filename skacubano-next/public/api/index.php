@@ -269,7 +269,8 @@ function gallery_upload()
     }
 
     $timestamp = now_ms();
-    $filePublicUrl = save_gallery_upload();
+    $upload = save_gallery_upload();
+    $filePublicUrl = $upload['url'];
 
     // El orden se cuenta dentro del mismo grupo (integrante, sección o galería general)
     $maxOrder = 0;
@@ -294,6 +295,11 @@ function gallery_upload()
         'enCarrusel' => $enCarrusel,
         'soloCarrusel' => $soloCarrusel,
     ];
+    foreach (['thumbUrl', 'largeUrl'] as $field) {
+        if (!empty($upload[$field])) {
+            $newPhoto[$field] = $upload[$field];
+        }
+    }
 
     if ($esPrincipal && $integranteId) {
         set_member_main_photo($data, $integranteId, $filePublicUrl);
@@ -322,12 +328,41 @@ function save_gallery_upload()
     ensure_dir($uploadsDir);
 
     $originalName = preg_replace('/[^a-zA-Z0-9.-]/', '_', $file['name']);
-    $fileName = now_ms() . '_' . $originalName;
+    $prefix = now_ms() . '_';
+    $fileName = $prefix . $originalName;
 
     if (!move_upload($file, $uploadsDir . '/' . $fileName)) {
         json_response(['error' => 'Upload failed'], 500);
     }
-    return '/uploads/gallery/' . $fileName;
+    $result = ['url' => '/uploads/gallery/' . $fileName];
+
+    // Versiones ligeras para la web pública (campos "thumb" y "large", las genera el navegador del admin
+    // al elegir la foto, ver ImageCompressor.js). Si no llegan, la web usa la foto original.
+    $baseName = $prefix . preg_replace('/\.[^.]*$/', '', $originalName);
+    foreach (['thumb' => ['thumbUrl', 'w400'], 'large' => ['largeUrl', 'w1600']] as $field => $info) {
+        list($key, $suffix) = $info;
+        $variants = uploaded_files($field);
+        $variant = isset($variants[0]) ? $variants[0] : null;
+        if (!$variant || $variant['error'] !== UPLOAD_ERR_OK || !allowed_extension($variant['name'], false)) {
+            continue;
+        }
+        $ext = strtolower(pathinfo($variant['name'], PATHINFO_EXTENSION));
+        $variantName = $baseName . '.' . $suffix . '.' . $ext;
+        if (move_upload($variant, $uploadsDir . '/' . $variantName)) {
+            $result[$key] = '/uploads/gallery/' . $variantName;
+        }
+    }
+    return $result;
+}
+
+// Borra del disco la imagen de una foto y sus versiones ligeras (url, thumbUrl, largeUrl)
+function delete_gallery_files($photo)
+{
+    foreach (['url', 'thumbUrl', 'largeUrl'] as $field) {
+        if (!empty($photo[$field])) {
+            delete_gallery_file((string) $photo[$field]);
+        }
+    }
 }
 
 // Borra del disco una imagen de la galería, solo si se subió desde el panel (las de /images son del repositorio)
@@ -358,9 +393,19 @@ function photo_replace_file($id)
         json_response(['error' => 'Photo not found'], 404);
     }
 
-    $oldUrl = $data['fotos'][$index]['url'];
-    $newUrl = save_gallery_upload();
+    $oldPhoto = $data['fotos'][$index];
+    $oldUrl = $oldPhoto['url'];
+    $upload = save_gallery_upload();
+    $newUrl = $upload['url'];
+    // La imagen nueva sustituye también a las versiones ligeras de la antigua (si no llegan, se usa la original)
     $data['fotos'][$index]['url'] = $newUrl;
+    foreach (['thumbUrl', 'largeUrl'] as $field) {
+        if (!empty($upload[$field])) {
+            $data['fotos'][$index][$field] = $upload[$field];
+        } else {
+            unset($data['fotos'][$index][$field]);
+        }
+    }
 
     // Si era la foto de perfil de algún integrante, se actualiza también
     foreach ($data['integrantes'] as &$m) {
@@ -371,10 +416,10 @@ function photo_replace_file($id)
     unset($m);
 
     if (!save_gallery_data($data)) {
-        delete_gallery_file($newUrl);
+        delete_gallery_files($upload);
         json_response(['error' => 'No se pudo guardar'], 500);
     }
-    delete_gallery_file($oldUrl);
+    delete_gallery_files($oldPhoto);
     json_response(['success' => true, 'photo' => $data['fotos'][$index], 'data' => $data]);
 }
 
@@ -468,8 +513,13 @@ function photo_update($id)
     $photo['integranteId'] = $targetMemberId;
     $photo['seccionId'] = $targetSectionId;
     $photo['esPrincipal'] = array_key_exists('esPrincipal', $body) ? (bool) $body['esPrincipal'] : !empty($current['esPrincipal']);
-    // Fotos que se muestran en el carrusel de la portada (hero)
-    $photo['enCarrusel'] = $soloCarrusel || (array_key_exists('enCarrusel', $body) ? (bool) $body['enCarrusel'] : !empty($current['enCarrusel']));
+    // Fotos que se muestran en el carrusel de la portada (hero). Una foto "solo carrusel" también se puede
+    // ocultar (enCarrusel = false) sin borrarla; al pasar una foto a "solo carrusel" se muestra.
+    if ($soloCarrusel && empty($current['soloCarrusel'])) {
+        $photo['enCarrusel'] = true;
+    } else {
+        $photo['enCarrusel'] = array_key_exists('enCarrusel', $body) ? (bool) $body['enCarrusel'] : !empty($current['enCarrusel']);
+    }
     $photo['soloCarrusel'] = $soloCarrusel;
     $data['fotos'][$index] = $photo;
 
@@ -493,8 +543,9 @@ function photo_delete($id)
         json_response(['error' => 'Photo not found'], 404);
     }
 
-    // Solo se borran del disco las fotos subidas desde el panel (las de /images son del repositorio)
-    delete_gallery_file($photo['url']);
+    // Solo se borran del disco las fotos subidas desde el panel (las de /images son del repositorio),
+    // junto con sus versiones ligeras
+    delete_gallery_files($photo);
 
     $data['fotos'] = array_values(array_filter($data['fotos'], function ($f) use ($id) {
         return $f['id'] !== $id;
@@ -585,7 +636,9 @@ function member_create()
         'nombre' => $body['nombre'],
         'slug' => $slug,
         'rol' => !empty($body['rol']) ? $body['rol'] : 'Integrante',
+        'rolEn' => !empty($body['rolEn']) ? $body['rolEn'] : '',
         'bio' => !empty($body['bio']) ? $body['bio'] : '',
+        'bioEn' => !empty($body['bioEn']) ? $body['bioEn'] : '',
         // Sin foto: la web muestra su primera foto subida o una silueta. La primera foto que se suba será la principal.
         'fotoPrincipalUrl' => !empty($body['fotoPrincipalUrl']) ? $body['fotoPrincipalUrl'] : '',
     ];
@@ -604,7 +657,7 @@ function member_update($id)
 
     foreach ($data['integrantes'] as $i => $m) {
         if ($m['id'] === $id) {
-            foreach (['nombre', 'rol', 'bio', 'fotoPrincipalUrl'] as $field) {
+            foreach (['nombre', 'rol', 'rolEn', 'bio', 'bioEn', 'fotoPrincipalUrl'] as $field) {
                 if (array_key_exists($field, $body)) {
                     $m[$field] = $body[$field];
                 }

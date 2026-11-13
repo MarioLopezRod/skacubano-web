@@ -150,6 +150,76 @@ function get_gallery_data()
         }
     }
     unset($f);
+    return migrate_gallery_data($data);
+}
+
+// Cambios de datos que hay que aplicar una sola vez a un galleryData.json ya existente (el del servidor
+// se copió de la semilla hace tiempo y no se vuelve a leer). Lo que falte se toma de seed/galleryData.json.
+//  - carrusel-por-defecto: las 17 fotos que el carrusel mostraba "por defecto" pasan a ser fotos normales
+//    "solo carrusel", para poder quitarlas o mantenerlas desde el panel. Si ya había fotos elegidas para el
+//    carrusel, se añaden ocultas (así la portada sigue mostrando lo mismo que antes).
+//  - traducciones-en: textos en inglés de las fotos (descripcionEn) e integrantes (rolEn, bioEn), solo
+//    donde estén vacíos.
+function migrate_gallery_data($data)
+{
+    $all = ['carrusel-por-defecto', 'traducciones-en'];
+    $done = isset($data['migraciones']) && is_array($data['migraciones']) ? $data['migraciones'] : [];
+    $pending = array_values(array_diff($all, $done));
+    if (!$pending) {
+        return $data;
+    }
+
+    $seed = json_decode((string) @file_get_contents(__DIR__ . '/../seed/galleryData.json'), true);
+    if (!is_array($seed) || !isset($seed['fotos'], $seed['integrantes'])) {
+        return $data;
+    }
+    if (!isset($data['fotos']) || !is_array($data['fotos'])) {
+        $data['fotos'] = [];
+    }
+    if (!isset($data['integrantes']) || !is_array($data['integrantes'])) {
+        $data['integrantes'] = [];
+    }
+
+    if (in_array('carrusel-por-defecto', $pending, true)) {
+        $existingIds = array_column($data['fotos'], 'id');
+        $hasCarousel = false;
+        foreach ($data['fotos'] as $f) {
+            if (!empty($f['enCarrusel'])) {
+                $hasCarousel = true;
+                break;
+            }
+        }
+        foreach ($seed['fotos'] as $f) {
+            if (strpos($f['id'], 'carrusel-') === 0 && !in_array($f['id'], $existingIds, true)) {
+                $f['enCarrusel'] = !$hasCarousel;
+                $data['fotos'][] = $f;
+            }
+        }
+    }
+
+    if (in_array('traducciones-en', $pending, true)) {
+        $seedFotos = array_column($seed['fotos'], null, 'id');
+        foreach ($data['fotos'] as &$f) {
+            $s = isset($seedFotos[$f['id']]) ? $seedFotos[$f['id']] : null;
+            if ($s && empty($f['descripcionEn']) && !empty($s['descripcionEn'])) {
+                $f['descripcionEn'] = $s['descripcionEn'];
+            }
+        }
+        unset($f);
+        $seedMembers = array_column($seed['integrantes'], null, 'id');
+        foreach ($data['integrantes'] as &$m) {
+            $s = isset($seedMembers[$m['id']]) ? $seedMembers[$m['id']] : null;
+            foreach (['rolEn', 'bioEn'] as $field) {
+                if ($s && empty($m[$field]) && !empty($s[$field])) {
+                    $m[$field] = $s[$field];
+                }
+            }
+        }
+        unset($m);
+    }
+
+    $data['migraciones'] = array_values(array_unique(array_merge($done, $pending)));
+    save_gallery_data($data);
     return $data;
 }
 

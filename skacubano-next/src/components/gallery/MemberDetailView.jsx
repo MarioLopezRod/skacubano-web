@@ -2,16 +2,17 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import BowloramaText from "../BowloramaText";
+import { useLanguage, localized } from "@/context/LanguageContext";
+import { optimizedSrc, memberPhoto, byOrder } from "@/lib/images";
 
 export default function MemberDetailView({ member, photos = [], onBack, onSelectPhoto }) {
+  const { lang, t } = useLanguage();
+  const g = t.gallery;
   if (!member) return null;
 
-  const memberPhotos = photos
-    .filter((p) => p.integranteId === member.id)
-    .sort((a, b) => (a.orden || 0) - (b.orden || 0));
-
-  const mainPhoto = member.fotoPrincipalUrl || (memberPhotos[0]?.url) || "/images/placeholder-integrante.svg";
+  const memberPhotos = byOrder(photos.filter((p) => p.integranteId === member.id));
+  const mainPhoto = memberPhoto(member, memberPhotos);
+  const rol = localized(member, "rol", lang);
 
   return (
     <motion.div
@@ -24,10 +25,11 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
       {/* Top Bar with Back Button */}
       <div className="flex items-center justify-between">
         <button
+          type="button"
           onClick={onBack}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-yellow-400/50 bg-black/80 hover:bg-yellow-400 hover:text-black font-mono font-bold text-xs uppercase tracking-widest text-yellow-400 transition-all duration-200 cursor-pointer shadow-lg"
         >
-          <span>← Volver a Integrantes</span>
+          <span>{g.backToMembers}</span>
         </button>
       </div>
 
@@ -37,7 +39,7 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
           {/* Main Profile Photo Badge Frame */}
           <div className="relative w-48 h-60 sm:w-56 sm:h-68 rounded-2xl overflow-hidden border-4 border-[#14100c] shadow-[0_10px_30px_rgba(0,0,0,0.5)] shrink-0 group">
             <Image
-              src={mainPhoto}
+              src={optimizedSrc(mainPhoto, "large")}
               alt={member.nombre}
               fill
               sizes="(max-width: 768px) 224px, 256px"
@@ -45,14 +47,14 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
               className="object-cover"
             />
             <div className="absolute top-2.5 right-2.5 px-2.5 py-1 rounded bg-yellow-400 text-black text-[9px] font-mono font-bold uppercase shadow">
-              Foto Principal
+              {g.mainPhoto}
             </div>
           </div>
 
           {/* Bio & Details */}
           <div className="flex-1 text-center md:text-left space-y-4">
             <div className="inline-block px-4 py-1 rounded-full bg-[#14100c] text-yellow-400 border border-yellow-400/40 text-xs font-mono font-bold uppercase tracking-widest shadow">
-              ★ {member.rol} ★
+              ★ {rol} ★
             </div>
             
             <h2 className="font-bebas text-5xl sm:text-7xl text-[#0d0a07] uppercase tracking-wider drop-shadow leading-none mb-1">
@@ -62,7 +64,7 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
             <div className="w-16 h-1 bg-[#d35400] mx-auto md:mx-0 shadow-sm" />
 
             <p className="font-sans text-base sm:text-lg text-amber-950/90 leading-relaxed max-w-3xl font-medium">
-              {member.bio || "Integrante destacado del ensamble internacional Ska Cubano."}
+              {localized(member, "bio", lang) || g.defaultBioDetail}
             </p>
           </div>
         </div>
@@ -71,33 +73,37 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
       {/* Member Additional Photos Grid */}
       <div className="space-y-6">
         <h3 className="font-retro50s text-2xl text-yellow-400 uppercase tracking-wide flex items-center gap-3 drop-shadow">
-          <span>GALERIA DE FOTOS DE {member.nombre.toUpperCase()}</span>
+          <span>{g.memberPhotosTitle} {member.nombre.toUpperCase()}</span>
           <div className="h-[2px] flex-1 bg-yellow-400/20" />
         </h3>
 
         {memberPhotos.length === 0 ? (
           <div className="text-center py-12 px-4 bg-black/60 rounded-2xl border border-dashed border-yellow-400/30">
             <p className="text-yellow-400/80 font-mono text-sm uppercase tracking-wider">
-              Aún no se han añadido fotos adicionales para {member.nombre}.
+              {g.noMemberPhotos} {member.nombre}.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {memberPhotos.map((photo, index) => (
-              <motion.div
+            {memberPhotos.map((photo, index) => {
+              const caption = localized(photo, "descripcion", lang);
+              return (
+              <motion.button
+                type="button"
                 key={photo.id}
                 initial={{ opacity: 0, y: 15 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.3, delay: index * 0.05 }}
                 onClick={() => onSelectPhoto(photo)}
-                className="group relative cursor-pointer overflow-hidden rounded-2xl bg-[#14100c] border border-yellow-400/30 shadow-md hover:border-yellow-400 transition-all duration-300 hover:-translate-y-1.5"
+                aria-label={caption || `${member.nombre} – ${g.photoAlt} ${index + 1}`}
+                className="group relative block w-full p-0 text-left cursor-pointer focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-yellow-400 overflow-hidden rounded-2xl bg-[#14100c] border border-yellow-400/30 shadow-md hover:border-yellow-400 transition-all duration-300 hover:-translate-y-1.5"
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-black p-1.5">
                   <div className="relative w-full h-full overflow-hidden rounded-lg">
                     {/* Fondo difuminado con la misma foto, para que las verticales se vean enteras sin huecos negros */}
                     <Image
-                      src={photo.url}
+                      src={optimizedSrc(photo, "thumb")}
                       alt=""
                       aria-hidden="true"
                       fill
@@ -105,8 +111,8 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
                       className="object-cover scale-110 blur-xl opacity-60"
                     />
                     <Image
-                      src={photo.url}
-                      alt={photo.descripcion || member.nombre}
+                      src={optimizedSrc(photo, "thumb")}
+                      alt=""
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                       className="object-contain transition-transform duration-500 group-hover:scale-105"
@@ -115,17 +121,17 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
 
                     {photo.esPrincipal && (
                       <span className="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-yellow-400 text-black text-[9px] font-mono font-bold uppercase shadow">
-                        Foto de Perfil
+                        {g.profilePhoto}
                       </span>
                     )}
                   </div>
                 </div>
 
-                {(photo.descripcion || photo.fecha) && (
+                {(caption || photo.fecha) && (
                   <div className="p-3 bg-[#14100c]">
-                    {photo.descripcion && (
+                    {caption && (
                       <p className="text-xs font-sans text-amber-100/90 line-clamp-2">
-                        {photo.descripcion}
+                        {caption}
                       </p>
                     )}
                     {photo.fecha && (
@@ -135,8 +141,9 @@ export default function MemberDetailView({ member, photos = [], onBack, onSelect
                     )}
                   </div>
                 )}
-              </motion.div>
-            ))}
+              </motion.button>
+              );
+            })}
           </div>
         )}
       </div>

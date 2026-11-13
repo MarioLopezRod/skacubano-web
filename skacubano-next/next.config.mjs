@@ -13,7 +13,12 @@ const nextConfig = {
   ...(isDev
     ? {
         async rewrites() {
-          return [{ source: "/api/:path*", destination: `${phpApiUrl}/api/:path*` }];
+          return [
+            { source: "/api/:path*", destination: `${phpApiUrl}/api/:path*` },
+            // Enlaces privados: /privado/<slug> sirve la página /privado, que lee el slug de la URL
+            // (en producción lo hacen public/.htaccess y vercel.json)
+            { source: "/privado/:slug", destination: "/privado" },
+          ];
         },
       }
     : { output: "export" }),

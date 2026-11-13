@@ -9,6 +9,7 @@ import MembersGrid from "@/components/gallery/MembersGrid";
 import MemberDetailView from "@/components/gallery/MemberDetailView";
 import GalleryLightbox from "@/components/gallery/GalleryLightbox";
 import { useLanguage } from "@/context/LanguageContext";
+import { byOrder } from "@/lib/images";
 import Link from "next/link";
 
 export default function GaleriaPage() {
@@ -27,14 +28,7 @@ export default function GaleriaPage() {
   const [activeTab, setActiveTab] = useState("banda");
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-  const g = t?.gallery || {
-    badge: "★ Archivo y Recuerdos ★",
-    title: "GALERÍA DE FOTOS",
-    subtitle: "Revive los conciertos legendarios, momentos de camerino y perfiles individuales de la orquesta Ska Cubano.",
-    tabBand: "Galería General",
-    tabMembers: "Integrantes",
-    adminBtn: "Panel Admin"
-  };
+  const g = t.gallery;
 
   useEffect(() => {
     fetchGalleryData();
@@ -56,23 +50,24 @@ export default function GaleriaPage() {
     }
   };
 
-  // Galería general: fotos que no son de ningún integrante ni de ninguna sección personalizada
-  const bandPhotos = data.fotos.filter((f) => !f.integranteId && !f.seccionId);
+  // Galería general: fotos que no son de ningún integrante ni de ninguna sección personalizada.
+  // Siempre en el orden de la galería, para que el visor y la cuadrícula coincidan (la 1ª foto es "1 / n")
+  const bandPhotos = byOrder(data.fotos.filter((f) => !f.integranteId && !f.seccionId));
   const currentMember = data.integrantes.find((m) => m.id === activeTab);
   // Secciones personalizadas creadas desde el panel (solo las que tienen fotos)
   const sections = (data.secciones || []).filter(
     (s) => s.id !== "banda" && data.fotos.some((f) => f.seccionId === s.id)
   );
   const currentSection = sections.find((s) => s.id === activeTab);
-  const sectionPhotos = currentSection ? data.fotos.filter((f) => f.seccionId === currentSection.id) : [];
+  const sectionPhotos = currentSection ? byOrder(data.fotos.filter((f) => f.seccionId === currentSection.id)) : [];
 
   const lightboxPhotosScope = activeTab === "banda"
     ? bandPhotos
     : activeTab === "integrantes"
-    ? data.fotos
+    ? byOrder(data.fotos)
     : currentSection
     ? sectionPhotos
-    : data.fotos.filter((f) => f.integranteId === activeTab);
+    : byOrder(data.fotos.filter((f) => f.integranteId === activeTab));
 
   return (
     <main className="min-h-screen bg-cuban-gallery-blue text-[#faf6ee] flex flex-col justify-between relative overflow-hidden">
@@ -103,7 +98,7 @@ export default function GaleriaPage() {
 
           <div className="flex items-center justify-center gap-4 max-w-md mx-auto py-1">
             <div className="h-[2px] flex-1 bg-gradient-to-r from-transparent via-amber-500 to-yellow-400" />
-            <span className="text-yellow-400 text-sm font-bold">★ SANTIAGO DE CUBA • LONDON ★</span>
+            <span className="text-yellow-400 text-sm font-bold uppercase">{t.hero.badge}</span>
             <div className="h-[2px] flex-1 bg-gradient-to-l from-transparent via-amber-500 to-yellow-400" />
           </div>
 
@@ -117,7 +112,8 @@ export default function GaleriaPage() {
           <button
             onClick={() => scrollTabs("left")}
             className="w-10 h-10 rounded-full bg-black/85 border border-yellow-400/50 text-yellow-400 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all font-mono font-bold text-xl shadow-lg shrink-0 cursor-pointer hover:scale-110"
-            title="Desplazar a la izquierda"
+            title={g.scrollLeft}
+            aria-label={g.scrollLeft}
           >
             ‹
           </button>
@@ -187,7 +183,8 @@ export default function GaleriaPage() {
           <button
             onClick={() => scrollTabs("right")}
             className="w-10 h-10 rounded-full bg-black/85 border border-yellow-400/50 text-yellow-400 flex items-center justify-center hover:bg-yellow-400 hover:text-black transition-all font-mono font-bold text-xl shadow-lg shrink-0 cursor-pointer hover:scale-110"
-            title="Desplazar a la derecha"
+            title={g.scrollRight}
+            aria-label={g.scrollRight}
           >
             ›
           </button>
@@ -198,7 +195,7 @@ export default function GaleriaPage() {
           <div className="flex flex-col items-center justify-center py-24 gap-4">
             <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin shadow-lg" />
             <p className="text-xs font-mono text-yellow-400 uppercase tracking-widest">
-              Cargando galería vintage Ska Cubano...
+              {g.loading}
             </p>
           </div>
         ) : (

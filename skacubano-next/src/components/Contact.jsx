@@ -100,9 +100,11 @@ function NoteForm() {
   const [currentDate, setCurrentDate] = useState("");
   const { t } = useLanguage();
 
+  // La fecha se calcula en el navegador (no al compilar) y en el formato del idioma activo
+  const dateLocale = t.contact.form.dateLocale;
   useEffect(() => {
-    setCurrentDate(new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }));
-  }, []);
+    setCurrentDate(new Date().toLocaleDateString(dateLocale, { day: "numeric", month: "long", year: "numeric" }));
+  }, [dateLocale]);
 
   const handleChange = (e) =>
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
@@ -136,12 +138,12 @@ function NoteForm() {
       } else {
         console.error("Error Web3Forms:", result);
         setStatus("idle");
-        alert("Hubo un problema al enviar el mensaje. Inténtalo de nuevo.");
+        alert(t.contact.form.errorSend);
       }
     } catch (error) {
       console.error("Error de red:", error);
       setStatus("idle");
-      alert("Error de conexión. Revisa tu internet.");
+      alert(t.contact.form.errorNetwork);
     }
   };
 

@@ -155,8 +155,8 @@ export default function Navbar() {
             <Link
               href="/"
               onClick={(e) => handleSmoothScroll(e, "/")}
-              title="Volver al Inicio"
-              aria-label="Volver al Inicio"
+              title={t.nav.home}
+              aria-label={t.nav.home}
               tabIndex={scrolled ? 0 : -1}
               className="flex items-center gap-3 group cursor-pointer"
             >
@@ -261,7 +261,7 @@ export default function Navbar() {
           <Link
             href="/"
             onClick={(e) => handleSmoothScroll(e, "/")}
-            title="Volver al Inicio"
+            title={t.nav.home}
             tabIndex={scrolled ? 0 : -1}
             className="flex items-center gap-2.5"
           >
@@ -291,7 +291,7 @@ export default function Navbar() {
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="p-1.5 text-yellow-400 hover:bg-yellow-500/10 rounded-sm focus:outline-none"
-              aria-label="Toggle Menu"
+              aria-label={t.nav.toggleMenu}
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 {menuOpen ? (

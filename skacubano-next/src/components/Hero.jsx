@@ -4,8 +4,11 @@ import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, useMotionValue, useReducedMotion } from "framer-motion";
 import { useLanguage } from "../context/LanguageContext";
 import { LOGO_HANDOFF_SCROLL, LOGO_FADE_START } from "../lib/logoScroll";
+import { optimizedSrc, byOrder } from "../lib/images";
 
-// Fotos por defecto si desde el panel de admin no se ha marcado ninguna para el carrusel
+// Las fotos del carrusel se eligen en el panel de admin (pestaña "Carrusel Portada"); estas 17 también
+// están allí como fotos "solo carrusel" para poder quitarlas o mantenerlas. Esta lista solo se usa si la
+// API no responde o si en el panel se quitan todas las fotos del carrusel (la portada nunca queda vacía).
 const defaultImages = [
   "/images/hero/SkaImagen2.jpg",
   "/images/hero/SkaImagen1.jpg",
@@ -85,10 +88,12 @@ export default function Hero() {
       try {
         const res = await fetch("/api/gallery");
         const json = await res.json();
-        const carrusel = (json.fotos || []).filter((f) => f.enCarrusel).map((f) => f.url);
-        if (!cancelled) setImages(carrusel.length > 0 ? carrusel : defaultImages);
+        // Mismo orden que en el panel (pestaña "Carrusel Portada")
+        const carrusel = byOrder((json.fotos || []).filter((f) => f.enCarrusel)).map((f) => optimizedSrc(f, "large"));
+        const fallback = defaultImages.map((url) => optimizedSrc(url, "large"));
+        if (!cancelled) setImages(carrusel.length > 0 ? carrusel : fallback);
       } catch (err) {
-        if (!cancelled) setImages(defaultImages);
+        if (!cancelled) setImages(defaultImages.map((url) => optimizedSrc(url, "large")));
       }
     };
 

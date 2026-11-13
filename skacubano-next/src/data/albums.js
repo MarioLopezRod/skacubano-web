@@ -12,9 +12,9 @@ const albumList = [
       en: "The debut album: 1960s Jamaican ska meets the son, mambo and cha-cha-chá of classic Cuba.",
     },
     links: { 
-      sp: "https://open.spotify.com/intl-es/album/3N58JMWyiCXtS0uJB5Kvxt?si=jB9p9RSnTsGstRTSSgQAbw",
+      sp: "https://open.spotify.com/album/3N58JMWyiCXtS0uJB5Kvxt?si=jB9p9RSnTsGstRTSSgQAbw",
       yt: "https://www.youtube.com/watch?v=wnMAwJ4KaPM&list=OLAK5uy_ll4KrcoDJi0_RU3fwPh0zAePNQo33j5KQ",
-      ap: "https://music.apple.com/es/album/ska-cubano/949685364" 
+      ap: "https://music.apple.com/album/ska-cubano/949685364" 
     } 
   },
   { 
@@ -24,9 +24,9 @@ const albumList = [
       en: "The second studio album: more brass, more rhythm and the live energy the band took on tour around the world.",
     },
     links: { 
-      sp: "https://open.spotify.com/intl-es/album/6dGWSlqez8ptLOJBCt1ymW?si=afdcvAJvT2OK5qXWkgrZXA",
+      sp: "https://open.spotify.com/album/6dGWSlqez8ptLOJBCt1ymW?si=afdcvAJvT2OK5qXWkgrZXA",
       yt: "https://www.youtube.com/watch?v=nwLyUCy7O7A&list=OLAK5uy_k0ldgoIleSHm7Ljh7-cr_NnXXH-dyWLVY",
-      ap: "https://music.apple.com/es/album/ay-caramba/902312351" 
+      ap: "https://music.apple.com/album/ay-caramba/902312351" 
     } 
   },
   { 
@@ -36,9 +36,9 @@ const albumList = [
       en: "A stew of remixes: DJs and producers from around the world rework the band's songs for the dance floor.",
     },
     links: { 
-      sp: "https://open.spotify.com/intl-es/album/4l0RKxCjk4xB9a4lsQ6SXK?si=cFJxv-07QR-5Hrrx_oADYQ",
+      sp: "https://open.spotify.com/album/4l0RKxCjk4xB9a4lsQ6SXK?si=cFJxv-07QR-5Hrrx_oADYQ",
       yt: "https://www.youtube.com/watch?v=40_2h7Vkpo8&list=OLAK5uy_kOaE4-Bqj6IwANG6RfDGqqQmewJ1T7I8g",
-      ap: "https://music.apple.com/es/album/ajiaco-the-remix-album/705272102" 
+      ap: "https://music.apple.com/album/ajiaco-the-remix-album/705272102" 
     } 
   },
   { 
@@ -48,9 +48,9 @@ const albumList = [
       en: "Mambo and ska in the same bar: big-band brass, Cuban grooves and off-beats that never stop moving.",
     },
     links: { 
-      sp: "https://open.spotify.com/intl-es/album/7qfCYynbJSqc6OzpLQwRy6?si=x5ulwQg5TsuDsn1MhpTHvg",
+      sp: "https://open.spotify.com/album/7qfCYynbJSqc6OzpLQwRy6?si=x5ulwQg5TsuDsn1MhpTHvg",
       yt: "https://www.youtube.com/watch?v=Es62wlmIlyE&list=OLAK5uy_m0kRcur0qgsmu9v5gZDePEDx4pXJiCFGg",
-      ap: "https://music.apple.com/es/album/mambo-ska/1617405456" 
+      ap: "https://music.apple.com/album/mambo-ska/1617405456" 
     } 
   },
 ];
