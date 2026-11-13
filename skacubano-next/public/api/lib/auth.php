@@ -53,7 +53,8 @@ function save_config($newConfig)
     $path = DATA_DIR . '/config.php';
     $php = "<?php\n"
         . "// Configuración del panel de admin de Ska Cubano. La contraseña se cambia desde el panel.\n"
-        . "// Si se olvida: borra la línea 'admin_password_hash' y añade 'admin_password' => 'nueva-contraseña',\n"
+        . "// Si se olvida, lo normal es usar el código de recuperación en /admin/login.\n"
+        . "// Si tampoco se tiene: borra la línea 'admin_password_hash' y añade 'admin_password' => 'nueva-contraseña',\n"
         . "// (al entrar con ella se guarda de nuevo como hash).\n"
         . "// Si cambias 'admin_secret', se cerrará la sesión de todos los administradores.\n"
         . 'return ' . var_export($newConfig, true) . ";\n";
@@ -104,6 +105,52 @@ function set_admin_password($password, $rotateSecret)
         $config['admin_secret'] = bin2hex(random_bytes(32));
     }
     return save_config($config);
+}
+
+/* ── Código de recuperación ────────────────────────────────────────── */
+// Permite poner una contraseña nueva si se olvida la actual. Se muestra una sola vez y en config.php
+// solo se guarda su hash ('recovery_code_hash'). Al usarlo se sustituye por uno nuevo.
+
+// Sin 0/O ni 1/I/L para que no se confundan al apuntarlo a mano. 16 caracteres de 31 posibles ≈ 79 bits.
+const RECOVERY_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+const RECOVERY_CODE_LENGTH = 16;
+
+// Mayúsculas y sin guiones ni espacios, para que dé igual cómo lo escriban
+function normalize_recovery_code($code)
+{
+    return preg_replace('/[^A-Z0-9]/', '', strtoupper((string) $code));
+}
+
+function has_recovery_code()
+{
+    $config = load_config();
+    return !empty($config['recovery_code_hash']);
+}
+
+// Genera un código nuevo (el anterior deja de valer). Devuelve el código en formato XXXX-XXXX-XXXX-XXXX, o null si no se pudo guardar.
+function create_recovery_code()
+{
+    $chars = '';
+    $max = strlen(RECOVERY_CODE_ALPHABET) - 1;
+    for ($i = 0; $i < RECOVERY_CODE_LENGTH; $i++) {
+        $chars .= RECOVERY_CODE_ALPHABET[random_int(0, $max)];
+    }
+    $config = load_config();
+    $config['recovery_code_hash'] = password_hash($chars, PASSWORD_DEFAULT);
+    if (!save_config($config)) {
+        return null;
+    }
+    return implode('-', str_split($chars, 4));
+}
+
+function verify_recovery_code($code)
+{
+    $code = normalize_recovery_code($code);
+    if (strlen($code) !== RECOVERY_CODE_LENGTH) {
+        return false;
+    }
+    $config = load_config();
+    return !empty($config['recovery_code_hash']) && password_verify($code, $config['recovery_code_hash']);
 }
 
 // Devuelve el motivo si la nueva contraseña no es válida, o null si lo es

@@ -53,6 +53,9 @@ function route($method, $s)
         if ($s[1] === 'login' && $method === 'POST') return admin_login();
         if ($s[1] === 'logout' && $method === 'POST') return admin_logout();
         if ($s[1] === 'password' && $method === 'POST') return admin_change_password();
+        if ($s[1] === 'recovery-code' && $method === 'GET') return admin_recovery_code_status();
+        if ($s[1] === 'recovery-code' && $method === 'POST') return admin_regenerate_recovery_code();
+        if ($s[1] === 'recover' && $method === 'POST') return admin_recover();
     }
 
     if ($first === 'gallery') {
@@ -118,10 +121,7 @@ function admin_login()
 function admin_change_password()
 {
     require_admin();
-    // Solo JSON: un formulario de otra web no puede enviar este tipo de petición sin permiso del navegador
-    if (!isset($_SERVER['CONTENT_TYPE']) || stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== 0) {
-        json_response(['error' => 'Petición no válida'], 400);
-    }
+    require_json_request();
     reject_if_locked();
 
     $body = read_json_body();
@@ -147,7 +147,84 @@ function admin_change_password()
         json_response(['error' => 'No se pudo guardar la nueva contraseña'], 500);
     }
     set_admin_cookie(create_signed_token(), 60 * 60 * 24 * 7);
-    json_response(['success' => true]);
+
+    // La primera vez que se cambia la contraseña se crea también el código de recuperación
+    $response = ['success' => true];
+    if (!has_recovery_code()) {
+        $code = create_recovery_code();
+        if ($code !== null) {
+            $response['recoveryCode'] = $code;
+        }
+    }
+    json_response($response);
+}
+
+// Solo JSON: un formulario de otra web no puede enviar este tipo de petición sin permiso del navegador
+function require_json_request()
+{
+    if (!isset($_SERVER['CONTENT_TYPE']) || stripos($_SERVER['CONTENT_TYPE'], 'application/json') !== 0) {
+        json_response(['error' => 'Petición no válida'], 400);
+    }
+}
+
+function admin_recovery_code_status()
+{
+    require_admin();
+    json_response(['exists' => has_recovery_code()]);
+}
+
+// Genera un código de recuperación nuevo (el anterior deja de valer). Pide la contraseña actual.
+function admin_regenerate_recovery_code()
+{
+    require_admin();
+    require_json_request();
+    reject_if_locked();
+
+    $body = read_json_body();
+    $current = isset($body['currentPassword']) ? (string) $body['currentPassword'] : '';
+    if (!verify_admin_password($current)) {
+        register_failed_login();
+        json_response(['error' => 'La contraseña actual no es correcta'], 401);
+    }
+    clear_failed_logins();
+
+    $code = create_recovery_code();
+    if ($code === null) {
+        json_response(['error' => 'No se pudo guardar el código de recuperación'], 500);
+    }
+    json_response(['success' => true, 'recoveryCode' => $code]);
+}
+
+// Contraseña olvidada: con el código de recuperación se pone una contraseña nueva y se entra al panel.
+// Comparte el límite de intentos con el login. El código usado se sustituye por uno nuevo.
+function admin_recover()
+{
+    require_json_request();
+    reject_if_locked();
+
+    $body = read_json_body();
+    $code = isset($body['recoveryCode']) ? (string) $body['recoveryCode'] : '';
+    $new = isset($body['newPassword']) ? (string) $body['newPassword'] : '';
+
+    if (!verify_recovery_code($code)) {
+        register_failed_login();
+        json_response(['error' => 'El código de recuperación no es correcto'], 401);
+    }
+    clear_failed_logins();
+
+    // Si la contraseña nueva no vale, el código sigue siendo válido para volver a intentarlo
+    $invalid = validate_new_admin_password($new);
+    if ($invalid !== null) {
+        json_response(['error' => $invalid], 400);
+    }
+
+    // Se cambia también el secreto: se cierran todas las sesiones abiertas
+    if (!set_admin_password($new, true)) {
+        json_response(['error' => 'No se pudo guardar la nueva contraseña'], 500);
+    }
+    $newCode = create_recovery_code();
+    set_admin_cookie(create_signed_token(), 60 * 60 * 24 * 7);
+    json_response(['success' => true, 'recoveryCode' => $newCode]);
 }
 
 function admin_logout()

@@ -91,9 +91,19 @@ hechos desde el panel (fotos, integrantes, contraseña) se pierden al cabo de un
 Desde el panel: botón **🔑 Contraseña** de la barra superior. Pide la contraseña actual y la nueva dos veces
 (mínimo 10 caracteres). Al cambiarla se cierran las sesiones abiertas en otros dispositivos.
 
+### Código de recuperación
+
+La primera vez que se cambia la contraseña, el panel muestra un **código de recuperación**
+(`XXXX-XXXX-XXXX-XXXX`) una sola vez; en `data/config.php` solo se guarda su hash (`recovery_code_hash`).
+Desde el mismo modal se puede generar uno nuevo (pide la contraseña actual y anula el anterior).
+
 ### Si se olvida la contraseña
 
-Editar en el servidor el fichero `data/config.php` (por FTP o SSH): borrar la línea de `admin_password_hash`
+En `/admin/login` → **¿Has olvidado la contraseña?**: con el código de recuperación se pone una contraseña
+nueva y se entra al panel. Se cierran las demás sesiones y el código usado se sustituye por uno nuevo, que se
+muestra en ese momento. Los intentos fallidos cuentan para el mismo bloqueo que el login (5 fallos → 15 min).
+
+Si tampoco se tiene el código, editar en el servidor el fichero `data/config.php` (por FTP o SSH): borrar la línea de `admin_password_hash`
 y añadir una con la contraseña nueva en texto plano:
 
 ```php

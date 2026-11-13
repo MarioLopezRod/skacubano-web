@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { compressImage } from "@/components/gallery/ImageCompressor";
 import ShowsAdmin from "@/components/admin/ShowsAdmin";
+import RecoveryCodeBox from "@/components/admin/RecoveryCodeBox";
 
 export default function AdminGalleryPage() {
   const router = useRouter();
@@ -85,6 +86,12 @@ export default function AdminGalleryPage() {
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const [passwordStatus, setPasswordStatus] = useState("");
+  // Código de recuperación: solo se ve justo después de generarlo
+  const [recoveryCodeExists, setRecoveryCodeExists] = useState(null);
+  const [shownRecoveryCode, setShownRecoveryCode] = useState(null);
+  const [recoveryPassword, setRecoveryPassword] = useState("");
+  const [generatingCode, setGeneratingCode] = useState(false);
+  const [recoveryStatus, setRecoveryStatus] = useState("");
 
   useEffect(() => {
     checkAdmin();
@@ -148,7 +155,39 @@ export default function AdminGalleryPage() {
     setConfirmPassword("");
     setShowPasswordFields(false);
     setPasswordStatus("");
+    setShownRecoveryCode(null);
+    setRecoveryPassword("");
+    setRecoveryStatus("");
     setShowPasswordModal(true);
+    fetch("/api/admin/recovery-code")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => setRecoveryCodeExists(json ? !!json.exists : null))
+      .catch(() => setRecoveryCodeExists(null));
+  };
+
+  const handleGenerateRecoveryCode = async (e) => {
+    e.preventDefault();
+    setGeneratingCode(true);
+    setRecoveryStatus("");
+    try {
+      const res = await fetch("/api/admin/recovery-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: recoveryPassword }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setRecoveryPassword("");
+        setShownRecoveryCode(json.recoveryCode);
+        setRecoveryCodeExists(true);
+      } else {
+        setRecoveryStatus(`❌ ${json.error || "No se pudo generar el código"}`);
+      }
+    } catch (err) {
+      setRecoveryStatus("❌ Error de red al generar el código");
+    } finally {
+      setGeneratingCode(false);
+    }
   };
 
   const handleChangePassword = async (e) => {
@@ -180,6 +219,10 @@ export default function AdminGalleryPage() {
         setNewPassword("");
         setConfirmPassword("");
         setPasswordStatus("✓ Contraseña cambiada. Se han cerrado las sesiones abiertas en otros dispositivos.");
+        if (json.recoveryCode) {
+          setShownRecoveryCode(json.recoveryCode);
+          setRecoveryCodeExists(true);
+        }
       } else {
         setPasswordStatus(`❌ ${json.error || "No se pudo cambiar la contraseña"}`);
       }
@@ -1830,7 +1873,7 @@ export default function AdminGalleryPage() {
 
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-          <div className="w-full max-w-md p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b-2 border-slate-800 pb-3">
               <h3 className="font-extrabold text-lg text-yellow-400 uppercase">
                 🔑 Cambiar Contraseña
@@ -1923,6 +1966,43 @@ export default function AdminGalleryPage() {
                 </button>
               </div>
             </form>
+
+            {shownRecoveryCode ? (
+              <RecoveryCodeBox code={shownRecoveryCode} />
+            ) : (
+              <form onSubmit={handleGenerateRecoveryCode} className="space-y-3 pt-4 border-t-2 border-slate-800">
+                <h4 className="font-extrabold text-sm text-yellow-400 uppercase">🛟 Código de recuperación</h4>
+                <p className="text-sm text-slate-300">
+                  {recoveryCodeExists === false
+                    ? "Todavía no tienes código de recuperación. Genéralo y apúntalo: te servirá para poner una contraseña nueva si olvidas la actual."
+                    : "Sirve para poner una contraseña nueva si olvidas la actual. Si has perdido el que apuntaste, genera otro: el anterior dejará de valer."}
+                </p>
+                <div>
+                  <label htmlFor="recoveryPassword" className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                    Contraseña actual:
+                  </label>
+                  <input
+                    id="recoveryPassword"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    value={recoveryPassword}
+                    onChange={(e) => setRecoveryPassword(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-semibold focus:outline-none focus:border-yellow-400"
+                  />
+                </div>
+                {recoveryStatus && <p className="text-sm font-bold text-red-300">{recoveryStatus}</p>}
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={generatingCode}
+                    className="px-5 py-2.5 rounded-xl bg-slate-700 text-white text-xs font-extrabold uppercase hover:bg-slate-600 disabled:opacity-50 cursor-pointer"
+                  >
+                    {generatingCode ? "Generando..." : recoveryCodeExists === false ? "Generar código" : "Generar código nuevo"}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
