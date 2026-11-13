@@ -7,8 +7,8 @@
     "dev": "next dev",
     "dev:php": "php -S localhost:8000 -t public public/api/dev-router.php",
     "prebuild": "node scripts/optimize-images.mjs",
-    "build": "next build",
-    "build:vercel": "node scripts/optimize-images.mjs && next build && node scripts/vercel-postbuild.mjs",
+    "build": "next build && node scripts/postbuild.mjs",
+    "build:vercel": "node scripts/optimize-images.mjs && next build && node scripts/postbuild.mjs && node scripts/vercel-postbuild.mjs",
     "lint": "eslint",
     "images": "node scripts/optimize-images.mjs",
     "tracklists": "node scripts/fetch-tracklists.mjs"

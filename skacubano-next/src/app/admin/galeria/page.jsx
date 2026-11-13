@@ -6,6 +6,7 @@ import Link from "next/link";
 import { compressImage, createImageVariants } from "@/components/gallery/ImageCompressor";
 import ShowsAdmin from "@/components/admin/ShowsAdmin";
 import { optimizedSrc, memberPhoto } from "@/lib/images";
+import RecoveryCodeBox from "@/components/admin/RecoveryCodeBox";
 
 export default function AdminGalleryPage() {
   const router = useRouter();
@@ -42,6 +43,10 @@ export default function AdminGalleryPage() {
   const [editEsPrincipal, setEditEsPrincipal] = useState(false);
   const [editEnCarrusel, setEditEnCarrusel] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+  // Nueva imagen para reemplazar la de la foto que se está editando (opcional)
+  const [editFile, setEditFile] = useState(null);
+  const [editFilePreview, setEditFilePreview] = useState("");
+  const [editFileVariants, setEditFileVariants] = useState(null);
 
   // Member State
   const [editingMember, setEditingMember] = useState(null);
@@ -87,6 +92,12 @@ export default function AdminGalleryPage() {
   const [showPasswordFields, setShowPasswordFields] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const [passwordStatus, setPasswordStatus] = useState("");
+  // Código de recuperación: solo se ve justo después de generarlo
+  const [recoveryCodeExists, setRecoveryCodeExists] = useState(null);
+  const [shownRecoveryCode, setShownRecoveryCode] = useState(null);
+  const [recoveryPassword, setRecoveryPassword] = useState("");
+  const [generatingCode, setGeneratingCode] = useState(false);
+  const [recoveryStatus, setRecoveryStatus] = useState("");
 
   useEffect(() => {
     checkAdmin();
@@ -150,13 +161,49 @@ export default function AdminGalleryPage() {
     setConfirmPassword("");
     setShowPasswordFields(false);
     setPasswordStatus("");
+    setShownRecoveryCode(null);
+    setRecoveryPassword("");
+    setRecoveryStatus("");
     setShowPasswordModal(true);
+    fetch("/api/admin/recovery-code")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((json) => setRecoveryCodeExists(json ? !!json.exists : null))
+      .catch(() => setRecoveryCodeExists(null));
+  };
+
+  const handleGenerateRecoveryCode = async (e) => {
+    e.preventDefault();
+    setGeneratingCode(true);
+    setRecoveryStatus("");
+    try {
+      const res = await fetch("/api/admin/recovery-code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword: recoveryPassword }),
+      });
+      const json = await res.json();
+      if (res.ok && json.success) {
+        setRecoveryPassword("");
+        setShownRecoveryCode(json.recoveryCode);
+        setRecoveryCodeExists(true);
+      } else {
+        setRecoveryStatus(`❌ ${json.error || "No se pudo generar el código"}`);
+      }
+    } catch (err) {
+      setRecoveryStatus("❌ Error de red al generar el código");
+    } finally {
+      setGeneratingCode(false);
+    }
   };
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (newPassword.length < 10) {
-      setPasswordStatus("❌ La nueva contraseña debe tener al menos 10 caracteres");
+    if (newPassword !== newPassword.trim()) {
+      setPasswordStatus("❌ La nueva contraseña no puede empezar ni acabar con espacios");
+      return;
+    }
+    if (newPassword.replace(/\s+/g, "").length < 10) {
+      setPasswordStatus("❌ La nueva contraseña debe tener al menos 10 caracteres (sin contar espacios)");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -178,6 +225,10 @@ export default function AdminGalleryPage() {
         setNewPassword("");
         setConfirmPassword("");
         setPasswordStatus("✓ Contraseña cambiada. Se han cerrado las sesiones abiertas en otros dispositivos.");
+        if (json.recoveryCode) {
+          setShownRecoveryCode(json.recoveryCode);
+          setRecoveryCodeExists(true);
+        }
       } else {
         setPasswordStatus(`❌ ${json.error || "No se pudo cambiar la contraseña"}`);
       }
@@ -304,10 +355,13 @@ export default function AdminGalleryPage() {
 
   const openEditPhoto = (photo) => {
     setEditingPhoto(photo);
+    setEditFile(null);
+    setEditFilePreview("");
+    setEditFileVariants(null);
     setEditDescripcion(photo.descripcion || "");
     setEditDescripcionEn(photo.descripcionEn || "");
     setEditFecha(photo.fecha || "");
-    setEditIntegranteId(photo.soloCarrusel ? "carrusel" : photo.integranteId || "banda");
+    setEditIntegranteId(photo.soloCarrusel ? "carrusel" : photo.integranteId || photo.seccionId || "banda");
     setEditEsPrincipal(!!photo.esPrincipal);
     setEditEnCarrusel(!!photo.enCarrusel);
   };
@@ -339,6 +393,25 @@ export default function AdminGalleryPage() {
     setSavingEdit(true);
 
     try {
+      // Primero se sustituye la imagen (si se ha elegido una nueva) y después se guardan los textos
+      if (editFile) {
+        const formData = new FormData();
+        formData.append("file", editFile);
+        if (editFileVariants) {
+          formData.append("thumb", editFileVariants.thumb);
+          formData.append("large", editFileVariants.large);
+        }
+        const fileRes = await fetch(`/api/gallery/photo/${editingPhoto.id}/file`, {
+          method: "POST",
+          body: formData,
+        });
+        const fileJson = await fileRes.json().catch(() => ({}));
+        if (!fileRes.ok || !fileJson.success) {
+          alert(fileJson.error || "Error al reemplazar la imagen");
+          return;
+        }
+      }
+
       const res = await fetch(`/api/gallery/photo/${editingPhoto.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -355,6 +428,8 @@ export default function AdminGalleryPage() {
       if (res.ok && json.data) {
         fetchData();
         setEditingPhoto(null);
+      } else {
+        alert(json.error || "Error al actualizar la foto");
       }
     } catch (err) {
       alert("Error al actualizar la foto");
@@ -668,7 +743,7 @@ export default function AdminGalleryPage() {
   const getFilteredPhotos = () => {
     let list = data.fotos;
     if (filterMember === "banda") {
-      list = list.filter((f) => !f.integranteId && !f.soloCarrusel);
+      list = list.filter((f) => !f.integranteId && !f.seccionId && !f.soloCarrusel);
     } else if (filterMember === "carrusel") {
       // También las "solo carrusel" ocultas, para poder volver a mostrarlas
       list = list.filter((f) => f.enCarrusel || f.soloCarrusel);
@@ -692,7 +767,7 @@ export default function AdminGalleryPage() {
   if (!authenticated) return null;
 
   const filteredPhotos = getFilteredPhotos();
-  const bandPhotosCount = data.fotos.filter((f) => !f.integranteId && !f.soloCarrusel).length;
+  const bandPhotosCount = data.fotos.filter((f) => !f.integranteId && !f.seccionId && !f.soloCarrusel).length;
   const carouselCount = data.fotos.filter((f) => f.enCarrusel).length;
   const seccionesList = data.secciones || [{ id: "banda", nombre: "Galería General de la Banda", slug: "banda" }];
 
@@ -1314,7 +1389,7 @@ export default function AdminGalleryPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {seccionesList.map((sec) => {
                 const isDefaultBanda = sec.id === "banda";
-                const secPhotosCount = data.fotos.filter((f) => f.seccionId === sec.id || (!f.integranteId && !f.soloCarrusel && isDefaultBanda)).length;
+                const secPhotosCount = data.fotos.filter((f) => f.seccionId === sec.id || (!f.integranteId && !f.seccionId && !f.soloCarrusel && isDefaultBanda)).length;
 
                 return (
                   <div
@@ -1907,7 +1982,7 @@ export default function AdminGalleryPage() {
 
       {showPasswordModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md">
-          <div className="w-full max-w-md p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
+          <div className="w-full max-w-md max-h-[90vh] overflow-y-auto p-6 rounded-2xl bg-slate-900 border-2 border-slate-700 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b-2 border-slate-800 pb-3">
               <h3 className="font-extrabold text-lg text-yellow-400 uppercase">
                 🔑 Cambiar Contraseña
@@ -2000,6 +2075,43 @@ export default function AdminGalleryPage() {
                 </button>
               </div>
             </form>
+
+            {shownRecoveryCode ? (
+              <RecoveryCodeBox code={shownRecoveryCode} />
+            ) : (
+              <form onSubmit={handleGenerateRecoveryCode} className="space-y-3 pt-4 border-t-2 border-slate-800">
+                <h4 className="font-extrabold text-sm text-yellow-400 uppercase">🔐 Código de recuperación</h4>
+                <p className="text-sm text-slate-300">
+                  {recoveryCodeExists === false
+                    ? "Todavía no tienes código de recuperación. Genéralo y apúntalo: te servirá para poner una contraseña nueva si olvidas la actual."
+                    : "Sirve para poner una contraseña nueva si olvidas la actual. Si has perdido el que apuntaste, genera otro: el anterior dejará de valer."}
+                </p>
+                <div>
+                  <label htmlFor="recoveryPassword" className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                    Contraseña actual:
+                  </label>
+                  <input
+                    id="recoveryPassword"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    value={recoveryPassword}
+                    onChange={(e) => setRecoveryPassword(e.target.value)}
+                    className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-semibold focus:outline-none focus:border-yellow-400"
+                  />
+                </div>
+                {recoveryStatus && <p className="text-sm font-bold text-red-300">{recoveryStatus}</p>}
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={generatingCode}
+                    className="px-5 py-2.5 rounded-xl bg-slate-700 text-white text-xs font-extrabold uppercase hover:bg-slate-600 disabled:opacity-50 cursor-pointer"
+                  >
+                    {generatingCode ? "Generando..." : recoveryCodeExists === false ? "Generar código" : "Generar código nuevo"}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}
@@ -2020,12 +2132,41 @@ export default function AdminGalleryPage() {
 
               <div className="flex items-center gap-4 bg-slate-950 p-3 rounded-xl border border-slate-800">
                 <div className="w-20 h-16 rounded-lg overflow-hidden bg-black shrink-0">
-                  <img src={optimizedSrc(editingPhoto, "large")} alt="Foto" className="w-full h-full object-cover" />
+                  <img src={editFilePreview || optimizedSrc(editingPhoto, "large")} alt="Foto" className="w-full h-full object-cover" />
                 </div>
                 <div className="text-xs text-slate-200 font-bold">
                   <p>ID: {editingPhoto.id}</p>
                   <p className="text-yellow-400 font-extrabold">Orden actual: #{editingPhoto.orden}</p>
+                  {editFile && <p className="text-orange-300 font-extrabold">Imagen nueva: se reemplazará al guardar</p>}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                  Reemplazar imagen (opcional):
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    let finalFile = file;
+                    try {
+                      finalFile = await compressImage(file);
+                    } catch (err) {
+                      finalFile = file;
+                    }
+                    // Versiones ligeras (400 y 1600 px) para la web pública, sacadas de la foto original
+                    setEditFileVariants(await createImageVariants(file));
+                    setEditFile(finalFile);
+                    setEditFilePreview(URL.createObjectURL(finalFile));
+                  }}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-bold file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-yellow-400 file:text-black hover:file:bg-yellow-300 cursor-pointer"
+                />
+                <p className="text-[11px] text-slate-400 font-semibold mt-1">
+                  Se conservan el pie de foto, la fecha, el integrante, el orden y el carrusel.
+                </p>
               </div>
 
               <div>

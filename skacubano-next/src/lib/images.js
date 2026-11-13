@@ -41,7 +41,7 @@ export function optimizedSrc(photo, size = "large") {
 export function memberPhoto(member, fotos = []) {
   const url = member?.fotoPrincipalUrl;
   if (url) return fotos.find((f) => f.url === url) || url;
-  return fotos.find((f) => f.integranteId === member?.id) || "/images/photos/bio_portrait_natty.jpg";
+  return fotos.find((f) => f.integranteId === member?.id) || "/images/placeholder-integrante.svg";
 }
 
 // Fotos en el mismo orden que la cuadrícula de la galería

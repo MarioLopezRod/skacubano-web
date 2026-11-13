@@ -50,14 +50,23 @@ export default function GaleriaPage() {
     }
   };
 
+  // Galería general: fotos que no son de ningún integrante ni de ninguna sección personalizada.
   // Siempre en el orden de la galería, para que el visor y la cuadrícula coincidan (la 1ª foto es "1 / n")
-  const bandPhotos = byOrder(data.fotos.filter((f) => !f.integranteId));
+  const bandPhotos = byOrder(data.fotos.filter((f) => !f.integranteId && !f.seccionId));
   const currentMember = data.integrantes.find((m) => m.id === activeTab);
+  // Secciones personalizadas creadas desde el panel (solo las que tienen fotos)
+  const sections = (data.secciones || []).filter(
+    (s) => s.id !== "banda" && data.fotos.some((f) => f.seccionId === s.id)
+  );
+  const currentSection = sections.find((s) => s.id === activeTab);
+  const sectionPhotos = currentSection ? byOrder(data.fotos.filter((f) => f.seccionId === currentSection.id)) : [];
 
   const lightboxPhotosScope = activeTab === "banda"
     ? bandPhotos
     : activeTab === "integrantes"
     ? byOrder(data.fotos)
+    : currentSection
+    ? sectionPhotos
     : byOrder(data.fotos.filter((f) => f.integranteId === activeTab));
 
   return (
@@ -129,6 +138,20 @@ export default function GaleriaPage() {
               ★ {g.tabBand} ({bandPhotos.length})
             </button>
 
+            {sections.map((sec) => (
+              <button
+                key={sec.id}
+                onClick={() => setActiveTab(sec.id)}
+                className={`px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer border shadow-lg shrink-0 ${
+                  activeTab === sec.id
+                    ? "bg-yellow-400 text-black border-yellow-300 shadow-[0_0_25px_rgba(250,204,21,0.5)] scale-105"
+                    : "bg-black/70 text-white/80 border-yellow-400/20 hover:border-yellow-400/60 hover:text-yellow-300"
+                }`}
+              >
+                📁 {sec.nombre} ({data.fotos.filter((f) => f.seccionId === sec.id).length})
+              </button>
+            ))}
+
             <button
               onClick={() => setActiveTab("integrantes")}
               className={`px-6 py-2.5 rounded-full text-xs font-mono font-bold uppercase tracking-wider transition-all duration-300 cursor-pointer border shadow-lg shrink-0 ${
@@ -180,6 +203,14 @@ export default function GaleriaPage() {
             {activeTab === "banda" && (
               <BandGalleryGrid
                 photos={bandPhotos}
+                onSelectPhoto={(photo) => setSelectedPhoto(photo)}
+              />
+            )}
+
+            {currentSection && (
+              <BandGalleryGrid
+                key={currentSection.id}
+                photos={sectionPhotos}
                 onSelectPhoto={(photo) => setSelectedPhoto(photo)}
               />
             )}
