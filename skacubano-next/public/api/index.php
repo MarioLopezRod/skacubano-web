@@ -971,14 +971,19 @@ function private_link_verify()
         json_response(['error' => 'Falta el identificador o la clave de acceso'], 400);
     }
 
+    // Protección contra fuerza bruta: tras 5 claves incorrectas desde la misma IP, bloqueo de 15 minutos
+    reject_if_locked('privado');
+
     $data = load_private_links();
     foreach ($data['links'] as $link) {
         if ($link['slug'] !== $slug) {
             continue;
         }
-        if (trim($link['clave']) !== trim($clave)) {
+        if (!hash_equals((string) $link['clave'], $clave)) {
+            register_failed_login('privado');
             json_response(['error' => 'La clave de acceso es incorrecta'], 401);
         }
+        clear_failed_logins('privado');
         // Cookie que permite descargar los adjuntos de este enlace durante unas horas
         grant_private_access($link);
         $out = private_link_out($link);
@@ -986,5 +991,7 @@ function private_link_verify()
         unset($out['clave']);
         json_response(['success' => true, 'link' => $out]);
     }
+    // Un slug inexistente también cuenta como intento fallido (si no, se podrían probar slugs sin límite)
+    register_failed_login('privado');
     json_response(['error' => 'El enlace privado no existe o ha caducado'], 404);
 }
