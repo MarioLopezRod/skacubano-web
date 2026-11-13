@@ -112,8 +112,13 @@ function validate_new_admin_password($password)
     if (strlen($password) > MAX_ADMIN_PASSWORD_BYTES) {
         return 'La contraseña es demasiado larga';
     }
-    if (mb_strlen($password, 'UTF-8') < MIN_ADMIN_PASSWORD_LENGTH) {
-        return 'La nueva contraseña debe tener al menos ' . MIN_ADMIN_PASSWORD_LENGTH . ' caracteres';
+    // Los espacios al principio o al final suelen ser un error al copiar y pegar: no se aceptan
+    if ($password !== trim($password)) {
+        return 'La nueva contraseña no puede empezar ni acabar con espacios';
+    }
+    // Los espacios no cuentan para la longitud mínima (una contraseña de solo espacios no vale)
+    if (mb_strlen(preg_replace('/\s+/u', '', $password), 'UTF-8') < MIN_ADMIN_PASSWORD_LENGTH) {
+        return 'La nueva contraseña debe tener al menos ' . MIN_ADMIN_PASSWORD_LENGTH . ' caracteres (sin contar espacios)';
     }
     if ($password === DEFAULT_ADMIN_PASSWORD) {
         return 'La nueva contraseña no puede ser la contraseña inicial';
@@ -123,56 +128,70 @@ function validate_new_admin_password($password)
 
 /* ── Límite de intentos de contraseña ──────────────────────────────── */
 
-function login_attempts_key()
+// Hay un contador por IP y por tipo de clave ($scope): 'admin' para el panel y 'privado' para los enlaces
+// privados. Así, un visitante que falla la clave de un enlace no bloquea el acceso al panel desde su IP.
+// Se cuentan los fallos durante LOGIN_LOCK_SECONDS desde el primero; al llegar a LOGIN_MAX_ATTEMPTS
+// se bloquea durante LOGIN_LOCK_SECONDS contados desde ese último fallo.
+
+function login_attempts_key($scope = 'admin')
 {
-    return hash('sha256', isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '');
+    $ip = isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+    return hash('sha256', $scope === 'admin' ? $ip : $scope . '|' . $ip);
+}
+
+// Si la entrada ya no cuenta (ventana de fallos o bloqueo terminados)
+function login_attempt_expired($entry, $now)
+{
+    if (!empty($entry['lockedAt'])) {
+        return $now - (int) $entry['lockedAt'] >= LOGIN_LOCK_SECONDS;
+    }
+    return $now - (int) $entry['first'] >= LOGIN_LOCK_SECONDS;
 }
 
 // Segundos que faltan para poder volver a intentarlo, o 0 si no hay bloqueo
-function login_lock_remaining()
+function login_lock_remaining($scope = 'admin')
 {
     $attempts = load_json_store('login_attempts.json', []);
-    $key = login_attempts_key();
-    if (!isset($attempts[$key])) {
+    $key = login_attempts_key($scope);
+    if (!isset($attempts[$key]) || empty($attempts[$key]['lockedAt'])) {
         return 0;
     }
-    $entry = $attempts[$key];
-    $elapsed = time() - (int) $entry['first'];
-    if ($elapsed >= LOGIN_LOCK_SECONDS || (int) $entry['count'] < LOGIN_MAX_ATTEMPTS) {
-        return 0;
-    }
-    return LOGIN_LOCK_SECONDS - $elapsed;
+    $remaining = LOGIN_LOCK_SECONDS - (time() - (int) $attempts[$key]['lockedAt']);
+    return max(0, $remaining);
 }
 
-function register_failed_login()
+function register_failed_login($scope = 'admin')
 {
     $attempts = load_json_store('login_attempts.json', []);
     $now = time();
     // Se descartan las entradas caducadas para que el fichero no crezca
     $attempts = array_filter($attempts, function ($entry) use ($now) {
-        return $now - (int) $entry['first'] < LOGIN_LOCK_SECONDS;
+        return !login_attempt_expired($entry, $now);
     });
-    $key = login_attempts_key();
+    $key = login_attempts_key($scope);
     if (!isset($attempts[$key])) {
         $attempts[$key] = ['count' => 0, 'first' => $now];
     }
     $attempts[$key]['count']++;
+    if ($attempts[$key]['count'] >= LOGIN_MAX_ATTEMPTS && empty($attempts[$key]['lockedAt'])) {
+        $attempts[$key]['lockedAt'] = $now;
+    }
     save_json_store('login_attempts.json', $attempts);
 }
 
-function clear_failed_logins()
+function clear_failed_logins($scope = 'admin')
 {
     $attempts = load_json_store('login_attempts.json', []);
-    $key = login_attempts_key();
+    $key = login_attempts_key($scope);
     if (isset($attempts[$key])) {
         unset($attempts[$key]);
         save_json_store('login_attempts.json', $attempts);
     }
 }
 
-function reject_if_locked()
+function reject_if_locked($scope = 'admin')
 {
-    $remaining = login_lock_remaining();
+    $remaining = login_lock_remaining($scope);
     if ($remaining > 0) {
         $minutes = (int) ceil($remaining / 60);
         json_response(['error' => 'Demasiados intentos fallidos. Prueba de nuevo en ' . $minutes . ' min.'], 429);

@@ -39,6 +39,9 @@ export default function AdminGalleryPage() {
   const [editEsPrincipal, setEditEsPrincipal] = useState(false);
   const [editEnCarrusel, setEditEnCarrusel] = useState(false);
   const [savingEdit, setSavingEdit] = useState(false);
+  // Nueva imagen para reemplazar la de la foto que se está editando (opcional)
+  const [editFile, setEditFile] = useState(null);
+  const [editFilePreview, setEditFilePreview] = useState("");
 
   // Member State
   const [editingMember, setEditingMember] = useState(null);
@@ -150,8 +153,12 @@ export default function AdminGalleryPage() {
 
   const handleChangePassword = async (e) => {
     e.preventDefault();
-    if (newPassword.length < 10) {
-      setPasswordStatus("❌ La nueva contraseña debe tener al menos 10 caracteres");
+    if (newPassword !== newPassword.trim()) {
+      setPasswordStatus("❌ La nueva contraseña no puede empezar ni acabar con espacios");
+      return;
+    }
+    if (newPassword.replace(/\s+/g, "").length < 10) {
+      setPasswordStatus("❌ La nueva contraseña debe tener al menos 10 caracteres (sin contar espacios)");
       return;
     }
     if (newPassword !== confirmPassword) {
@@ -291,10 +298,12 @@ export default function AdminGalleryPage() {
 
   const openEditPhoto = (photo) => {
     setEditingPhoto(photo);
+    setEditFile(null);
+    setEditFilePreview("");
     setEditDescripcion(photo.descripcion || "");
     setEditDescripcionEn(photo.descripcionEn || "");
     setEditFecha(photo.fecha || "");
-    setEditIntegranteId(photo.soloCarrusel ? "carrusel" : photo.integranteId || "banda");
+    setEditIntegranteId(photo.soloCarrusel ? "carrusel" : photo.integranteId || photo.seccionId || "banda");
     setEditEsPrincipal(!!photo.esPrincipal);
     setEditEnCarrusel(!!photo.enCarrusel);
   };
@@ -326,6 +335,21 @@ export default function AdminGalleryPage() {
     setSavingEdit(true);
 
     try {
+      // Primero se sustituye la imagen (si se ha elegido una nueva) y después se guardan los textos
+      if (editFile) {
+        const formData = new FormData();
+        formData.append("file", editFile);
+        const fileRes = await fetch(`/api/gallery/photo/${editingPhoto.id}/file`, {
+          method: "POST",
+          body: formData,
+        });
+        const fileJson = await fileRes.json().catch(() => ({}));
+        if (!fileRes.ok || !fileJson.success) {
+          alert(fileJson.error || "Error al reemplazar la imagen");
+          return;
+        }
+      }
+
       const res = await fetch(`/api/gallery/photo/${editingPhoto.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -342,6 +366,8 @@ export default function AdminGalleryPage() {
       if (res.ok && json.data) {
         fetchData();
         setEditingPhoto(null);
+      } else {
+        alert(json.error || "Error al actualizar la foto");
       }
     } catch (err) {
       alert("Error al actualizar la foto");
@@ -647,7 +673,7 @@ export default function AdminGalleryPage() {
   const getFilteredPhotos = () => {
     let list = data.fotos;
     if (filterMember === "banda") {
-      list = list.filter((f) => !f.integranteId && !f.soloCarrusel);
+      list = list.filter((f) => !f.integranteId && !f.seccionId && !f.soloCarrusel);
     } else if (filterMember === "carrusel") {
       list = list.filter((f) => f.enCarrusel);
     } else if (filterMember !== "todos") {
@@ -670,7 +696,7 @@ export default function AdminGalleryPage() {
   if (!authenticated) return null;
 
   const filteredPhotos = getFilteredPhotos();
-  const bandPhotosCount = data.fotos.filter((f) => !f.integranteId && !f.soloCarrusel).length;
+  const bandPhotosCount = data.fotos.filter((f) => !f.integranteId && !f.seccionId && !f.soloCarrusel).length;
   const seccionesList = data.secciones || [{ id: "banda", nombre: "Galería General de la Banda", slug: "banda" }];
 
   return (
@@ -1205,7 +1231,7 @@ export default function AdminGalleryPage() {
                   <div className="flex items-start gap-4">
                     <div className="w-20 h-24 rounded-xl overflow-hidden border-2 border-slate-700 bg-black shrink-0 relative">
                       <img
-                        src={m.fotoPrincipalUrl || "/images/photos/bio_portrait_natty.jpg"}
+                        src={m.fotoPrincipalUrl || "/images/placeholder-integrante.svg"}
                         alt={m.nombre}
                         className="w-full h-full object-cover"
                       />
@@ -1269,7 +1295,7 @@ export default function AdminGalleryPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {seccionesList.map((sec) => {
                 const isDefaultBanda = sec.id === "banda";
-                const secPhotosCount = data.fotos.filter((f) => f.seccionId === sec.id || (!f.integranteId && !f.soloCarrusel && isDefaultBanda)).length;
+                const secPhotosCount = data.fotos.filter((f) => f.seccionId === sec.id || (!f.integranteId && !f.seccionId && !f.soloCarrusel && isDefaultBanda)).length;
 
                 return (
                   <div
@@ -1917,12 +1943,39 @@ export default function AdminGalleryPage() {
 
               <div className="flex items-center gap-4 bg-slate-950 p-3 rounded-xl border border-slate-800">
                 <div className="w-20 h-16 rounded-lg overflow-hidden bg-black shrink-0">
-                  <img src={editingPhoto.url} alt="Foto" className="w-full h-full object-cover" />
+                  <img src={editFilePreview || editingPhoto.url} alt="Foto" className="w-full h-full object-cover" />
                 </div>
                 <div className="text-xs text-slate-200 font-bold">
                   <p>ID: {editingPhoto.id}</p>
                   <p className="text-yellow-400 font-extrabold">Orden actual: #{editingPhoto.orden}</p>
+                  {editFile && <p className="text-orange-300 font-extrabold">Imagen nueva: se reemplazará al guardar</p>}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-extrabold text-yellow-400 uppercase mb-1">
+                  Reemplazar imagen (opcional):
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    let finalFile = file;
+                    try {
+                      finalFile = await compressImage(file);
+                    } catch (err) {
+                      finalFile = file;
+                    }
+                    setEditFile(finalFile);
+                    setEditFilePreview(URL.createObjectURL(finalFile));
+                  }}
+                  className="w-full px-4 py-2.5 rounded-xl bg-slate-950 border-2 border-slate-700 text-white text-sm font-bold file:mr-4 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-yellow-400 file:text-black hover:file:bg-yellow-300 cursor-pointer"
+                />
+                <p className="text-[11px] text-slate-400 font-semibold mt-1">
+                  Se conservan el pie de foto, la fecha, el integrante, el orden y el carrusel.
+                </p>
               </div>
 
               <div>

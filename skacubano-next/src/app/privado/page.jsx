@@ -205,7 +205,7 @@ export default function PrivateDossierPage() {
                           👁️ Abrir
                         </a>
                         <a
-                          href={file.url}
+                          href={`${file.url}?download=1`}
                           download
                           className="px-3.5 py-2 rounded-xl bg-yellow-400 text-black hover:bg-yellow-300 font-extrabold text-xs uppercase transition-colors shadow"
                         >
@@ -242,7 +242,7 @@ export default function PrivateDossierPage() {
                         {file.nombre || "Foto de Escenario"}
                       </span>
                       <a
-                        href={file.url}
+                        href={`${file.url}?download=1`}
                         download
                         className="px-3 py-1.5 rounded-lg bg-yellow-400 text-black hover:bg-yellow-300 font-extrabold text-xs uppercase transition-colors shrink-0 shadow"
                       >
@@ -274,7 +274,7 @@ export default function PrivateDossierPage() {
             </span>
             <div className="flex items-center gap-3">
               <a
-                href={activePhoto.url}
+                href={`${activePhoto.url}?download=1`}
                 download
                 className="px-4 py-2 rounded-xl bg-yellow-400 text-black font-extrabold text-xs uppercase shadow hover:bg-yellow-300 transition-colors"
               >

@@ -14,6 +14,12 @@ if (!defined('PUBLIC_DIR')) {
 // Valor del selector de destino de una foto que solo va al carrusel de la portada
 const CARRUSEL_ID = 'carrusel';
 
+// Segundos durante los que vale la clave introducida en /privado/<slug> sin volver a pedirla (12 horas)
+const PRIVATE_ACCESS_TTL = 12 * 60 * 60;
+
+// Valores que usan el panel y la API con un significado especial: ningún integrante ni sección puede llamarse así
+const RESERVED_GALLERY_IDS = ['banda', 'carrusel', 'todos', 'integrantes', 'member', 'section', 'photo', 'reorder'];
+
 require __DIR__ . '/lib/helpers.php';
 require __DIR__ . '/lib/auth.php';
 
@@ -28,22 +34,16 @@ $path = preg_replace('#^.*?/api/#', '', rawurldecode($path));
 $path = trim($path, '/');
 $segments = $path === '' ? [] : explode('/', $path);
 
-// En PHP los PUT multipart no rellenan $_POST/$_FILES. En PHP 8.4 se procesan con request_parse_body().
-$putFiles = [];
-if ($method === 'PUT' && isset($_SERVER['CONTENT_TYPE']) && stripos($_SERVER['CONTENT_TYPE'], 'multipart/form-data') === 0) {
-    if (function_exists('request_parse_body')) {
-        list($_POST, $putFiles) = request_parse_body();
-    }
-}
+// Las peticiones con ficheros van siempre por POST: PHP no rellena $_POST/$_FILES en los PUT con ficheros.
 
 try {
-    route($method, $segments, $putFiles);
+    route($method, $segments);
 } catch (Throwable $e) {
     error_log('API error: ' . $e->getMessage());
     json_response(['error' => 'Error interno del servidor'], 500);
 }
 
-function route($method, $s, $putFiles)
+function route($method, $s)
 {
     $n = count($s);
     $first = $n > 0 ? $s[0] : '';
@@ -61,6 +61,7 @@ function route($method, $s, $putFiles)
         if ($n === 2 && $s[1] === 'reorder' && $method === 'PUT') return gallery_reorder();
         if ($n === 2 && $s[1] === 'member' && $method === 'POST') return member_create();
         if ($n === 2 && $s[1] === 'section' && $method === 'POST') return section_create();
+        if ($n === 4 && $s[1] === 'photo' && $s[3] === 'file' && $method === 'POST') return photo_replace_file($s[2]);
         if ($n === 3) {
             $id = $s[2];
             if ($s[1] === 'photo' && $method === 'PUT') return photo_update($id);
@@ -81,8 +82,9 @@ function route($method, $s, $putFiles)
         if ($n === 1 && $method === 'GET') return private_links_list();
         if ($n === 1 && $method === 'POST') return private_link_create();
         if ($n === 2 && $s[1] === 'verify' && $method === 'POST') return private_link_verify();
-        if ($n === 2 && ($method === 'PUT' || $method === 'POST')) return private_link_update($s[1], $method === 'PUT' ? $putFiles : $_FILES);
+        if ($n === 2 && $method === 'POST') return private_link_update($s[1]);
         if ($n === 2 && $method === 'DELETE') return private_link_delete($s[1]);
+        if ($n === 4 && $s[2] === 'files' && $method === 'GET') return private_file_serve($s[1], $s[3]);
     }
 
     json_response(['error' => 'Not found'], 404);
@@ -176,33 +178,28 @@ function gallery_upload()
         $enCarrusel = true;
     }
 
-    $files = uploaded_files('file');
-    $file = isset($files[0]) ? $files[0] : null;
-    if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
-        json_response(['error' => 'No file provided'], 400);
+    $data = get_gallery_data();
+    // Destino "sección personalizada": la sección va en 'seccionId', no en 'integranteId'
+    $seccionId = null;
+    if (is_section_id($data, $integranteId)) {
+        $seccionId = $integranteId;
+        $integranteId = null;
+        $esPrincipal = false;
     }
-    if (!allowed_extension($file['name'], false)) {
-        json_response(['error' => 'Tipo de archivo no permitido'], 400);
+    // La primera foto de un integrante que todavía no tiene foto principal pasa a serlo
+    if ($integranteId && !$esPrincipal && member_exists($data, $integranteId) && !member_has_main_photo($data, $integranteId)) {
+        $esPrincipal = true;
     }
-
-    $uploadsDir = PUBLIC_DIR . '/uploads/gallery';
-    ensure_dir($uploadsDir);
 
     $timestamp = now_ms();
-    $originalName = preg_replace('/[^a-zA-Z0-9.-]/', '_', $file['name']);
-    $fileName = $timestamp . '_' . $originalName;
+    $filePublicUrl = save_gallery_upload();
 
-    if (!move_upload($file, $uploadsDir . '/' . $fileName)) {
-        json_response(['error' => 'Upload failed'], 500);
-    }
-
-    $filePublicUrl = '/uploads/gallery/' . $fileName;
-    $data = get_gallery_data();
-
+    // El orden se cuenta dentro del mismo grupo (integrante, sección o galería general)
     $maxOrder = 0;
     foreach ($data['fotos'] as $f) {
         $fid = isset($f['integranteId']) ? $f['integranteId'] : null;
-        if ($fid === $integranteId) {
+        $sid = isset($f['seccionId']) ? $f['seccionId'] : null;
+        if ($fid === $integranteId && $sid === $seccionId) {
             $maxOrder = max($maxOrder, isset($f['orden']) ? (int) $f['orden'] : 0);
         }
     }
@@ -214,6 +211,7 @@ function gallery_upload()
         'descripcionEn' => $descripcionEn,
         'fecha' => $fecha,
         'integranteId' => $integranteId,
+        'seccionId' => $seccionId,
         'orden' => $maxOrder + 1,
         'esPrincipal' => $esPrincipal,
         'enCarrusel' => $enCarrusel,
@@ -228,6 +226,79 @@ function gallery_upload()
     save_gallery_data($data);
 
     json_response(['success' => true, 'photo' => $newPhoto, 'data' => $data]);
+}
+
+// Guarda la imagen recibida en el campo 'file' en /uploads/gallery y devuelve su URL pública
+// (o responde con error y termina)
+function save_gallery_upload()
+{
+    $files = uploaded_files('file');
+    $file = isset($files[0]) ? $files[0] : null;
+    if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+        json_response(['error' => 'No file provided'], 400);
+    }
+    if (!allowed_extension($file['name'], false)) {
+        json_response(['error' => 'Tipo de archivo no permitido'], 400);
+    }
+
+    $uploadsDir = PUBLIC_DIR . '/uploads/gallery';
+    ensure_dir($uploadsDir);
+
+    $originalName = preg_replace('/[^a-zA-Z0-9.-]/', '_', $file['name']);
+    $fileName = now_ms() . '_' . $originalName;
+
+    if (!move_upload($file, $uploadsDir . '/' . $fileName)) {
+        json_response(['error' => 'Upload failed'], 500);
+    }
+    return '/uploads/gallery/' . $fileName;
+}
+
+// Borra del disco una imagen de la galería, solo si se subió desde el panel (las de /images son del repositorio)
+function delete_gallery_file($url)
+{
+    if (strpos($url, '/uploads/') === 0 && strpos($url, '..') === false) {
+        $filePath = PUBLIC_DIR . $url;
+        if (is_file($filePath)) {
+            @unlink($filePath);
+        }
+    }
+}
+
+// Sustituye la imagen de una foto conservando sus datos (pie, fecha, integrante, orden, carrusel...)
+function photo_replace_file($id)
+{
+    require_admin();
+    $data = get_gallery_data();
+
+    $index = null;
+    foreach ($data['fotos'] as $i => $f) {
+        if ($f['id'] === $id) {
+            $index = $i;
+            break;
+        }
+    }
+    if ($index === null) {
+        json_response(['error' => 'Photo not found'], 404);
+    }
+
+    $oldUrl = $data['fotos'][$index]['url'];
+    $newUrl = save_gallery_upload();
+    $data['fotos'][$index]['url'] = $newUrl;
+
+    // Si era la foto de perfil de algún integrante, se actualiza también
+    foreach ($data['integrantes'] as &$m) {
+        if (isset($m['fotoPrincipalUrl']) && $m['fotoPrincipalUrl'] === $oldUrl) {
+            $m['fotoPrincipalUrl'] = $newUrl;
+        }
+    }
+    unset($m);
+
+    if (!save_gallery_data($data)) {
+        delete_gallery_file($newUrl);
+        json_response(['error' => 'No se pudo guardar'], 500);
+    }
+    delete_gallery_file($oldUrl);
+    json_response(['success' => true, 'photo' => $data['fotos'][$index], 'data' => $data]);
 }
 
 // Marca como no principal todas las fotos del integrante y actualiza su foto de perfil
@@ -292,10 +363,17 @@ function photo_update($id)
     $current = $data['fotos'][$index];
     $currentMember = isset($current['integranteId']) ? $current['integranteId'] : null;
     $soloCarrusel = !empty($current['soloCarrusel']);
+    $targetSectionId = isset($current['seccionId']) ? $current['seccionId'] : null;
     if (array_key_exists('integranteId', $body)) {
         $soloCarrusel = $body['integranteId'] === CARRUSEL_ID;
         $targetMemberId = ($body['integranteId'] === 'banda' || $body['integranteId'] === '' || $soloCarrusel) ? null : $body['integranteId'];
-        if ($soloCarrusel) {
+        $targetSectionId = null;
+        // Destino "sección personalizada": va en 'seccionId'
+        if (is_section_id($data, $targetMemberId)) {
+            $targetSectionId = $targetMemberId;
+            $targetMemberId = null;
+        }
+        if ($soloCarrusel || $targetSectionId !== null) {
             $body['esPrincipal'] = false;
         }
     } else {
@@ -311,6 +389,7 @@ function photo_update($id)
     $photo['descripcionEn'] = array_key_exists('descripcionEn', $body) ? $body['descripcionEn'] : (isset($current['descripcionEn']) ? $current['descripcionEn'] : '');
     $photo['fecha'] = array_key_exists('fecha', $body) ? $body['fecha'] : (isset($current['fecha']) ? $current['fecha'] : '');
     $photo['integranteId'] = $targetMemberId;
+    $photo['seccionId'] = $targetSectionId;
     $photo['esPrincipal'] = array_key_exists('esPrincipal', $body) ? (bool) $body['esPrincipal'] : !empty($current['esPrincipal']);
     // Fotos que se muestran en el carrusel de la portada (hero)
     $photo['enCarrusel'] = $soloCarrusel || (array_key_exists('enCarrusel', $body) ? (bool) $body['enCarrusel'] : !empty($current['enCarrusel']));
@@ -338,12 +417,7 @@ function photo_delete($id)
     }
 
     // Solo se borran del disco las fotos subidas desde el panel (las de /images son del repositorio)
-    if (strpos($photo['url'], '/uploads/') === 0 && strpos($photo['url'], '..') === false) {
-        $filePath = PUBLIC_DIR . $photo['url'];
-        if (is_file($filePath)) {
-            @unlink($filePath);
-        }
-    }
+    delete_gallery_file($photo['url']);
 
     $data['fotos'] = array_values(array_filter($data['fotos'], function ($f) use ($id) {
         return $f['id'] !== $id;
@@ -372,6 +446,47 @@ function photo_delete($id)
 
 /* ── Galería: integrantes ──────────────────────────────────────────── */
 
+// Devuelve $base, o $base-2, $base-3... si ya lo usa otro integrante, otra sección o es un valor reservado.
+// Integrantes y secciones comparten el mismo selector de destino al subir fotos, por eso no pueden repetirse.
+function unique_gallery_id($data, $base)
+{
+    $taken = RESERVED_GALLERY_IDS;
+    foreach ($data['integrantes'] as $m) {
+        $taken[] = $m['id'];
+    }
+    if (isset($data['secciones'])) {
+        foreach ($data['secciones'] as $sec) {
+            $taken[] = $sec['id'];
+        }
+    }
+    $id = $base;
+    $i = 2;
+    while (in_array($id, $taken, true)) {
+        $id = $base . '-' . $i++;
+    }
+    return $id;
+}
+
+function member_has_main_photo($data, $memberId)
+{
+    foreach ($data['integrantes'] as $m) {
+        if ($m['id'] === $memberId) {
+            return !empty($m['fotoPrincipalUrl']);
+        }
+    }
+    return false;
+}
+
+function member_exists($data, $memberId)
+{
+    foreach ($data['integrantes'] as $m) {
+        if ($m['id'] === $memberId) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function member_create()
 {
     require_admin();
@@ -384,8 +499,9 @@ function member_create()
     $data = get_gallery_data();
     $slug = slugify($nombre);
     if ($slug === '') {
-        $slug = 'member-' . now_ms();
+        $slug = 'member';
     }
+    $slug = unique_gallery_id($data, $slug);
 
     $newMember = [
         'id' => $slug,
@@ -393,12 +509,10 @@ function member_create()
         'slug' => $slug,
         'rol' => !empty($body['rol']) ? $body['rol'] : 'Integrante',
         'bio' => !empty($body['bio']) ? $body['bio'] : '',
-        'fotoPrincipalUrl' => !empty($body['fotoPrincipalUrl']) ? $body['fotoPrincipalUrl'] : '/images/photos/bio_portrait_natty.jpg',
+        // Sin foto: la web muestra su primera foto subida o una silueta. La primera foto que se suba será la principal.
+        'fotoPrincipalUrl' => !empty($body['fotoPrincipalUrl']) ? $body['fotoPrincipalUrl'] : '',
     ];
 
-    if (!isset($data['integrantes'])) {
-        $data['integrantes'] = [];
-    }
     $data['integrantes'][] = $newMember;
 
     save_gallery_data($data);
@@ -466,13 +580,15 @@ function section_create()
 
     $slug = slugify($nombre);
     if ($slug === '') {
-        $slug = 'section-' . now_ms();
+        $slug = 'section';
     }
+    // Se compara por nombre (no por id): el id puede llevar sufijo si coincidía con un integrante
     foreach ($data['secciones'] as $sec) {
-        if ($sec['id'] === $slug) {
+        if (slugify(isset($sec['nombre']) ? $sec['nombre'] : '') === slugify($nombre)) {
             json_response(['error' => 'Ya existe una sección con ese nombre'], 400);
         }
     }
+    $slug = unique_gallery_id($data, $slug);
 
     $newSection = ['id' => $slug, 'nombre' => $body['nombre'], 'slug' => $slug];
     $data['secciones'][] = $newSection;
@@ -630,17 +746,194 @@ function shows_save()
 
 /* ── Enlaces privados (riders técnicos) ────────────────────────────── */
 
+// Los adjuntos (PDF y fotos) se guardan en DATA_DIR/privado, una carpeta que no es accesible desde la web.
+// Solo se descargan a través de /api/private-links/<id>/files/<fileId>, que exige haber introducido la clave
+// del enlace (cookie firmada) o ser administrador.
+
+function private_files_dir()
+{
+    return DATA_DIR . '/privado';
+}
+
+// Ruta en disco de un adjunto. Si todavía está en la ubicación antigua (/uploads/privado, pública) o solo
+// existe en la semilla del repositorio, lo trae a DATA_DIR/privado. Devuelve null si no existe.
+function private_file_path($archivo)
+{
+    $archivo = basename((string) $archivo);
+    if ($archivo === '' || $archivo[0] === '.') {
+        return null;
+    }
+    $dir = private_files_dir();
+    ensure_dir($dir);
+    $path = $dir . '/' . $archivo;
+    if (is_file($path)) {
+        return $path;
+    }
+    $old = PUBLIC_DIR . '/uploads/privado/' . $archivo;
+    if (is_file($old) && @rename($old, $path)) {
+        return $path;
+    }
+    $seed = __DIR__ . '/seed/privado/' . $archivo;
+    if (is_file($seed) && @copy($seed, $path)) {
+        return $path;
+    }
+    return null;
+}
+
+function delete_private_file($entry)
+{
+    if (!empty($entry['archivo'])) {
+        $path = private_files_dir() . '/' . basename((string) $entry['archivo']);
+        if (is_file($path)) {
+            @unlink($path);
+        }
+    }
+}
+
+// Lee los enlaces privados. Los adjuntos guardados con el formato antiguo ('url' => '/uploads/privado/...')
+// se pasan al nuevo ('archivo') y se mueven fuera de la carpeta pública.
+function load_private_links()
+{
+    $data = get_private_links_data();
+    if (!isset($data['links']) || !is_array($data['links'])) {
+        $data['links'] = [];
+    }
+    $changed = false;
+    foreach ($data['links'] as &$link) {
+        if (!isset($link['fotos']) || !is_array($link['fotos'])) {
+            $link['fotos'] = [];
+        }
+        foreach ($link['fotos'] as &$f) {
+            if (empty($f['archivo']) && isset($f['url']) && preg_match('#^/uploads/privado/([^/]+)$#', $f['url'], $m)) {
+                $f['archivo'] = $m[1];
+                unset($f['url']);
+                $changed = true;
+                private_file_path($f['archivo']);
+            }
+        }
+        unset($f);
+    }
+    unset($link);
+    if ($changed) {
+        save_private_links_data($data);
+    }
+    return $data;
+}
+
+// Versión de un enlace para enviar al navegador: los adjuntos llevan la URL de descarga protegida
+// y nunca el nombre del fichero en disco
+function private_link_out($link)
+{
+    $out = [];
+    foreach ($link['fotos'] as $f) {
+        unset($f['archivo']);
+        $f['url'] = '/api/private-links/' . rawurlencode($link['id']) . '/files/' . rawurlencode($f['id']);
+        $out[] = $f;
+    }
+    $link['fotos'] = $out;
+    return $link;
+}
+
+function private_links_out($data)
+{
+    return ['links' => array_map('private_link_out', $data['links'])];
+}
+
+/* Acceso a los adjuntos: cookie firmada por enlace, ligada a su clave (si se cambia la clave, deja de valer) */
+
+function private_access_signature($link, $exp)
+{
+    $payload = $link['id'] . '|' . $exp . '|' . hash('sha256', (string) $link['clave']);
+    return hash_hmac('sha256', $payload, get_admin_secret());
+}
+
+function private_access_cookie_name($link)
+{
+    return 'skacubano_privado_' . substr(hash('sha256', $link['id']), 0, 16);
+}
+
+function grant_private_access($link)
+{
+    $exp = time() + PRIVATE_ACCESS_TTL;
+    setcookie(private_access_cookie_name($link), $exp . '.' . private_access_signature($link, $exp), [
+        'expires' => $exp,
+        'path' => '/api/private-links/' . rawurlencode($link['id']) . '/',
+        'secure' => is_https(),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+function has_private_access($link)
+{
+    if (get_admin_secret() === '') {
+        return false;
+    }
+    $name = private_access_cookie_name($link);
+    $value = isset($_COOKIE[$name]) ? (string) $_COOKIE[$name] : '';
+    $parts = explode('.', $value, 2);
+    if (count($parts) !== 2 || !ctype_digit($parts[0]) || (int) $parts[0] < time()) {
+        return false;
+    }
+    return hash_equals(private_access_signature($link, $parts[0]), $parts[1]);
+}
+
+function private_file_serve($linkId, $fileId)
+{
+    $data = load_private_links();
+    foreach ($data['links'] as $link) {
+        if ($link['id'] !== $linkId) {
+            continue;
+        }
+        if (!is_admin() && !has_private_access($link)) {
+            json_response(['error' => 'No autorizado'], 401);
+        }
+        foreach ($link['fotos'] as $f) {
+            if ($f['id'] !== $fileId) {
+                continue;
+            }
+            $path = isset($f['archivo']) ? private_file_path($f['archivo']) : null;
+            if ($path === null) {
+                break;
+            }
+            $types = [
+                'pdf' => 'application/pdf',
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'webp' => 'image/webp',
+            ];
+            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+            $nombre = isset($f['nombre']) && $f['nombre'] !== '' ? (string) $f['nombre'] : basename($path);
+            $ascii = preg_replace('/[^A-Za-z0-9._-]/', '_', $nombre);
+            $disposition = isset($_GET['download']) ? 'attachment' : 'inline';
+
+            header('Content-Type: ' . (isset($types[$ext]) ? $types[$ext] : 'application/octet-stream'));
+            header('Content-Length: ' . filesize($path));
+            header('Content-Disposition: ' . $disposition . '; filename="' . $ascii . '"; filename*=UTF-8\'\'' . rawurlencode($nombre));
+            header('X-Content-Type-Options: nosniff');
+            header('X-Robots-Tag: noindex, nofollow');
+            header('Cache-Control: private, max-age=3600');
+            readfile($path);
+            exit;
+        }
+        json_response(['error' => 'Archivo no encontrado'], 404);
+    }
+    json_response(['error' => 'Enlace privado no encontrado'], 404);
+}
+
 function private_links_list()
 {
     require_admin();
-    json_response(get_private_links_data());
+    json_response(private_links_out(load_private_links()));
 }
 
-// Guarda los ficheros adjuntos de un enlace privado y devuelve sus entradas
+// Guarda los ficheros adjuntos de un enlace privado (fuera de la carpeta pública) y devuelve sus entradas
 function save_private_files($files)
 {
     $out = [];
-    $uploadDir = PUBLIC_DIR . '/uploads/privado';
+    $uploadDir = private_files_dir();
     ensure_dir($uploadDir);
 
     foreach ($files as $i => $file) {
@@ -648,13 +941,13 @@ function save_private_files($files)
             continue;
         }
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $isPdf = $ext === 'pdf' || $file['type'] === 'application/pdf';
+        $isPdf = $ext === 'pdf';
         $filename = 'doc_' . now_ms() . '_' . $i . '.' . $ext;
 
         if (move_upload($file, $uploadDir . '/' . $filename)) {
             $out[] = [
                 'id' => 'file-' . now_ms() . '-' . $i,
-                'url' => '/uploads/privado/' . $filename,
+                'archivo' => $filename,
                 'nombre' => $file['name'],
                 'esPdf' => $isPdf,
                 'tipo' => $isPdf ? 'pdf' : 'imagen',
@@ -675,7 +968,7 @@ function private_link_create()
         json_response(['error' => 'El título y la clave son obligatorios'], 400);
     }
 
-    $data = get_private_links_data();
+    $data = load_private_links();
     $slug = slugify($titulo);
     if ($slug === '') {
         $slug = 'stage-' . now_ms();
@@ -701,27 +994,48 @@ function private_link_create()
     array_unshift($data['links'], $newLink);
     save_private_links_data($data);
 
-    json_response(['success' => true, 'link' => $newLink, 'data' => $data]);
+    json_response(['success' => true, 'link' => private_link_out($newLink), 'data' => private_links_out($data)]);
 }
 
-function private_link_update($id, $fileSource)
+function private_link_update($id)
 {
     require_admin();
-    $data = get_private_links_data();
+    $data = load_private_links();
 
     foreach ($data['links'] as $i => $link) {
         if ($link['id'] !== $id) {
             continue;
         }
 
-        $fotos = [];
+        // El navegador solo indica QUÉ adjuntos se conservan y en qué orden (por id). Los datos de cada uno
+        // salen siempre del servidor, para que nadie pueda apuntar a otro fichero del disco.
+        $keepIds = [];
         if (!empty($_POST['existingFotos'])) {
             $decoded = json_decode($_POST['existingFotos'], true);
             if (is_array($decoded)) {
-                $fotos = $decoded;
+                foreach ($decoded as $item) {
+                    if (is_array($item) && isset($item['id'])) {
+                        $keepIds[] = (string) $item['id'];
+                    }
+                }
             }
         }
-        $fotos = array_merge($fotos, save_private_files(uploaded_files('files', $fileSource)));
+        $current = [];
+        foreach ($link['fotos'] as $f) {
+            $current[$f['id']] = $f;
+        }
+        $fotos = [];
+        foreach ($keepIds as $keepId) {
+            if (isset($current[$keepId])) {
+                $fotos[] = $current[$keepId];
+                unset($current[$keepId]);
+            }
+        }
+        // Los adjuntos quitados se borran también del disco
+        foreach ($current as $removed) {
+            delete_private_file($removed);
+        }
+        $fotos = array_merge($fotos, save_private_files(uploaded_files('files')));
 
         if (!empty($_POST['titulo'])) {
             $link['titulo'] = $_POST['titulo'];
@@ -734,7 +1048,7 @@ function private_link_update($id, $fileSource)
         $data['links'][$i] = $link;
 
         save_private_links_data($data);
-        json_response(['success' => true, 'link' => $link, 'data' => $data]);
+        json_response(['success' => true, 'link' => private_link_out($link), 'data' => private_links_out($data)]);
     }
     json_response(['error' => 'Enlace privado no encontrado'], 404);
 }
@@ -742,12 +1056,21 @@ function private_link_update($id, $fileSource)
 function private_link_delete($id)
 {
     require_admin();
-    $data = get_private_links_data();
-    $data['links'] = array_values(array_filter($data['links'], function ($l) use ($id) {
-        return $l['id'] !== $id;
-    }));
+    $data = load_private_links();
+    $kept = [];
+    foreach ($data['links'] as $l) {
+        if ($l['id'] === $id) {
+            // Al borrar el enlace se borran también sus adjuntos del disco
+            foreach ($l['fotos'] as $f) {
+                delete_private_file($f);
+            }
+        } else {
+            $kept[] = $l;
+        }
+    }
+    $data['links'] = $kept;
     save_private_links_data($data);
-    json_response(['success' => true, 'data' => $data]);
+    json_response(['success' => true, 'data' => private_links_out($data)]);
 }
 
 function private_link_verify()
@@ -760,17 +1083,27 @@ function private_link_verify()
         json_response(['error' => 'Falta el identificador o la clave de acceso'], 400);
     }
 
-    $data = get_private_links_data();
+    // Protección contra fuerza bruta: tras 5 claves incorrectas desde la misma IP, bloqueo de 15 minutos
+    reject_if_locked('privado');
+
+    $data = load_private_links();
     foreach ($data['links'] as $link) {
         if ($link['slug'] !== $slug) {
             continue;
         }
-        if (trim($link['clave']) !== trim($clave)) {
+        if (!hash_equals((string) $link['clave'], $clave)) {
+            register_failed_login('privado');
             json_response(['error' => 'La clave de acceso es incorrecta'], 401);
         }
+        clear_failed_logins('privado');
+        // Cookie que permite descargar los adjuntos de este enlace durante unas horas
+        grant_private_access($link);
+        $out = private_link_out($link);
         // La clave no se devuelve nunca al visitante
-        unset($link['clave']);
-        json_response(['success' => true, 'link' => $link]);
+        unset($out['clave']);
+        json_response(['success' => true, 'link' => $out]);
     }
+    // Un slug inexistente también cuenta como intento fallido (si no, se podrían probar slugs sin límite)
+    register_failed_login('privado');
     json_response(['error' => 'El enlace privado no existe o ha caducado'], 404);
 }

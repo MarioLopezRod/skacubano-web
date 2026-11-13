@@ -37,8 +37,12 @@ npm run dev:php   # API PHP en http://localhost:8000
 npm run dev       # web en http://localhost:3000 (reenvía /api/* a PHP)
 ```
 
-En local los datos se guardan en `public/data/` y las fotos subidas en `public/uploads/gallery/`
-(ninguna de las dos carpetas se sube al repositorio).
+En local los datos (contraseña, galería, enlaces privados) se guardan en `.data/`, fuera de `public/`,
+y las fotos subidas en `public/uploads/gallery/`. Ninguna de las dos carpetas se sube al repositorio.
+Si tenías datos de pruebas en la antigua `public/data/`, puedes moverlos a `.data/` o borrarlos.
+
+`npm run build` borra de `out/` las carpetas `data/` y `uploads/gallery/` por si quedaran restos de pruebas
+en `public/`: así nunca se suben al hosting ni sobrescriben los datos reales.
 
 ## Web de prueba en Vercel (solo test, no es el proyecto final)
 
