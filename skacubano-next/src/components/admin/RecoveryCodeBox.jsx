@@ -18,7 +18,7 @@ export default function RecoveryCodeBox({ code }) {
 
   return (
     <div className="p-4 rounded-xl bg-black/80 border-2 border-yellow-400 space-y-3 text-left">
-      <p className="text-sm font-extrabold text-yellow-400 uppercase">🛟 Tu código de recuperación</p>
+      <p className="text-sm font-extrabold text-yellow-400 uppercase">🔐 Tu código de recuperación</p>
       <p className="font-mono text-lg sm:text-xl font-bold text-white tracking-wider text-center select-all break-all">
         {code}
       </p>

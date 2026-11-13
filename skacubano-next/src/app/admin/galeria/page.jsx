@@ -1971,7 +1971,7 @@ export default function AdminGalleryPage() {
               <RecoveryCodeBox code={shownRecoveryCode} />
             ) : (
               <form onSubmit={handleGenerateRecoveryCode} className="space-y-3 pt-4 border-t-2 border-slate-800">
-                <h4 className="font-extrabold text-sm text-yellow-400 uppercase">🛟 Código de recuperación</h4>
+                <h4 className="font-extrabold text-sm text-yellow-400 uppercase">🔐 Código de recuperación</h4>
                 <p className="text-sm text-slate-300">
                   {recoveryCodeExists === false
                     ? "Todavía no tienes código de recuperación. Genéralo y apúntalo: te servirá para poner una contraseña nueva si olvidas la actual."
