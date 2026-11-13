@@ -14,6 +14,9 @@ if (!defined('PUBLIC_DIR')) {
 // Valor del selector de destino de una foto que solo va al carrusel de la portada
 const CARRUSEL_ID = 'carrusel';
 
+// Segundos durante los que vale la clave introducida en /privado/<slug> sin volver a pedirla (12 horas)
+const PRIVATE_ACCESS_TTL = 12 * 60 * 60;
+
 require __DIR__ . '/lib/helpers.php';
 require __DIR__ . '/lib/auth.php';
 
@@ -83,6 +86,7 @@ function route($method, $s, $putFiles)
         if ($n === 2 && $s[1] === 'verify' && $method === 'POST') return private_link_verify();
         if ($n === 2 && ($method === 'PUT' || $method === 'POST')) return private_link_update($s[1], $method === 'PUT' ? $putFiles : $_FILES);
         if ($n === 2 && $method === 'DELETE') return private_link_delete($s[1]);
+        if ($n === 4 && $s[2] === 'files' && $method === 'GET') return private_file_serve($s[1], $s[3]);
     }
 
     json_response(['error' => 'Not found'], 404);
@@ -630,17 +634,194 @@ function shows_save()
 
 /* ── Enlaces privados (riders técnicos) ────────────────────────────── */
 
+// Los adjuntos (PDF y fotos) se guardan en DATA_DIR/privado, una carpeta que no es accesible desde la web.
+// Solo se descargan a través de /api/private-links/<id>/files/<fileId>, que exige haber introducido la clave
+// del enlace (cookie firmada) o ser administrador.
+
+function private_files_dir()
+{
+    return DATA_DIR . '/privado';
+}
+
+// Ruta en disco de un adjunto. Si todavía está en la ubicación antigua (/uploads/privado, pública) o solo
+// existe en la semilla del repositorio, lo trae a DATA_DIR/privado. Devuelve null si no existe.
+function private_file_path($archivo)
+{
+    $archivo = basename((string) $archivo);
+    if ($archivo === '' || $archivo[0] === '.') {
+        return null;
+    }
+    $dir = private_files_dir();
+    ensure_dir($dir);
+    $path = $dir . '/' . $archivo;
+    if (is_file($path)) {
+        return $path;
+    }
+    $old = PUBLIC_DIR . '/uploads/privado/' . $archivo;
+    if (is_file($old) && @rename($old, $path)) {
+        return $path;
+    }
+    $seed = __DIR__ . '/seed/privado/' . $archivo;
+    if (is_file($seed) && @copy($seed, $path)) {
+        return $path;
+    }
+    return null;
+}
+
+function delete_private_file($entry)
+{
+    if (!empty($entry['archivo'])) {
+        $path = private_files_dir() . '/' . basename((string) $entry['archivo']);
+        if (is_file($path)) {
+            @unlink($path);
+        }
+    }
+}
+
+// Lee los enlaces privados. Los adjuntos guardados con el formato antiguo ('url' => '/uploads/privado/...')
+// se pasan al nuevo ('archivo') y se mueven fuera de la carpeta pública.
+function load_private_links()
+{
+    $data = get_private_links_data();
+    if (!isset($data['links']) || !is_array($data['links'])) {
+        $data['links'] = [];
+    }
+    $changed = false;
+    foreach ($data['links'] as &$link) {
+        if (!isset($link['fotos']) || !is_array($link['fotos'])) {
+            $link['fotos'] = [];
+        }
+        foreach ($link['fotos'] as &$f) {
+            if (empty($f['archivo']) && isset($f['url']) && preg_match('#^/uploads/privado/([^/]+)$#', $f['url'], $m)) {
+                $f['archivo'] = $m[1];
+                unset($f['url']);
+                $changed = true;
+                private_file_path($f['archivo']);
+            }
+        }
+        unset($f);
+    }
+    unset($link);
+    if ($changed) {
+        save_private_links_data($data);
+    }
+    return $data;
+}
+
+// Versión de un enlace para enviar al navegador: los adjuntos llevan la URL de descarga protegida
+// y nunca el nombre del fichero en disco
+function private_link_out($link)
+{
+    $out = [];
+    foreach ($link['fotos'] as $f) {
+        unset($f['archivo']);
+        $f['url'] = '/api/private-links/' . rawurlencode($link['id']) . '/files/' . rawurlencode($f['id']);
+        $out[] = $f;
+    }
+    $link['fotos'] = $out;
+    return $link;
+}
+
+function private_links_out($data)
+{
+    return ['links' => array_map('private_link_out', $data['links'])];
+}
+
+/* Acceso a los adjuntos: cookie firmada por enlace, ligada a su clave (si se cambia la clave, deja de valer) */
+
+function private_access_signature($link, $exp)
+{
+    $payload = $link['id'] . '|' . $exp . '|' . hash('sha256', (string) $link['clave']);
+    return hash_hmac('sha256', $payload, get_admin_secret());
+}
+
+function private_access_cookie_name($link)
+{
+    return 'skacubano_privado_' . substr(hash('sha256', $link['id']), 0, 16);
+}
+
+function grant_private_access($link)
+{
+    $exp = time() + PRIVATE_ACCESS_TTL;
+    setcookie(private_access_cookie_name($link), $exp . '.' . private_access_signature($link, $exp), [
+        'expires' => $exp,
+        'path' => '/api/private-links/' . rawurlencode($link['id']) . '/',
+        'secure' => is_https(),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+function has_private_access($link)
+{
+    if (get_admin_secret() === '') {
+        return false;
+    }
+    $name = private_access_cookie_name($link);
+    $value = isset($_COOKIE[$name]) ? (string) $_COOKIE[$name] : '';
+    $parts = explode('.', $value, 2);
+    if (count($parts) !== 2 || !ctype_digit($parts[0]) || (int) $parts[0] < time()) {
+        return false;
+    }
+    return hash_equals(private_access_signature($link, $parts[0]), $parts[1]);
+}
+
+function private_file_serve($linkId, $fileId)
+{
+    $data = load_private_links();
+    foreach ($data['links'] as $link) {
+        if ($link['id'] !== $linkId) {
+            continue;
+        }
+        if (!is_admin() && !has_private_access($link)) {
+            json_response(['error' => 'No autorizado'], 401);
+        }
+        foreach ($link['fotos'] as $f) {
+            if ($f['id'] !== $fileId) {
+                continue;
+            }
+            $path = isset($f['archivo']) ? private_file_path($f['archivo']) : null;
+            if ($path === null) {
+                break;
+            }
+            $types = [
+                'pdf' => 'application/pdf',
+                'jpg' => 'image/jpeg',
+                'jpeg' => 'image/jpeg',
+                'png' => 'image/png',
+                'gif' => 'image/gif',
+                'webp' => 'image/webp',
+            ];
+            $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+            $nombre = isset($f['nombre']) && $f['nombre'] !== '' ? (string) $f['nombre'] : basename($path);
+            $ascii = preg_replace('/[^A-Za-z0-9._-]/', '_', $nombre);
+            $disposition = isset($_GET['download']) ? 'attachment' : 'inline';
+
+            header('Content-Type: ' . (isset($types[$ext]) ? $types[$ext] : 'application/octet-stream'));
+            header('Content-Length: ' . filesize($path));
+            header('Content-Disposition: ' . $disposition . '; filename="' . $ascii . '"; filename*=UTF-8\'\'' . rawurlencode($nombre));
+            header('X-Content-Type-Options: nosniff');
+            header('X-Robots-Tag: noindex, nofollow');
+            header('Cache-Control: private, max-age=3600');
+            readfile($path);
+            exit;
+        }
+        json_response(['error' => 'Archivo no encontrado'], 404);
+    }
+    json_response(['error' => 'Enlace privado no encontrado'], 404);
+}
+
 function private_links_list()
 {
     require_admin();
-    json_response(get_private_links_data());
+    json_response(private_links_out(load_private_links()));
 }
 
-// Guarda los ficheros adjuntos de un enlace privado y devuelve sus entradas
+// Guarda los ficheros adjuntos de un enlace privado (fuera de la carpeta pública) y devuelve sus entradas
 function save_private_files($files)
 {
     $out = [];
-    $uploadDir = PUBLIC_DIR . '/uploads/privado';
+    $uploadDir = private_files_dir();
     ensure_dir($uploadDir);
 
     foreach ($files as $i => $file) {
@@ -648,13 +829,13 @@ function save_private_files($files)
             continue;
         }
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        $isPdf = $ext === 'pdf' || $file['type'] === 'application/pdf';
+        $isPdf = $ext === 'pdf';
         $filename = 'doc_' . now_ms() . '_' . $i . '.' . $ext;
 
         if (move_upload($file, $uploadDir . '/' . $filename)) {
             $out[] = [
                 'id' => 'file-' . now_ms() . '-' . $i,
-                'url' => '/uploads/privado/' . $filename,
+                'archivo' => $filename,
                 'nombre' => $file['name'],
                 'esPdf' => $isPdf,
                 'tipo' => $isPdf ? 'pdf' : 'imagen',
@@ -675,7 +856,7 @@ function private_link_create()
         json_response(['error' => 'El título y la clave son obligatorios'], 400);
     }
 
-    $data = get_private_links_data();
+    $data = load_private_links();
     $slug = slugify($titulo);
     if ($slug === '') {
         $slug = 'stage-' . now_ms();
@@ -701,25 +882,46 @@ function private_link_create()
     array_unshift($data['links'], $newLink);
     save_private_links_data($data);
 
-    json_response(['success' => true, 'link' => $newLink, 'data' => $data]);
+    json_response(['success' => true, 'link' => private_link_out($newLink), 'data' => private_links_out($data)]);
 }
 
 function private_link_update($id, $fileSource)
 {
     require_admin();
-    $data = get_private_links_data();
+    $data = load_private_links();
 
     foreach ($data['links'] as $i => $link) {
         if ($link['id'] !== $id) {
             continue;
         }
 
-        $fotos = [];
+        // El navegador solo indica QUÉ adjuntos se conservan y en qué orden (por id). Los datos de cada uno
+        // salen siempre del servidor, para que nadie pueda apuntar a otro fichero del disco.
+        $keepIds = [];
         if (!empty($_POST['existingFotos'])) {
             $decoded = json_decode($_POST['existingFotos'], true);
             if (is_array($decoded)) {
-                $fotos = $decoded;
+                foreach ($decoded as $item) {
+                    if (is_array($item) && isset($item['id'])) {
+                        $keepIds[] = (string) $item['id'];
+                    }
+                }
             }
+        }
+        $current = [];
+        foreach ($link['fotos'] as $f) {
+            $current[$f['id']] = $f;
+        }
+        $fotos = [];
+        foreach ($keepIds as $keepId) {
+            if (isset($current[$keepId])) {
+                $fotos[] = $current[$keepId];
+                unset($current[$keepId]);
+            }
+        }
+        // Los adjuntos quitados se borran también del disco
+        foreach ($current as $removed) {
+            delete_private_file($removed);
         }
         $fotos = array_merge($fotos, save_private_files(uploaded_files('files', $fileSource)));
 
@@ -734,7 +936,7 @@ function private_link_update($id, $fileSource)
         $data['links'][$i] = $link;
 
         save_private_links_data($data);
-        json_response(['success' => true, 'link' => $link, 'data' => $data]);
+        json_response(['success' => true, 'link' => private_link_out($link), 'data' => private_links_out($data)]);
     }
     json_response(['error' => 'Enlace privado no encontrado'], 404);
 }
@@ -742,12 +944,21 @@ function private_link_update($id, $fileSource)
 function private_link_delete($id)
 {
     require_admin();
-    $data = get_private_links_data();
-    $data['links'] = array_values(array_filter($data['links'], function ($l) use ($id) {
-        return $l['id'] !== $id;
-    }));
+    $data = load_private_links();
+    $kept = [];
+    foreach ($data['links'] as $l) {
+        if ($l['id'] === $id) {
+            // Al borrar el enlace se borran también sus adjuntos del disco
+            foreach ($l['fotos'] as $f) {
+                delete_private_file($f);
+            }
+        } else {
+            $kept[] = $l;
+        }
+    }
+    $data['links'] = $kept;
     save_private_links_data($data);
-    json_response(['success' => true, 'data' => $data]);
+    json_response(['success' => true, 'data' => private_links_out($data)]);
 }
 
 function private_link_verify()
@@ -760,7 +971,7 @@ function private_link_verify()
         json_response(['error' => 'Falta el identificador o la clave de acceso'], 400);
     }
 
-    $data = get_private_links_data();
+    $data = load_private_links();
     foreach ($data['links'] as $link) {
         if ($link['slug'] !== $slug) {
             continue;
@@ -768,9 +979,12 @@ function private_link_verify()
         if (trim($link['clave']) !== trim($clave)) {
             json_response(['error' => 'La clave de acceso es incorrecta'], 401);
         }
+        // Cookie que permite descargar los adjuntos de este enlace durante unas horas
+        grant_private_access($link);
+        $out = private_link_out($link);
         // La clave no se devuelve nunca al visitante
-        unset($link['clave']);
-        json_response(['success' => true, 'link' => $link]);
+        unset($out['clave']);
+        json_response(['success' => true, 'link' => $out]);
     }
     json_response(['error' => 'El enlace privado no existe o ha caducado'], 404);
 }

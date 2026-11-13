@@ -9,25 +9,31 @@
       "fotos": [
         {
           "id": "img-1785064232146-0",
-          "url": "/uploads/privado/stage_1785064232145_0.png",
-          "nombre": "STAGEPLAN & MONITOR MIX & CHANEL LIST-1.png"
+          "nombre": "STAGEPLAN & MONITOR MIX & CHANEL LIST-1.png",
+          "archivo": "stage_1785064232145_0.png",
+          "esPdf": false,
+          "tipo": "imagen"
         },
         {
           "id": "img-1785064232147-1",
-          "url": "/uploads/privado/stage_1785064232146_1.jpg",
-          "nombre": "back of jewel case.jpg"
+          "nombre": "back of jewel case.jpg",
+          "archivo": "stage_1785064232146_1.jpg",
+          "esPdf": false,
+          "tipo": "imagen"
         },
         {
           "id": "img-1785064232149-2",
-          "url": "/uploads/privado/stage_1785064232148_2.jpg",
-          "nombre": "pages 7 & 8 copy.jpg"
+          "nombre": "pages 7 & 8 copy.jpg",
+          "archivo": "stage_1785064232148_2.jpg",
+          "esPdf": false,
+          "tipo": "imagen"
         },
         {
           "id": "file-1785330084952-0",
-          "url": "/uploads/privado/doc_1785330084951_0.pdf",
           "nombre": "backline.pdf",
           "esPdf": true,
-          "tipo": "pdf"
+          "tipo": "pdf",
+          "archivo": "doc_1785330084951_0.pdf"
         }
       ],
       "creadoEn": "2026-07-26T11:10:32.149Z",
