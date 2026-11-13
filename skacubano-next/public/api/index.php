@@ -61,6 +61,7 @@ function route($method, $s)
         if ($n === 2 && $s[1] === 'reorder' && $method === 'PUT') return gallery_reorder();
         if ($n === 2 && $s[1] === 'member' && $method === 'POST') return member_create();
         if ($n === 2 && $s[1] === 'section' && $method === 'POST') return section_create();
+        if ($n === 4 && $s[1] === 'photo' && $s[3] === 'file' && $method === 'POST') return photo_replace_file($s[2]);
         if ($n === 3) {
             $id = $s[2];
             if ($s[1] === 'photo' && $method === 'PUT') return photo_update($id);
@@ -183,27 +184,8 @@ function gallery_upload()
         $esPrincipal = true;
     }
 
-    $files = uploaded_files('file');
-    $file = isset($files[0]) ? $files[0] : null;
-    if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
-        json_response(['error' => 'No file provided'], 400);
-    }
-    if (!allowed_extension($file['name'], false)) {
-        json_response(['error' => 'Tipo de archivo no permitido'], 400);
-    }
-
-    $uploadsDir = PUBLIC_DIR . '/uploads/gallery';
-    ensure_dir($uploadsDir);
-
     $timestamp = now_ms();
-    $originalName = preg_replace('/[^a-zA-Z0-9.-]/', '_', $file['name']);
-    $fileName = $timestamp . '_' . $originalName;
-
-    if (!move_upload($file, $uploadsDir . '/' . $fileName)) {
-        json_response(['error' => 'Upload failed'], 500);
-    }
-
-    $filePublicUrl = '/uploads/gallery/' . $fileName;
+    $filePublicUrl = save_gallery_upload();
 
     $maxOrder = 0;
     foreach ($data['fotos'] as $f) {
@@ -234,6 +216,79 @@ function gallery_upload()
     save_gallery_data($data);
 
     json_response(['success' => true, 'photo' => $newPhoto, 'data' => $data]);
+}
+
+// Guarda la imagen recibida en el campo 'file' en /uploads/gallery y devuelve su URL pública
+// (o responde con error y termina)
+function save_gallery_upload()
+{
+    $files = uploaded_files('file');
+    $file = isset($files[0]) ? $files[0] : null;
+    if (!$file || $file['error'] !== UPLOAD_ERR_OK) {
+        json_response(['error' => 'No file provided'], 400);
+    }
+    if (!allowed_extension($file['name'], false)) {
+        json_response(['error' => 'Tipo de archivo no permitido'], 400);
+    }
+
+    $uploadsDir = PUBLIC_DIR . '/uploads/gallery';
+    ensure_dir($uploadsDir);
+
+    $originalName = preg_replace('/[^a-zA-Z0-9.-]/', '_', $file['name']);
+    $fileName = now_ms() . '_' . $originalName;
+
+    if (!move_upload($file, $uploadsDir . '/' . $fileName)) {
+        json_response(['error' => 'Upload failed'], 500);
+    }
+    return '/uploads/gallery/' . $fileName;
+}
+
+// Borra del disco una imagen de la galería, solo si se subió desde el panel (las de /images son del repositorio)
+function delete_gallery_file($url)
+{
+    if (strpos($url, '/uploads/') === 0 && strpos($url, '..') === false) {
+        $filePath = PUBLIC_DIR . $url;
+        if (is_file($filePath)) {
+            @unlink($filePath);
+        }
+    }
+}
+
+// Sustituye la imagen de una foto conservando sus datos (pie, fecha, integrante, orden, carrusel...)
+function photo_replace_file($id)
+{
+    require_admin();
+    $data = get_gallery_data();
+
+    $index = null;
+    foreach ($data['fotos'] as $i => $f) {
+        if ($f['id'] === $id) {
+            $index = $i;
+            break;
+        }
+    }
+    if ($index === null) {
+        json_response(['error' => 'Photo not found'], 404);
+    }
+
+    $oldUrl = $data['fotos'][$index]['url'];
+    $newUrl = save_gallery_upload();
+    $data['fotos'][$index]['url'] = $newUrl;
+
+    // Si era la foto de perfil de algún integrante, se actualiza también
+    foreach ($data['integrantes'] as &$m) {
+        if (isset($m['fotoPrincipalUrl']) && $m['fotoPrincipalUrl'] === $oldUrl) {
+            $m['fotoPrincipalUrl'] = $newUrl;
+        }
+    }
+    unset($m);
+
+    if (!save_gallery_data($data)) {
+        delete_gallery_file($newUrl);
+        json_response(['error' => 'No se pudo guardar'], 500);
+    }
+    delete_gallery_file($oldUrl);
+    json_response(['success' => true, 'photo' => $data['fotos'][$index], 'data' => $data]);
 }
 
 // Marca como no principal todas las fotos del integrante y actualiza su foto de perfil
@@ -344,12 +399,7 @@ function photo_delete($id)
     }
 
     // Solo se borran del disco las fotos subidas desde el panel (las de /images son del repositorio)
-    if (strpos($photo['url'], '/uploads/') === 0 && strpos($photo['url'], '..') === false) {
-        $filePath = PUBLIC_DIR . $photo['url'];
-        if (is_file($filePath)) {
-            @unlink($filePath);
-        }
-    }
+    delete_gallery_file($photo['url']);
 
     $data['fotos'] = array_values(array_filter($data['fotos'], function ($f) use ($id) {
         return $f['id'] !== $id;
